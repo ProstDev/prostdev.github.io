@@ -5,17 +5,24 @@
  * Driven by the optional `readerNotes` frontmatter array (see src/content.config.ts). Wix's
  * comment text is client-rendered and NOT recoverable from the page HTML, so these are supplied
  * by the user and kept VERBATIM — never fabricated. A note may carry a code snippet (e.g. a
- * reader's DataWeave solution), rendered with Astro's built-in <Code> so it picks up the SAME
- * Shiki config as body code (dual github-light/dark themes + the dataweave→scala langAlias) and
- * the existing `.astro-code` container styles in global.css — no new CSS needed. The page's
- * <CodeBlockEnhancer> (mounted after this in [slug].astro) gives these blocks the same Copy
- * affordance as body code.
+ * reader's DataWeave solution), rendered with Astro's built-in <Code>. NOTE: <Code> does NOT
+ * inherit astro.config.mjs's shikiConfig (that only governs fenced .md/.mdx body code), so the
+ * dual themes MUST be passed explicitly (`themes={{ light: 'github-light', dark: 'github-dark' }}`)
+ * or light-mode blocks render washed-out (a single dark theme on a light surface). The page's
+ * <CodeBlockEnhancer> (mounted after this in [slug].astro) was extended to also match
+ * `.reader-note pre.astro-code` so these blocks get the same header bar + Copy affordance as body
+ * code (they render OUTSIDE .prose, so a .prose-only query would miss them).
+ *
+ * Inline markup in a note's `text` is parsed by inlineSegments() below: `backtick` spans → <code>
+ * chips and bare http(s) URLs → autolinked <a>. Styled by `.reader-note code`/`.reader-note__link`
+ * in global.css (the .prose code/link rules don't reach outside .prose).
  *
  * Renders OUTSIDE the .prose <Content />, so its <h2> is intentionally absent from the
  * right-rail ToC. Mounted after the body, before the tags, in src/pages/post/[slug].astro.
  */
 import { Code } from 'astro:components';
 import { formatDate } from '@/lib/content';
+import Icon from './Icon.astro';
 
 interface Note {
   author: string;
@@ -31,6 +38,37 @@ interface Props {
 }
 
 const { notes } = Astro.props;
+
+/**
+ * Split a comment's prose into renderable inline segments. Two kinds of markup are recognized:
+ *   • `inline-code` spans (backtick-delimited) → <code> chips, and
+ *   • bare http(s) URLs → autolinked <a> (opens in a new tab + external icon, like the rest of
+ *     the site's "opens elsewhere" links).
+ * These notes live OUTSIDE .prose, so neither the .prose code-chip nor the .prose link rule can
+ * reach them — `.reader-note code`/`.reader-note a` in global.css style them. The .md endpoint
+ * serializes the verbatim text (backticks + bare URLs) for AEO, so both surfaces agree.
+ *
+ * URLs are only linked in NON-code segments — a URL that appears inside a `code` span (e.g. the
+ * Maven error string) stays literal code, never a link.
+ */
+const URL_SPLIT = /(https?:\/\/[^\s)]+[^\s).,;:!?])/g;
+const URL_ONE = /^https?:\/\/[^\s)]+[^\s).,;:!?]$/;
+
+function inlineSegments(text: string) {
+  return text
+    .split(/(`[^`]+`)/g)
+    .flatMap((seg) => {
+      if (seg.length > 1 && seg.startsWith('`') && seg.endsWith('`')) {
+        return [{ type: 'code' as const, value: seg.slice(1, -1) }];
+      }
+      return seg.split(URL_SPLIT).map((part) =>
+        URL_ONE.test(part)
+          ? { type: 'link' as const, value: part }
+          : { type: 'text' as const, value: part }
+      );
+    })
+    .filter((seg) => seg.value !== '');
+}
 ---
 <section aria-labelledby="reader-notes" class="mt-12 border-t border-default pt-8">
   <h2 id="reader-notes" class="text-lg font-bold">Reader notes</h2>
@@ -48,10 +86,29 @@ const { notes } = Astro.props;
           <span class="font-semibold text-[var(--text)]">{note.author}</span>
           {note.date && <span class="text-muted">· {formatDate(note.date)}</span>}
         </div>
-        {note.text && <p class="mt-2 text-[var(--text)]">{note.text}</p>}
+        {note.text && (
+          <p class="mt-2 whitespace-pre-line text-[var(--text)]">
+            {inlineSegments(note.text).map((seg) =>
+              seg.type === 'code' ? (
+                <code>{seg.value}</code>
+              ) : seg.type === 'link' ? (
+                <a href={seg.value} target="_blank" rel="noopener" class="reader-note__link">
+                  {seg.value}
+                  <Icon name="external" class="external-icon" />
+                </a>
+              ) : (
+                seg.value
+              )
+            )}
+          </p>
+        )}
         {note.code && (
           <div class="mt-3">
-            <Code code={note.code} lang={(note.lang ?? 'text') as any} />
+            <Code
+              code={note.code}
+              lang={(note.lang ?? 'text') as any}
+              themes={{ light: 'github-light', dark: 'github-dark' }}
+            />
           </div>
         )}
       </li>

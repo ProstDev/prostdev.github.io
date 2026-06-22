@@ -179,8 +179,11 @@ import Icon from './Icon.astro';
     }
   }
 
-  const root = document.querySelector('.prose');
-  if (root) {
-    root.querySelectorAll<HTMLElement>('pre.astro-code').forEach((pre, i) => enhance(pre, i));
-  }
+  // Enhance code blocks in the post body (.prose) AND in the reader-notes section
+  // (which renders OUTSIDE .prose, so it isn't covered by a single .prose query).
+  // One shared index keeps every collapsible region's id unique across both regions.
+  const blocks = document.querySelectorAll<HTMLElement>(
+    '.prose pre.astro-code, .reader-note pre.astro-code'
+  );
+  blocks.forEach((pre, i) => enhance(pre, i));
 </script>

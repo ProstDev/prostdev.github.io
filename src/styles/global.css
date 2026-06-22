@@ -493,6 +493,56 @@ summary,
   content: none;
 }
 
+/* ── Inline code in reader notes ──
+   ReaderNotes.astro renders OUTSIDE .prose, so the rule above can't reach its inline `code`
+   spans. Same chip treatment via the semantic --code-* tokens, but reader comments can carry a
+   very long inline string (e.g. a full Maven error), so the chip must WRAP rather than force
+   horizontal overflow (WCAG 1.4.10 Reflow) — overflow-wrap:anywhere breaks long unbroken tokens
+   (URLs, fully-qualified class names) inside the card. */
+.reader-note code:not(pre code) {
+  background-color: var(--code-bg);
+  border: 1px solid var(--code-border);
+  color: var(--code-text);
+  border-radius: 4px;
+  padding: 0.0625em 0.3125em;
+  font-size: 0.85em;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  /* A long inline string (e.g. a full Maven error) wraps across lines; clone the
+     border/background/padding onto EVERY line fragment so each line is a clean chip
+     instead of the default `slice` look (open-ended boxes with no left/right edge). */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ── Links in reader notes ──
+   ReaderNotes.astro autolinks bare URLs in comment prose; like inline code, these live OUTSIDE
+   .prose so the .prose link rule can't reach them. Use --accent-strong (AA in both themes —
+   plain --accent is only 3.46:1 on white) + an underline (color is not the only cue, WCAG 1.4.1)
+   + overflow-wrap so a long URL doesn't force horizontal scroll on mobile (WCAG 1.4.10). */
+.reader-note__link {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+.reader-note__link:hover {
+  text-decoration-thickness: 2px;
+}
+.reader-note__link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* The trailing "opens in a new tab" external-arrow icon (site convention). */
+.reader-note__link .external-icon {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-left: 0.15em;
+  vertical-align: -0.08em;
+}
+
 /* ── Prose links ──
    `post/[slug].astro` carries `prose-a:text-accent`, but `accent` is NOT a registered Tailwind
    color (only a hand-written `.text-accent` helper exists), so the `prose-a:` variant compiles

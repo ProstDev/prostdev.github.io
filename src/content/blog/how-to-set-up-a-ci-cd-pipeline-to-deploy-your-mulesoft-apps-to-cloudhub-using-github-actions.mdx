@@ -7,6 +7,137 @@ tags: [MuleSoft, GitHub Actions, CloudHub, CI/CD]
 youtubeId: fcFJ3Jhgaw4
 draft: false
 heroImage: ../../assets/blog/how-to-set-up-a-ci-cd-pipeline-to-deploy-your-mulesoft-apps-to-cloudhub-using-github-actions.png
+readerNotes:
+  - author: "Young Mitchell"
+    date: 2024-11-07
+    text: |-
+      Hello, Alex!
+      Thank you so much for your video and intruduction!
+      I sucessfully deployed with cloudhub2 branch's codes.
+      And now trying your main branch's.
+
+      Firstly, Action failed on deploy step with 401 code.
+      I find that you have nexus-ee auth info(action secret) in `.maven/setting.xml`, but I donnot have.
+      So,
+      I tried not to deploy with nexus-ee dependencies.
+      I delete profiles contents in `setting.xml` and tried again.
+      but failed with this error
+        `org.mule.maven.client.api.BundleDependenciesResolutionException: org.eclipse.aether.resolution.ArtifactResolutionException: com.github.everit-org.json-schema:org.everit.json.schema:jar:1.12.2 was not found in https://maven.anypoint.mulesoft.com/api/v3/maven during a previous attempt. This failure was cached in the local repository and resolution is not reattempted until the update interval of anypoint-exchange-v3 has elapsed or updates are forced`
+
+      I asked chatgpt sensei with this error, he asked me to import nexus-ee dependencies...
+
+      could you please tell me what should I do with this?
+  - author: "Alex Martinez"
+    replyTo: "Young Mitchell"
+    date: 2025-04-10
+    text: "If you try the main branch, you actually do need nexus credentials because of the MUnit tests :("
+  - author: "Kati Sarajärvi"
+    date: 2024-04-30
+    text: "I am unable to make the versioning work. I can to run the pipeline and get the application running in Runtime manager, but pushing new updates to main does not work. I have to delete the running app and only then can I run the pipeline successfully again, Is this a featrure or a bug?"
+  - author: "Alex Martinez"
+    replyTo: "Kati Sarajärvi"
+    date: 2024-04-30
+    text: "could you please share the error you're getting?"
+  - author: "willian souza vieira"
+    date: 2023-12-20
+    text: "I´m getting this error `Error: Failed to execute goal org.mule.tools.maven:mule-maven-plugin:3.8.2:deploy (default-deploy) on project salesforce-to-twilid: Deployment configuration is not valid, : No deployment configuration was defined. Aborting. -> [Help 1]`"
+  - author: "Alex Martinez"
+    replyTo: "willian souza vieira"
+    date: 2023-12-21
+    text: |-
+      Hello! You're missing the configuration in your `pom.xml` - at the beginning of the post it states the following:
+
+      We won't go into the details of creating a GitHub repo with your Mule application. You can take a look at the example repo we'll be using throughout the post so we can focus on explaining the CI/CD setup.
+
+      Please take a look at the repo: https://github.com/alexandramartinez/github-actions
+
+      You should configure something like this:
+    code: |-
+      <configuration>
+          <cloudHubDeployment>
+              <uri>https://anypoint.mulesoft.com</uri>
+              <muleVersion>${app.runtime}</muleVersion>
+              <username>${anypoint.username}</username>
+              <password>${anypoint.password}</password>
+              <applicationName>${app.name}</applicationName>
+              <environment>${env}</environment>
+              <workerType>MICRO</workerType>
+              <region>us-east-2</region>
+              <workers>1</workers>
+              <objectStoreV2>true</objectStoreV2>
+          </cloudHubDeployment>
+          <classifier>mule-application</classifier>
+      </configuration>
+    lang: "xml"
+  - author: "willian souza vieira"
+    replyTo: "Alex Martinez"
+    date: 2023-12-21
+    text: "Ok thanks for reply, it worked now : D"
+  - author: "Julian Redwood"
+    date: 2023-07-27
+    text: |-
+      Hi Alex, I tried to implement the workflow but I'm getting an error on "Build with MAven" section
+
+      "`Error: Failed to execute goal on project <projectname>: Could not resolve dependencies for project com.mycompany:projectname:mule-application:1.0.0-SNAPSHOT: Failed to collect dependencies at <> Failed to read artifact descriptor for 4<> Could not transfer artifact <> from/to anypoint-exchange-v3 (https://maven.anypoint.mulesoft.com/api/v3/maven): authentication failed for https://maven.anypoint.mulesoft.com/api/v3/<>, status: 401 Unauthorized -> [Help 1]`"
+
+      Any idea why?
+
+      Thank you
+  - author: "Alex Martinez"
+    replyTo: "Julian Redwood"
+    date: 2023-07-27
+    text: |-
+      Hi Julian! Make sure you're not using MFA and you're using the correct Anypoint Platform credentials (username/password).
+
+      You can also contact me if you're still having issues so we can troubleshoot together :)
+  - author: "Julian Redwood"
+    replyTo: "Alex Martinez"
+    date: 2023-07-28
+    text: "I ended up making the API spec public and that worked ok - not ideal but will get me over the line. Thank you and great set of videos/blogs."
+  - author: "Alex Martinez"
+    replyTo: "Julian Redwood"
+    date: 2023-07-28
+    text: "Ohh! Well, this project did not include the API spec. I'll try to play around with that in the future to understand better how that works. I'm glad you found a workaround at least!"
+  - author: "Wuilver Patricio"
+    date: 2023-03-08
+    text: |-
+      ¿Te funciona con la version actual de maven (`3.9.0`) que tiene el sistema operativo (ubuntu)?
+      Porque a mi no. Esto según entiendo es porque las versiones soportadas por mule maven plugin son de `3.6.3` a `3.8.6` (Mule Maven Plugin 3.8.0 Release Notes | MuleSoft Documentation)
+  - author: "Alex Martinez"
+    replyTo: "Wuilver Patricio"
+    date: 2023-03-08
+    text: |-
+      Puedes revisar el repositorio directamente para ver si hay algo diferente con tu proyecto. Pero a mí sí me funciona perfecto siguiendo las instrucciones de los posts.
+
+      Si lo intento correr localmente, yo estoy en Mac, mi maven es `3.8.4` y mi java es `8`. Pero si lo intentas correr desde GitHub Actions, no importa tu sistema operativo, simplemente se basa en lo que está en el `build.yml`
+
+      Avísame si esto contestó tu pregunta
+  - author: "Wuilver Patricio"
+    replyTo: "Alex Martinez"
+    date: 2023-03-09
+    text: "Todo parece indicar que depende de la imagen que cargue el runner, la version de maven no siempre es la misma, por lo que la ejecución falla aleatoriamente, lo que hice fue establecer una versión especifica en un paso del flujo de trabajo."
+  - author: "Alex Martinez"
+    replyTo: "Wuilver Patricio"
+    date: 2023-03-09
+    text: "Puedes postear aqui lo que agregaste en caso de que otras personas tengan el mismo problema?"
+  - author: "Wuilver Patricio"
+    replyTo: "Alex Martinez"
+    date: 2023-03-09
+    text: |-
+      Con lo cual se establece Apache Maven `3.6.3`, hice pruebas sobre el runner Ubuntu en las versiones soportadas por github-actions.
+
+      Y ya hay documentación del incidente:
+      Missing BasicRepositoryConnectorFactory With New Version of Apache Maven (3.9.0) | MuleSoft Help Center
+    code: |-
+      - name: "Setup maven"
+        run: |
+          sudo apt-get install maven
+          mvn -v
+    lang: "yaml"
+  - author: "Alex Martinez"
+    replyTo: "Wuilver Patricio"
+    date: 2023-03-10
+    text: "Muchas gracias!!"
 ---
 
 Creating CI/CD (Continuous Integration, Continuous Delivery) pipelines for your code has become a standard practice. Instead of worrying about deployments and keeping your environments up to date, you can set up this automated pipeline to do the deployments for you. You can focus on developing your code and let the pipeline take care of the rest.
