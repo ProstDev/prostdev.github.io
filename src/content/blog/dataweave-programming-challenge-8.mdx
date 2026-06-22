@@ -6,6 +6,93 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: 4BThMEAJ02s
 heroImage: ../../assets/blog/dataweave-programming-challenge-8.png
+readerNotes:
+  - author: Nicky van Steensel van der Aa
+    date: 2023-07-18
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      fun solve(x) =
+       if (sizeOf(x)==1) x
+       else solve((x reduce ((item, accumulator ) -> accumulator + item)))
+      ---
+      solve(payload splitBy('\n'))
+  - author: sai teja nallamallli
+    date: 2023-07-12
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      fun singleit(L:Array):Number=singleit(sum(L map singleit($ as Number default $)))
+      fun singleit(X:Null):Number =0
+      fun singleit(N: Number):Number = if (N==0) 0 else do{var res = (N mod 9)
+
+      ---
+      if(res==0) 9 else res}
+
+      fun singleit(Str :Any) : Number =0
+      ---
+      singleit(payload splitBy "\n")
+  - author: T. sc.
+    date: 2023-07-12
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import lines from dw::core::Strings
+      fun reduceToOneDigit(inputValue) = inputValue  match {
+          case d if(d is Number and sizeOf(d) == 1) -> d
+          else -> reduceToOneDigit($ reduce $$ + $)
+      }
+      ---
+      reduceToOneDigit(lines(payload))
+  - author: Diksha Dhanuka
+    date: 2023-07-12
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+
+
+      ---
+      payload splitBy ("\n") reduce ($+$$) reduce ($+$$) reduce($+$$)
+  - author: armandomejiam
+    date: 2023-07-12
+    text: "https://gist.github.com/armandomejiam/f49ea694e09f91bf6f0530920876186b"
+  - author: Nirmala Vairaganthan
+    date: 2023-07-11
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      fun add(num) = if (sizeOf(num) > 1) add(sum(num splitBy "")) else num
+      ---
+      add(sum(payload splitBy "\n"))
+  - author: Sudiptaa
+    date: 2023-07-11
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Strings
+
+      fun sumOfDigits(n) = if(sizeOf(n) == 1) n else sumOfDigits(n reduce($ + $$))
+      ---
+
+      sumOfDigits(sum(lines(payload) map ($))  splitBy  "")
+  - author: Victor Manuel Rodriguez
+    date: 2023-07-11
+    lang: dataweave
+    code: |
+      %dw 2.0
+      fun sumDigits(val) = using(result = sumValue(val)) if(result / 10 >= 1)
+      sumDigits("$(result)") else result
+
+      fun sumValue(val) = val reduce((item, acc = 0) -> (item as Number) + acc)
+      output application/json
+      ---
+      sumDigits(sumValue((read(payload, "text/plain") splitBy('\n'))))
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

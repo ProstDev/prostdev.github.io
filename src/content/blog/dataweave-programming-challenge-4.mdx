@@ -6,6 +6,83 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: _3GJtx-NK8M
 heroImage: ../../assets/blog/dataweave-programming-challenge-4.png
+readerNotes:
+  - author: armandomejiam
+    date: 2023-03-23
+    text: |
+      One of my favorites mathematical puzzles!
+      Here's a simple solution, without really moving individual disks :)
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+
+      fun minMoves (n: Number) = (2 pow n) - 1
+      var sourceTower = payload.towers filterObject !isEmpty($) mapObject (value: $)
+      ---
+      {
+          "moves": minMoves(payload.disks),
+          "disks": payload.disks,
+          "targetTower": payload.targetTower,
+          "towers": payload.towers mapObject ((value, key, index) -> {
+              (key): if (key ~= payload.targetTower) sourceTower.value else []
+          })
+      }
+  - author: Alex Martinez
+    date: 2023-03-23
+    replyTo: armandomejiam
+    text: |
+      hahaha yeah I didn't even thought of that when I was thinking of it tbh :D
+      Felix did the same thing in a short answer lol but try to move them!
+  - author: Felix Schnabel
+    date: 2023-03-21
+    text: |
+      Really cool challenge!😄
+      I think there are some open questions which should be described in the problem statement:
+      - Are there always 3 towers?
+      - Is the initial state of the towers always like in your sample inputs? So all disks are in order on another tower than the targetTower.
+      - Is it possible that there are two rings with the same number? (Probably not, but should be stated explicitly IMO)
+
+      I will try my luck with the challenge and post my solution (if I solve it 😂).
+  - author: Felix Schnabel
+    date: 2023-03-21
+    replyTo: Felix Schnabel
+    text: |
+      Here is my solution😄
+      https://gist.github.com/Shadow-Devil/e083bb04c4d0467a239932fd1cc03511
+  - author: Felix Schnabel
+    date: 2023-03-21
+    replyTo: Felix Schnabel
+    text: |
+      And my super super short solution (which is a bit like cheating):
+      https://gist.github.com/Shadow-Devil/fde7c8bf1994a07e26359cd411ed4a2a
+  - author: Alex Martinez
+    date: 2023-03-21
+    replyTo: Felix Schnabel
+    text: |
+      Thank you so much for your suggestions! I thought it was clear from the inputs, but I'll add those points too :)
+
+      - yes, always 3 towers
+      - the disks always start in order and the initial tower could be anything (except the targetTower)
+      - it's not possible to have two rings with the same number
+  - author: Alex Martinez
+    date: 2023-03-21
+    replyTo: Felix Schnabel
+    text: |
+      whoops! your solutions are not working for the 3 scenarios 😄
+      In the inputs section, there are 3 different payloads to try out :)
+  - author: Felix Schnabel
+    date: 2023-03-21
+    replyTo: Alex Martinez
+    text: "Are you sure? For me they work with my scripts 🤔"
+  - author: Alex Martinez
+    date: 2023-03-22
+    replyTo: Felix Schnabel
+    text: "Ahh!! you're right. I was taking the wrong input 😂"
+  - author: armandomejiam
+    date: 2023-03-23
+    replyTo: Felix Schnabel
+    text: 'I like your usage of "update" on this one'
 ---
 
 > [!NOTE]

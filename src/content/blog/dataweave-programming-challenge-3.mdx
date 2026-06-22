@@ -6,6 +6,236 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: 8owpvAhYfEs
 heroImage: ../../assets/blog/dataweave-programming-challenge-3.png
+readerNotes:
+  - author: Kevin Medina
+    date: 2024-02-23
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      import * from dw::core::Arrays
+      output application/json
+      fun getPalindromCount(text) = (lines(text) map ((sentence, index) -> do{
+          var cleanedSentence = lower(sentence mapString if (!isAlphanumeric($)) "" else $)
+          ---
+          if(reverse(cleanedSentence) == cleanedSentence) sizeOf(sentence) else 0
+      }))sumBy $
+      ---
+      getPalindromCount(payload)
+  - author: Kelvin Fernandes
+    date: 2023-10-23
+    lang: dataweave
+    code: |
+      %dw 2.0
+
+      import * from dw::core::Strings
+
+      var payloadLines = lines(payload)
+      var payloadLinesOnlyLetterAndNumbers = payloadLines map (
+          lower(
+              $ replace /[^A-Za-z0-9]/ with ""
+          )
+      )
+      var areTheyPalindromes = payloadLinesOnlyLetterAndNumbers map (
+          $ == reverse($)
+      )
+      var onlyPalindromesLines = (areTheyPalindromes map (
+          if($) ( payloadLines[$$] ) else ( null )
+      )) filter $ != null
+
+      output application/json
+      ---
+      /* Expected output: 148 */
+      sizeOf(onlyPalindromesLines joinBy "")
+  - author: Victor Manuel Rodriguez
+    date: 2023-07-11
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      fun isPalindrome(word) = word == reverse(word)
+      fun formatWord(word) = lower(word replace /[^\w\d]/ with "")
+
+      output application/json
+      ---
+      sum(lines(payload) map(if(isPalindrome(formatWord($))) sizeOf($) else 0))
+  - author: shwetabh singh
+    date: 2023-05-06
+    text: "Here is my approach:"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      fun checkPalindrome(a)= do{
+          import * from dw::core::Strings
+          var originalString = lower(a) replace /[\/,.'?!\s]/ with ""
+          var reverseString = reverse(originalString)
+          ---
+          if(reverseString == originalString) "Palindrome" else "Not Palindrome"
+
+      }
+      import * from dw::core::Strings
+      output application/json
+      ---
+      sum((lines(payload) map ((item, index) ->{
+          isPalindrome: checkPalindrome(item),
+          size: sizeOf(item)
+      } ) filter $.isPalindrome == "Palindrome").size)
+  - author: tafkamw
+    date: 2023-05-02
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+
+      import * from dw::core::Strings
+
+      var cleanString = (aString) ->
+          lower (aString mapString if( !isAlphanumeric($)) "" else $)
+      ---
+      lines(payload) map (
+          sizeOf(
+              if (cleanString($) == reverse(cleanString($))) $ else ""
+          )
+      )
+      reduce ($$ + $)
+  - author: mysg147
+    date: 2023-04-22
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      output application/json
+      fun str(inputstring) = lower(inputstring mapString if(isAlphanumeric($)) $ else "")
+      var x  = payload splitBy('\n')
+      var y = x map((val,in) ->
+      if(reverse(str(val)) == str(val)) sizeOf(val) else 0
+      )
+      ---
+      sum(y)
+  - author: Sudiptaa
+    date: 2023-03-28
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output json
+      import * from dw::core::Strings
+
+      fun isPalindrome(s) = do {
+          var str = lower(s) replace /[^a-zA-Z0-9]/ with ""
+          var revStr = lower(reverse(s)) replace /[^a-zA-Z0-9]/ with ""
+          ---
+          str == revStr
+      }
+      ---
+      sum((payload splitBy("\n") map
+      {
+
+      inputString : $,
+      countChars: sizeOf($),
+      isPalindrome: isPalindrome($)
+
+      } filter($.isPalindrome)).countChars)
+  - author: Monika Soni
+    date: 2023-03-22
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Strings
+      fun charcterstring(str) =  lower(str mapString (if(isAlphanumeric($)) $ else "" ))
+      ---
+      sum((lines(payload) map ( if (charcterstring($)== reverse(charcterstring($))) sizeOf($) else 0)))
+  - author: armandomejiam
+    date: 2023-03-10
+    text: "👌 This was my first approach, I was avoiding the usage of regex... then I checked your solution and I remember the existence of \"isAlphanumeric\" function, so I refactored my solution to make it a bit more clean:"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      output application/json
+
+      fun clearLine (line:String) = lower(line filter (isAlphanumeric ($)))
+      fun isPalindrome(line: String) = line == reverse(line)
+      ---
+      lines(payload) filter (isPalindrome(clearLine($))) reduce ((line, acc=0) -> acc+sizeOf(line))
+  - author: Abhijeet Kumar
+    date: 2023-03-07
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      output application/json
+      fun replaceSpecial(data:String) = (data replace  /[^a-z0-9A-Z]/ with "")
+      fun isPalindrome(data:String)=  if(lower(reverse(replaceSpecial(data))) == lower(replaceSpecial(data))) data else 0
+      ---
+      sum(payload splitBy("\n") map ((item, index) -> if(isPalindrome(item) == 0 ) 0 else sizeOf(item)  ))
+  - author: Felix Schnabel
+    date: 2023-03-07
+    text: "My solution:"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Arrays
+      import * from dw::core::Strings
+      ---
+      lines(payload)
+      filter(
+          lower($ filter isAlphanumeric($)) then $ == $[-1 to 0]
+      )
+      map sizeOf($)
+      then sum($)
+  - author: Shyam Raj Prasad
+    date: 2023-03-07
+    text: "My approach for this."
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import lines, isAlphanumeric, reverse from dw::core::Strings
+      output application/json
+      ---
+      lines(payload) reduce ((item, accumulator = 0) ->
+              do {
+                  var text = lower(item filter (isAlphanumeric($)))
+                  ---
+                  if(text == reverse(text)) sizeOf(item) + accumulator else accumulator + 0
+              }
+      )
+  - author: Stefano Bernardini
+    date: 2023-03-07
+    text: "I can do better than this, but it works! 😅"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+
+      fun removeStuff(p: String) = upper(p) then $ replace  /[^a-z0-9A-Z ]/ with "" then $ replace " " with ""
+
+      fun isPalindrome(p: String) = removeStuff(p) == removeStuff(p[-1 to 0])
+
+      ---
+      (
+      payload splitBy  "\n"
+      map (item, index) ->
+      {
+         "paly" : isPalindrome(item),
+         "size" : sizeOf(item)
+      })
+
+      filter $.paly
+
+      then sum($.size)
+  - author: prasadrnithin
+    date: 2023-03-07
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Strings
+      var split_phrases = lines(payload)
+      var alpha_numeric_strings = split_phrases map ((item, index) -> item filter (isAlphanumeric($)))
+      ---
+      sum(alpha_numeric_strings map ((item, index) -> if(lower(item) == lower(item)[-1 to 0]) sizeOf(split_phrases[index]) else 0))
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

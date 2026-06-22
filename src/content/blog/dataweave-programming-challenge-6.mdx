@@ -6,6 +6,88 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: fgzImvWfgHY
 heroImage: ../../assets/blog/dataweave-programming-challenge-6.png
+readerNotes:
+  - author: Nicky van Steensel van der Aa
+    date: 2023-07-18
+    text: |
+      For those using `dw::core::Arrays` slice
+      it excludes the last index, so select 20-26
+  - author: Nicky van Steensel van der Aa
+    date: 2023-07-18
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+
+      fun solve(x)=
+      x reduce (item, acc) -> ( (if(item > 0) acc + factorial(item) else acc))
+
+      fun factorial(x)=
+      2 to x reduce (item, acc) -> (acc*item)
+
+      ---
+
+      (solve(payload splitBy('\n')) splitBy(''))[20 to 25] joinBy("")
+  - author: Nirmala Vairaganthan
+    date: 2023-05-10
+    lang: dataweave
+    code: |
+      %dw 2.0
+      fun factorial(num)= num to 1 reduce ((item, accumulator) -> accumulator * item)
+      fun pos(val) = val[20 to 25]
+      ---
+      pos(sum((payload splitBy "\n" ) map factorial($))) as Number
+  - author: Disha Bhar
+    date: 2023-05-10
+    text: "Tried this out. :)"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      fun tailFactorial(n:Number, p:Number = 1) =
+          (if(n == 1 or n == 0)
+              p
+          else
+              tailFactorial(n-1, (p * n)))
+      output application/json
+      ---
+      (sum((payload splitBy "\n") filter($>0) map tailFactorial($ as Number) )as String)[20 to 25] as Number
+  - author: Felix Schnabel
+    date: 2023-05-09
+    text: "https://gist.github.com/Shadow-Devil/38922025e3ab95f18bc21633eae5f27f"
+  - author: Sudiptaa
+    date: 2023-05-09
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+
+      import lines from dw::core::Strings
+
+      fun factorial(n:Number,res:Number=1):Number = if (n == 1 or n ==0) res
+
+          else if (n < 0) 0
+
+          else factorial(n - 1,res * n)
+      ---
+
+      sum(lines(payload) map factorial($))[20 to 25] as Number
+  - author: Shyam Raj Prasad
+    date: 2023-05-09
+    text: "Solved using reduce."
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import lines from dw::core::Strings
+      output application/json
+      fun factorial(x) = 1 to x reduce ((item, accumulator) -> 
+          accumulator * item
+      )
+
+      ---
+      ((lines(payload) filter ($>0) reduce ((item, accumulator) ->
+          factorial(item) + accumulator
+       )) as String)[20 to 25] as Number
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

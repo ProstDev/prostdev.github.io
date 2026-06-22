@@ -6,6 +6,64 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: qBiFkditGbk
 heroImage: ../../assets/blog/dataweave-programming-challenge-7.png
+readerNotes:
+  - author: Sudiptaa
+    date: 2023-06-13
+    text: "Used tree:"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::util::Tree
+      ---
+      payload mapLeafValues ((value, path) ->
+
+      if(path.selector contains 'thisname') value else upper(value)
+
+       )
+  - author: Kenneth Brennan
+    date: 2023-06-13
+    text: "I went with a recursive solution:"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      fun capitalizeObject(item: Object) = do{
+        fun matchItem(item) = item match{
+          case item is Object -> item mapObject ((value, key, index) -> if(key as String == 'thisname') {(key): value} else {(key): matchItem(value)})
+          case item is Array -> item map ((item, index) -> matchItem(item))
+          case item is String -> upper(item)
+        }
+        ---
+        matchItem(item)
+      }
+      ---
+      capitalizeObject(payload)
+  - author: Alex Martinez
+    date: 2023-06-13
+    replyTo: Kenneth Brennan
+    text: |
+      I love love love that you're using the `do` keyword to create a local context. This function's structure can be used for any number of modifications in a recursive way. I love it!
+
+      The only downside being that if there are more than 255 fields (or recursive calls), you will reach the StackOverflow error. But if it's a small payload like this one, you're all good!
+
+      Thanks for sharing :D
+  - author: Kenneth Brennan
+    date: 2023-06-13
+    replyTo: Alex Martinez
+    text: "That pesky stack overflow, I'm not sure how to rewrite this in the same format using tail recursion and match, hard to conceptualize. Might give it another go when I get some free time. Thanks for posting these challenges, I enjoyed this one!"
+  - author: Shyam Raj Prasad
+    date: 2023-06-13
+    text: "My solution is similar to yours with extra type check of string."
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::util::Tree
+      ---
+      payload mapLeafValues ((value, path) ->
+        if(!(path[-1].selector == "thisname") and value is String) upper(value) else value
+      )
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

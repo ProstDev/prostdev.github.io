@@ -6,6 +6,71 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: Dk1MZQ7T-GM
 heroImage: ../../assets/blog/dataweave-programming-challenge-5.png
+readerNotes:
+  - author: decipherMiddleware
+    date: 2023-08-16
+    text: "My approach 🤓"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      output application/json
+      fun extract(text)=
+      do {
+          var list= words(text)
+          var punc= list map (if(isAlphanumeric($)) "" else $[-1])
+          var rev= list[-1 to 0] map ((if(isAlphanumeric($)) $ else $[0 to -2]) ++ punc[$$])
+          ---
+          rev joinBy(" ")
+      }
+
+      ---
+      payload splitBy("\n") map (line,key)-> extract(line)
+  - author: Felix Schnabel
+    date: 2023-04-18
+    text: |
+      My solution: https://gist.github.com/Shadow-Devil/c579da4418b135bd67869437bf999653
+      My first approach was wrong, I just inserted the special chars at the exact index where they were before 😂
+
+      So "a, bc" would be "b,c a" what's wrong of course
+  - author: Shyam Raj Prasad
+    date: 2023-04-18
+    text: "My approach for this."
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Strings
+      ---
+      /* Expected output:
+      [
+        "world Hello",
+        "you with be Fourth the May",
+        "world Hello!",
+        "Fourth the, May be you With",
+        "Fourth the, May be you With!"
+      ]
+      */
+      (payload splitBy  "\n") map (
+        do {
+            var  y = $ splitBy  " " map ($ filter isAlphanumeric($))
+            var x =($ splitBy " ") map if(isAlphanumeric($)) "" else $ filter !(isAlphanumeric($))
+        ---
+        y [-1 to 0] map (
+          $ ++ x[$$] 
+         ) joinBy  " "
+        }
+      )
+  - author: Alex Martinez
+    date: 2023-04-18
+    replyTo: Shyam Raj Prasad
+    text: "OH MY GOD SO EASY!!! Love it!!!"
+  - author: Felix Schnabel
+    date: 2023-04-18
+    replyTo: Shyam Raj Prasad
+    text: |
+      Damn, that solution is so nice.
+      I was kinda thinking in that direction but couldn't write it down
 ---
 
 > [!NOTE]
