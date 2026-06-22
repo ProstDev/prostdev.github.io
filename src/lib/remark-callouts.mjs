@@ -39,12 +39,15 @@ const TYPES = {
   // Special CTA — rendered as a pill anchor, not a box (see the PLAYGROUND branch below).
   // No `shapes` — its rocket is a 🚀 emoji glyph, not an inline SVG.
   PLAYGROUND: { type: 'playground', label: 'Open in DataWeave Playground' },
+  // Generic CTA pill — same accent button as PLAYGROUND but with NO rocket (label + external
+  // arrow only). For any "download this" / "go here" call-to-action recovered from a Wix button.
+  BUTTON: { type: 'button', label: 'Button' },
 };
 
 // External-arrow icon (Icon.astro `external`) — the site convention for "opens in a new tab".
 const EXTERNAL_SHAPES = [['path', { d: 'M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6' }]];
 
-const MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION|DOCS|PLAYGROUND)\][^\S\n]*\n?/;
+const MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION|DOCS|PLAYGROUND|BUTTON)\][^\S\n]*\n?/;
 
 const attr = (name, value) => ({ type: 'mdxJsxAttribute', name, value });
 const el = (name, attrs, children = []) => ({
@@ -87,25 +90,30 @@ export default function remarkCallouts() {
       // If that leaves an empty leading text node, drop it so the body doesn't start blank.
       if (firstText.value === '') firstPara.children.shift();
 
-      // PLAYGROUND — render a pill anchor instead of the title/body box. Find the first link in
-      // the (marker-stripped) blockquote body; its url is the href, its text the visible label.
-      if (def.type === 'playground') {
+      // PLAYGROUND / BUTTON — render a pill anchor instead of the title/body box. Find the first
+      // link in the (marker-stripped) blockquote body; its url is the href, its text the visible
+      // label. Both share the `.playground-btn` pill styling; PLAYGROUND adds a 🚀 rocket glyph.
+      if (def.type === 'playground' || def.type === 'button') {
         let link = null;
         visit(node, 'link', (n) => {
           if (!link) link = n;
         });
         if (!link) return; // no link to wrap — leave the blockquote untouched, don't crash.
+        const children = [];
+        if (def.type === 'playground') {
+          // Rocket EMOJI (not the SVG icon) — the author prefers the 🚀 glyph here.
+          children.push(
+            el('span', { class: 'playground-btn__icon', 'aria-hidden': 'true' }, [
+              { type: 'text', value: '🚀' },
+            ])
+          );
+        }
+        children.push(el('span', { class: 'playground-btn__label' }, link.children));
+        children.push(iconEl(EXTERNAL_SHAPES, 'playground-btn__ext'));
         const anchor = el(
           'a',
           { class: 'playground-btn', href: link.url, target: '_blank', rel: 'noopener' },
-          [
-            // Rocket EMOJI (not the SVG icon) — the author prefers the 🚀 glyph here.
-            el('span', { class: 'playground-btn__icon', 'aria-hidden': 'true' }, [
-              { type: 'text', value: '🚀' },
-            ]),
-            el('span', { class: 'playground-btn__label' }, link.children),
-            iconEl(EXTERNAL_SHAPES, 'playground-btn__ext'),
-          ]
+          children
         );
         parent.children[index] = anchor;
         return;
