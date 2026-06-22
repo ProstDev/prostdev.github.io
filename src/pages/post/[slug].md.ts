@@ -10,7 +10,7 @@ export async function getStaticPaths() {
 
 export const GET: APIRoute = async ({ props }) => {
   const { post } = props as { post: Awaited<ReturnType<typeof getPosts>>[number] };
-  const { title, description, author, pubDate, category, tags } = post.data;
+  const { title, description, author, pubDate, category, tags, readerNotes } = post.data;
 
   const frontmatter = [
     `# ${title}`,
@@ -50,7 +50,26 @@ export const GET: APIRoute = async ({ props }) => {
 
   const body = post.body ?? '';
 
-  return new Response(frontmatter + seriesBlock + body, {
+  // Curated reader comments preserved from the old Wix site (AEO) — mirrors ReaderNotes.astro.
+  // Verbatim; a note may carry a code snippet, serialized as a fenced block.
+  let notesBlock = '';
+  if (readerNotes && readerNotes.length > 0) {
+    notesBlock =
+      '\n\n---\n\n## Reader notes\n\n' +
+      readerNotes
+        .map((n) => {
+          const reply = n.replyTo ? `↳ Reply to ${n.replyTo} — ` : '';
+          const head = `${reply}**${n.author}**${n.date ? ` (${formatDate(n.date)})` : ''}`;
+          const prose = n.text ? `${head}: ${n.text}` : head;
+          const code = n.code
+            ? `\n\n\`\`\`${n.lang ?? ''}\n${n.code.replace(/\n+$/, '')}\n\`\`\``
+            : '';
+          return prose + code;
+        })
+        .join('\n\n');
+  }
+
+  return new Response(frontmatter + seriesBlock + body + notesBlock, {
     headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
   });
 };

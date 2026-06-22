@@ -106,6 +106,26 @@ const blog = defineCollection({
       heroImage: image().optional(),
       /** Optional related YouTube video to embed at the top of the post. */
       youtubeId: z.string().optional(),
+      /**
+       * Curated, genuinely-helpful reader comments preserved from the old Wix site. OPTIONAL;
+       * a post with none renders no section. Wix's comment text is client-rendered and NOT
+       * recoverable from the page HTML, so these are supplied by the user (copy/screenshot from
+       * the live post) and kept VERBATIM — never fabricated. A note may include a code snippet
+       * (e.g. a reader's DataWeave solution). Rendered by ReaderNotes.astro + the .md endpoint.
+       */
+      readerNotes: z
+        .array(
+          z.object({
+            author: z.string(),
+            text: z.string().optional(),
+            code: z.string().optional(),
+            lang: z.string().optional(),
+            date: z.coerce.date().optional(),
+            /** Author this note replies to — renders the note indented/nested as a reply. */
+            replyTo: z.string().optional(),
+          })
+        )
+        .optional(),
       draft: z.boolean().default(false),
     }),
 });

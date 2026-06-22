@@ -10,6 +10,7 @@ import CategoryBadge from '@/components/CategoryBadge.astro';
 import TagChip from '@/components/TagChip.astro';
 import Icon from '@/components/Icon.astro';
 import SeriesNav from '@/components/SeriesNav.astro';
+import ReaderNotes from '@/components/ReaderNotes.astro';
 import { Image } from 'astro:assets';
 import { getPosts, formatDate, readingTime, categoryUrl, getSeriesParts } from '@/lib/content';
 import { getSeriesForPost } from '@/data/series';
@@ -24,7 +25,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
-const { title, description, author, pubDate, updatedDate, category, tags, heroImage, youtubeId } = post.data;
+const { title, description, author, pubDate, updatedDate, category, tags, heroImage, youtubeId, readerNotes } = post.data;
 
 const url = new URL(`/post/${post.id}`, SITE.url).href;
 const mdUrl = `/post/${post.id}.md`;
@@ -129,6 +130,10 @@ const jsonLd = [
         <Content />
       </div>
       <CodeBlockEnhancer />
+
+      {readerNotes && readerNotes.length > 0 && (
+        <ReaderNotes notes={readerNotes} />
+      )}
 
       <!-- Tags -->
       {tags.length > 0 && (

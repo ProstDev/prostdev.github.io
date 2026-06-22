@@ -1,0 +1,60 @@
+---
+/**
+ * "Reader notes" — curated, genuinely-helpful reader comments preserved from the old Wix site.
+ *
+ * Driven by the optional `readerNotes` frontmatter array (see src/content.config.ts). Wix's
+ * comment text is client-rendered and NOT recoverable from the page HTML, so these are supplied
+ * by the user and kept VERBATIM — never fabricated. A note may carry a code snippet (e.g. a
+ * reader's DataWeave solution), rendered with Astro's built-in <Code> so it picks up the SAME
+ * Shiki config as body code (dual github-light/dark themes + the dataweave→scala langAlias) and
+ * the existing `.astro-code` container styles in global.css — no new CSS needed. The page's
+ * <CodeBlockEnhancer> (mounted after this in [slug].astro) gives these blocks the same Copy
+ * affordance as body code.
+ *
+ * Renders OUTSIDE the .prose <Content />, so its <h2> is intentionally absent from the
+ * right-rail ToC. Mounted after the body, before the tags, in src/pages/post/[slug].astro.
+ */
+import { Code } from 'astro:components';
+import { formatDate } from '@/lib/content';
+
+interface Note {
+  author: string;
+  text?: string;
+  code?: string;
+  lang?: string;
+  date?: Date;
+  replyTo?: string;
+}
+
+interface Props {
+  notes: Note[];
+}
+
+const { notes } = Astro.props;
+---
+<section aria-labelledby="reader-notes" class="mt-12 border-t border-default pt-8">
+  <h2 id="reader-notes" class="text-lg font-bold">Reader notes</h2>
+  <p class="mt-1 text-sm text-muted">Helpful comments preserved from the original post.</p>
+
+  <ul class="mt-5 space-y-4">
+    {notes.map((note) => (
+      <li class={`reader-note rounded-lg border border-default bg-surface-card p-4${note.replyTo ? ' ml-4 border-l-2 border-l-[var(--accent)] sm:ml-8' : ''}`}>
+        {note.replyTo && (
+          <p class="mb-1 text-xs text-muted">
+            <span aria-hidden="true">↳</span> Reply to {note.replyTo}
+          </p>
+        )}
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+          <span class="font-semibold text-[var(--text)]">{note.author}</span>
+          {note.date && <span class="text-muted">· {formatDate(note.date)}</span>}
+        </div>
+        {note.text && <p class="mt-2 text-[var(--text)]">{note.text}</p>}
+        {note.code && (
+          <div class="mt-3">
+            <Code code={note.code} lang={(note.lang ?? 'text') as any} />
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
+</section>
