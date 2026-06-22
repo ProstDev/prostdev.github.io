@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistGrid from '@/components/PlaylistGrid.astro';
+import { getPlaylist, videosInPlaylist } from '@/data/videos';
+
+const playlist = getPlaylist('curietech')!;
+const videos = videosInPlaylist('curietech');
+---
+<BaseLayout title="From Zero to API with CurieTech AI" description={playlist.description}>
+  <PlaylistGrid
+    playlist={playlist}
+    videos={videos}
+    hook="In this step-by-step series, we go from absolutely nothing to a fully functional MuleSoft API — with the help of CurieTech AI and Anypoint Code Builder (ACB)."
+  />
+</BaseLayout>

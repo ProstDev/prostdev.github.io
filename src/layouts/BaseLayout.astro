@@ -1,0 +1,53 @@
+---
+import '@/styles/global.css';
+import Seo from '@/components/Seo.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import SearchModal from '@/components/SearchModal.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: string;
+  canonical?: string;
+  noindex?: boolean;
+  follow?: boolean;
+  jsonLd?: Record<string, unknown>[];
+  /** Constrain main content width. Disable for full-bleed landing pages. */
+  contained?: boolean;
+}
+
+const { contained = true, ...seo } = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="alternate" type="application/rss+xml" title="ProstDev Blog" href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+    <!-- Set theme before paint to avoid flash of incorrect theme -->
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = stored ?? (prefersDark ? 'dark' : 'light');
+          document.documentElement.dataset.theme = theme;
+        } catch {}
+      })();
+    </script>
+    <Seo {...seo} />
+  </head>
+  <body class="flex min-h-screen flex-col bg-surface text-default">
+    <Header />
+    <main class:list={['flex-1', contained && 'mx-auto w-full max-w-6xl px-4 sm:px-6']}>
+      <slot />
+    </main>
+    <Footer />
+    <SearchModal />
+  </body>
+</html>

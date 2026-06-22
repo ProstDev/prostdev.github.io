@@ -1,0 +1,82 @@
+---
+title: "3 ways to import a function/module in DataWeave 2.0"
+description: >-
+  There are different ways to import a module in DataWeave for functions that aren't part of
+  the core: import the module directly, import all functions from a module, or import one or
+  more specific functions from a module.
+pubDate: 2021-04-20
+category: Guides
+tags: [MuleSoft, DataWeave]
+heroImage: ../../assets/blog/3-ways-to-import-a-function-module-in-dataweave-2-0.png
+---
+
+There are different ways to import a module in DataWeave. You need to do this for the modules that are not a part of the [core functions](https://docs.mulesoft.com/mule-runtime/4.3/dw-core). Here is a list of all the modules in DataWeave: [Mule Docs - DataWeave Reference](https://docs.mulesoft.com/mule-runtime/4.3/dw-functions).
+
+## 1. Import module directly
+
+You can simply import the module without specifying the functions’ names. If you do this, you will need to reference the module every time you want to use that module’s function. Like this:
+
+```dataweave
+%dw 2.0
+output application/json
+import dw::core::Strings
+---
+Strings::capitalize("alex martinez")
+```
+
+To reference the function, you need to use the name of the module, then add two colons (::), and finally, the name of the function. After doing this, you can continue using the function as usual.
+
+## 2. Import all functions from a module
+
+You can import all of the functions from the module by using the asterisk (*) and using the keyword “from.” This will let you use the function directly without referencing the module’s name every time. Like this:
+
+```dataweave
+%dw 2.0
+output application/json
+import * from dw::core::Arrays
+---
+{
+   field1: [true, false] every ($),
+   field2: [true, false] some ($)
+}
+```
+
+This approach, however, will import all of the functions that are found inside the module. Normally, this doesn’t affect performance. But I personally want to see which functions exactly I am importing to my code. For example, in the previous script, I don’t know if “every” or “some” are functions that come from the Arrays module or if they’re core functions. For this reason, my favorite approach is the 3rd option described below.
+
+## 3. Import one or more functions from a module
+
+To explicitly import each function separately, you have to list them instead of just writing the asterisk (*). Like this:
+
+```dataweave
+%dw 2.0
+output application/json
+import every, some from dw::core::Arrays
+---
+{
+   field1: [true, false] every ($),
+   field2: [true, false] some ($)
+}
+```
+
+This will still let you call the function directly. The difference is that you’ll have to list all of the functions you’re using. I prefer this approach because sometimes you may not know which function comes from which module (especially for big scripts). With this, you can just search for the function and see which module is importing it.
+
+Of course, it can become annoying if you’re changing functions often, and you remove and re-add them several times. You will also get an error if you forget to list one of the functions that you’re using.
+
+For example, the following script shows an error because the “some” function is not listed in the import statement:
+
+```dataweave
+%dw 2.0
+output application/json
+import every from dw::core::Arrays
+---
+{
+   field1: [true, false] every ($),
+   field2: [true, false] some ($) // Unable to resolve reference of: `some`.
+}
+```
+
+The option you choose really depends on your personal preference or the standards of your project.
+
+By the way, do you know how to create your own modules and reference them for your DataWeave scripts? If not, check this out! - [Custom Modules in Mule 4 - DataWeave 2.0](https://www.prostdev.com/post/custom-modules-in-mule-4-dataweave-2-0).
+
+-Alex

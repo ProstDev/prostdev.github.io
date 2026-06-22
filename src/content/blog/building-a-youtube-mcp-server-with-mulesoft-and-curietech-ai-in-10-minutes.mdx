@@ -1,0 +1,154 @@
+---
+title: Building a YouTube MCP Server with MuleSoft and CurieTech AI in 10 Minutes
+description: >-
+  Learn how to build a YouTube Data API MCP server using MuleSoft and CurieTech
+  AI in 10 minutes. Full setup, testing, and Claude integration tutorial
+  included.
+pubDate: 2025-06-19
+category: Tutorials
+tags: [MuleSoft, CurieTech AI, AI, Anypoint Code Builder, GitHub]
+youtubeId: EE1QLCuzGVk
+draft: false
+heroImage: ../../assets/blog/building-a-youtube-mcp-server-with-mulesoft-and-curietech-ai-in-10-minutes.png
+---
+
+Curious how to integrate the YouTube Data API v3 into a fully functioning MCP (Model Context Protocol) server in record time? With the help of CurieTech AI and MuleSoft, I did it in just 10 minutes, without ever having created an MCP server before.
+
+In this article, I’ll walk you through what I did step-by-step — including how I used CurieTech to generate the entire integration, converted it into an MCP server, and ran it using SuperGateway and the MCP Inspector. I also show how you can connect this to Claude or other apps and use natural language to run YouTube searches via the MCP server.
+
+🔗 **GitHub Repo:** [https://github.com/alexandramartinez/youtube-mcp-server-mule](https://github.com/alexandramartinez/youtube-mcp-server-mule)
+
+## 🧠 What Is MCP?
+
+MCP stands for **Model Context Protocol**, a new protocol designed for agents, AI tools, and other automated systems to interact with structured tools in a flexible and self-describing way. MCP tools define schemas, input parameters, and responses — and are ideal for agent-based use cases.
+
+> In other words... It's an API for your agents.
+
+## 🛠️ What We’re Building
+
+A MuleSoft app that:
+
+- Connects to the **YouTube Data API v3**
+- Accepts search queries and API keys as parameters
+- Returns YouTube search results
+- Runs as an **MCP server** with full schema and parameter validation
+
+## 🔑 Step 1: Get Your YouTube API Key
+
+To use the YouTube API, you'll need an API key from Google Cloud:
+
+- Go to [Google Cloud Console](https://console.cloud.google.com/).
+- Create a project.
+- Enable the **YouTube Data API v3**.
+- Under **APIs & Services > Credentials**, create a new **API Key**.
+- Under **API Restrictions**, select **YouTube Data API v3**.
+- Save your changes and copy the key — you'll use it in your requests.
+
+## 🧪 Step 2: Generate the API with CurieTech AI
+
+Inside [CurieTech AI](https://curietech.ai):
+
+- Go to the **Integration Generator**.
+- Set the language to **Java 17**, build tool to **Maven 3.9**, and **Mule 4.9**.
+- Use a prompt like:
+
+"Make an API that uses YouTube Data API v3. Include all query parameters, especially key, and make it as simple as possible."
+
+- Paste the list of parameters from the [official docs](https://developers.google.com/youtube/v3/docs/search/list) or paste the URL.
+- CurieTech generates the full integration — copy the code.
+
+## 💻 Step 3: Run the App in MuleSoft
+
+- Create a new Mule project in **Anypoint Code Builder** or **Studio**.
+- Paste the code from CurieTech.
+- Run the project (default port is 8081).
+- Use Postman to test:
+
+```
+GET http://localhost:8081/search?key=YOUR_API_KEY&q=mulesoft
+```
+
+## 🤖 Step 4: Convert to an MCP Server
+
+- Push your Mule project to GitHub (or use VS Code's repo initializer).
+- In CurieTech, open the **Coding Agent** and select your repo.
+- Prompt:
+
+"Turn this into an MCP server using the beta MCP connector."
+
+- CurieTech updates the code, modifies the `pom.xml`, adds a global MCP config, and replaces the HTTP listener with an MCP listener.
+- Approve the PR in GitHub and merge.
+
+## 🚦 Step 5: Run SuperGateway
+
+- Open a terminal window.
+- Run the following command (ensure the port matches your Mule app's HTTP Listener):
+
+```bash
+npx -y supergateway --sse http://localhost:8081/sse --ssePath /sse --messagePath /message
+```
+
+## 🔍 Step 6: Open MCP Inspector
+
+- Open a new terminal window and run:
+
+```bash
+npx @modelcontextprotocol/inspector
+```
+
+- Copy the tokenized URL (e.g., http://localhost:6274/?MCP_PROXY_AUTH_TOKEN=...) into your browser.
+- Select SSE as the transport type
+- Paste the following URL:
+
+```
+http://0.0.0.0:8081/sse
+```
+
+- Click Connect
+- Select the youtube-search tool
+- Enter your API Key and query
+- Click on Run Tool
+
+## 🤝 Step 7: Add the Server to Your App (e.g., Claude)
+
+Add the following to your Claude or other AI agent config:
+
+```json
+{
+  "mcpServers": {
+    "youtube": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "http://0.0.0.0:8081/sse",
+        "--ssePath",
+        "/sse",
+        "--messagePath",
+        "/message"
+      ]
+    }
+  }
+}
+```
+
+Restart your app, and you're ready to use it in natural language prompts!
+
+## 🧠 Example Prompts You Can Use
+
+Inside Claude (or any compatible tool):
+
+- “Search for the ProstDev YouTube channel and return the last 4 videos.”
+- “Generate a LinkedIn post that promotes the first video. Include the title, description, and video link.”
+- “Find trending content about ‘API design’ using YouTube search.”
+
+## 📦 Repo
+
+🔗 **GitHub Repo:** [https://github.com/alexandramartinez/youtube-mcp-server-mule](https://github.com/alexandramartinez/youtube-mcp-server-mule)
+
+## 🧭 Final Thoughts
+
+I had never worked with MCP before — and I built this whole server in 10 minutes thanks to **CurieTech AI**. The entire flow, from integration to deployment and testing, was smoother than I imagined. If you learn by reading code like I do, this is one of the fastest ways to master new patterns like MCP.
+
+Whether you're building for fun, research, or AI-driven platforms, give this a try and let me know what you build next!

@@ -1,0 +1,45 @@
+---
+import type { Playlist, Video } from '@/data/videos';
+import VideoCard from './VideoCard.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  playlist: Playlist;
+  videos: Video[];
+  /** Link the heading to the playlist's section page. */
+  headingHref?: string;
+}
+const { playlist, videos, headingHref } = Astro.props;
+const rowId = `row-${playlist.id}`;
+---
+{videos.length > 0 && (
+  <section class="py-6">
+    <div class="mb-4 flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <h2 class="text-lg font-bold text-default sm:text-xl">
+          {headingHref ? (
+            <a href={headingHref} class="hover:text-accent">{playlist.title}</a>
+          ) : (
+            playlist.title
+          )}
+        </h2>
+        {playlist.years && (
+          <p class="mt-0.5 text-sm text-muted">{playlist.years}</p>
+        )}
+      </div>
+      {playlist.playlistUrl && (
+        <a href={playlist.playlistUrl} target="_blank" rel="noopener" class="shrink-0 text-sm font-medium text-accent hover:underline">
+          Full playlist ↗
+        </a>
+      )}
+    </div>
+
+    <div class="relative">
+      <div id={rowId} class="no-scrollbar flex snap-x gap-4 overflow-x-auto scroll-smooth pb-2">
+        {videos.map((v) => (
+          <div class="snap-start"><VideoCard video={v} compact /></div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

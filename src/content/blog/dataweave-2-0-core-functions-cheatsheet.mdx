@@ -1,0 +1,420 @@
+---
+title: "DataWeave 2.0 core functions cheatsheet"
+description: "A compilation of all the core functions that can be used in DataWeave 2.0 according to MuleSoft's official documentation, separated by input and output, with a link to each function's official documentation page."
+pubDate: 2021-01-19
+category: Guides
+tags: [MuleSoft, DataWeave]
+heroImage: ../../assets/blog/dataweave-2-0-core-functions-cheatsheet-1.png
+---
+
+This is a compilation of all the core functions that can be used in DataWeave 2.0 according to [MuleSoft's official documentation](https://docs.mulesoft.com/dataweave/latest/dw-core), separated by input and output.
+
+The link to each function's official documentation page is provided in the list. There you can find more details about the functions and examples of how to use them.
+
+You can use ctrl+F or cmd+F to search for specific keywords and get to the function you're looking for.
+
+> [!IMPORTANT]
+> This cheatsheet has been last updated for **DataWeave version 2.12** (Mule 4.12).
+
+## Array to Array
+
+**Input:** Array | **Output:** Array
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+- [Minus minus (--)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-minusminus) - Removes specified values from an input value.
+- [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) - Iterates over the input and returns the unique elements in it.
+- [filter](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-filter) - Iterates over an array and applies an expression that returns matching values.
+- [find](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-find) - Returns indices of an input that match a specified value.
+- [flatMap](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-flatmap) - Iterates over each item in an array and flattens the results.
+- [flatten](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-flatten) - Turns a set of subarrays into a single, flattened array.
+- [map](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-map) - Iterates over items in an array and outputs the result into a new array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest array according to the provided expression.
+- [orderBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-orderby) - Reorders the array's elements based on the given criteria.
+- [reduce](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-reduce) - Applies a reduction expression to the elements in the array.
+- [unzip](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-unzip) - Groups the values of the given sub-arrays by matching indices (or indexes) and returns new sub-arrays with the matching indices. *Note: performs the opposite of zip.*
+- [zip](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-zip) - Merges elements from two arrays into an array of arrays. *Note: performs the opposite of unzip.*
+
+## Array to Boolean
+
+**Input:** Array | **Output:** Boolean
+
+- [contains](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-contains) - Returns true if an input contains a given value, false if not.
+- [isEmpty](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isempty) - Returns true if the given input value is empty, false if not.
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest boolean according to the provided expression.
+- [reduce](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-reduce) - Applies a reduction expression to the elements in the array.
+
+## Array to Date
+
+**Input:** Array | **Output:** Date
+
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest date according to the provided expression.
+
+## Array to DateTime
+
+**Input:** Array | **Output:** DateTime
+
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest datetime according to the provided expression.
+
+## Array to LocalDateTime
+
+**Input:** Array | **Output:** LocalDateTime
+
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest localdatetime according to the provided expression.
+
+## Array to LocalTime
+
+**Input:** Array | **Output:** LocalTime
+
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest localtime according to the provided expression.
+
+## Array to Number
+
+**Input:** Array | **Output:** Number
+
+- [avg](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-avg) - Returns the average of numbers listed in the array.
+- [indexOf](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-indexof) - Returns the index of the first occurrence of the specified element in this array, or -1 if this list does not contain the element.
+- [lastIndexOf](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-lastindexof) - Returns the index of the last occurrence of the specified element in a given array, or -1 if the array does not contain the element.
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest number according to the provided expression.
+- [reduce](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-reduce) - Applies a reduction expression to the elements in the array.
+- [sizeOf](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sizeof) - Returns the number of elements in an array.
+- [sum](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sum) - Returns the sum of numeric values in the given array.
+
+## Array to Object
+
+**Input:** Array | **Output:** Object
+
+- [groupBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-groupby) - Returns an object that groups items from an array based on specified criteria, such as an expression or matching selector.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest object according to the provided expression.
+- [reduce](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-reduce) - Applies a reduction expression to the elements in the array.
+
+## Array to String
+
+**Input:** Array | **Output:** String
+
+- [joinBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-joinby) - Merges an array into a string and uses the provided string as a separator between each item in the list. *Note: this is the opposite operation of splitBy.*
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest string according to the provided expression.
+- [reduce](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-reduce) - Applies a reduction expression to the elements in the array.
+
+## Array to Time
+
+**Input:** Array | **Output:** Time
+
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest time according to the provided expression.
+
+## Array to TimeZone
+
+**Input:** Array | **Output:** TimeZone
+
+- [max](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-max) - Returns the highest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [maxBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-maxby) - Iterates over the array and returns the highest value of [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) elements from it.
+- [min](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-min) - Returns the lowest [Comparable](https://docs.mulesoft.com/munit/latest/comparable-matchers-reference) value in the given array.
+- [minBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby) - Iterates over the array and returns the lowest timezone according to the provided expression.
+
+## Array and String to String
+
+**Input:** Array, String | **Output:** String
+
+- [joinBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-joinby) - Merges an array into a string and uses the provided string as a separator between each item in the list. *Note: this is the opposite operation of splitBy.*
+
+## Date to Boolean
+
+**Input:** Date | **Output:** Boolean
+
+- [isLeapYear](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isleapyear) - Returns true if it receives a date for a leap year, false. if not.
+
+## Date to Number
+
+**Input:** Date | **Output:** Number
+
+- [daysBetween](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-daysbetween) - Returns the number of days between two dates.
+
+## Date and LocalTime to LocalDateTime
+
+**Input:** Date, LocalTime | **Output:** LocalDateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## Date and Time to DateTime
+
+**Input:** Date, Time | **Output:** DateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## Date and TimeZone to DateTime
+
+**Input:** Date, TimeZone | **Output:** DateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## DateTime to Boolean
+
+**Input:** DateTime | **Output:** Boolean
+
+- [isLeapYear](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isleapyear) - Returns true if it receives a date for a leap year, false. if not.
+
+## LocalTime and Date to LocalDateTime
+
+**Input:** LocalTime, Date | **Output:** LocalDateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## LocalTime and TimeZone to Time
+
+**Input:** LocalTime, TimeZone | **Output:** Time
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## LocalDateTime to Boolean
+
+**Input:** LocalDateTime | **Output:** Boolean
+
+- [isLeapYear](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isleapyear) - Returns true if it receives a date for a leap year, false. if not.
+
+## LocalDateTime and TimeZone to DateTime
+
+**Input:** LocalDateTime, TimeZone | **Output:** DateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## Number to Array
+
+**Input:** Number | **Output:** Array
+
+- [to](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-to) - Returns a range with the given numbers.
+
+## Number to Boolean
+
+**Input:** Number | **Output:** Boolean
+
+- [isDecimal](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isdecimal) - Returns true if the given number contains a decimal, otherwise false.
+- [isEven](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-iseven) - Returns true if the number or numeric result of a mathematical operation is even, false if not.
+- [isInteger](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isinteger) - Returns true if the given number is an integer, otherwise false.
+- [isOdd](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isodd) - Returns true if the given number is odd, otherwise false.
+
+## Number to Number
+
+**Input:** Number | **Output:** Number
+
+- [abs](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-abs) - Returns the absolute value of a number.
+- [ceil](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-ceil) - Rounds the number up to the nearest whole number.
+- [floor](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-floor) - Rounds a number down to the nearest whole number.
+- [mod](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-mod) - Returns the modulo (the remainder after dividing the dividend by the divisor).
+- [pow](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-pow) - Raises the value of the given base number to the given power.
+- [randomInt](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-randomint) - Returns a pseudo-random whole number from 0 to the given number.
+- [round](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-round) - Rounds the number up or down to the nearest number.
+- [sqrt](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sqrt) - Returns the square root of the given number.
+
+## Number to Range
+
+**Input:** Number | **Output:** Range
+
+- [to](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-to) - Returns a range with the given numbers.
+
+## Object to Array
+
+**Input:** Object | **Output:** Array
+
+- [entriesOf](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-entriesof) - Returns an array of key-value pairs that describe the key, value, and any attributes in the input object.
+- [keysOf](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-keysof) - Returns an array of keys from key-value pairs within the input object.
+- [namesOf](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-namesof) - Returns an array of strings with the names of the keys from the given object.
+- [pluck](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-pluck) - Iterates over an object and returns an array of keys, values, or indices (or indexes) from the object. Useful for mapping an object into an array. *Note: similar to mapObject - mapObject returns an object and pluck returns an array.*
+- [valuesOf](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-valuesof) - Returns an array of the values from the given object's key/value pairs.
+
+## Object to Boolean
+
+**Input:** Object | **Output:** Boolean
+
+- [isEmpty](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isempty) - Returns true if the given input value is empty, false if not.
+
+## Object to Number
+
+**Input:** Object | **Output:** Number
+
+- [sizeOf](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sizeof) - Returns the number of key/value pairs in an object.
+
+## Object to Object
+
+**Input:** Object | **Output:** Object
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+- [Minus minus (--)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-minusminus) - Removes specified values from an input value.
+- [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) - Iterates over the input and returns the unique elements in it.
+- [filterObject](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-filterobject) - Iterates a list of key-value pairs in an object and applies an expression that returns only matching objects, filtering out the rest from the output.
+- [groupBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-groupby) - Groups elements of an object based on criteria that the groupBy uses to iterate over elements in the input.
+- [mapObject](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-mapobject) - Iterates over the object using a mapper that acts on keys, values, or indices (or indexes) of that object. *Note: similar to pluck - mapObject returns an object and pluck returns an array.*
+- [orderBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-orderby) - Reorders the object's elements based on the given criteria.
+
+## Object and Array to Object
+
+**Input:** Object, Array | **Output:** Object
+
+- [Minus minus (--)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-minusminus) - Removes specified values from an input value.
+
+## String to Array
+
+**Input:** String | **Output:** Array
+
+- [find](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-find) - Returns indices of an input that match a specified value.
+- [splitBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-splitby) - Splits the given string into an array based on the given separating string. *Note: this is the opposite operation of joinBy.*
+
+## String to Boolean
+
+**Input:** String | **Output:** Boolean
+
+- [contains](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-contains) - Returns true if an input contains a given value, false if not.
+- [endsWith](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-endswith) - Returns true if a string ends with a provided substring, false if not.
+- [evaluateCompatibilityFlag](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-evaluatecompatibilityflag) - Returns the value of the compatibility flag with the specified name.
+- [isBlank](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isblank) - Returns true if the given string is empty, composed of whitespaces, or null; otherwise false.
+- [isDecimal](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isdecimal) - Returns true if the given number contains a decimal, otherwise false. *Note: this function is designed for Number instead of String. You will receive a warning from DataWeave, or an error if the provided String contains something that can't be coerced into Number.*
+- [isEmpty](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-isempty) - Returns true if the given input value is empty, false if not.
+- [startsWith](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-startswith) - Returns true if the string starts with the given substring, otherwise false.
+
+## String to Number
+
+**Input:** String | **Output:** Number
+
+- [indexOf](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-indexof) - Returns the index of the first occurrence of the specified string in this string, or -1 if this list does not contain the element.
+- [lastIndexOf](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-lastindexof) - Returns the index of the last occurrence of the specified element in a given array, or -1 if the array does not contain the element.
+- [sizeOf](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sizeof) - Returns the number of characters in a string.
+
+## String to Object
+**Input:** String | **Output:** Object
+
+- [groupBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-groupby) - Returns an object that groups characters from a string based on specified criteria, such as an expression or matching selector.
+
+## String to String
+
+**Input:** String | **Output:** String
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+- [filter](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-filter) - Iterates over a string and applies an expression that returns matching values.
+- [lower](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-lower) - Returns the given string in lowercase characters.
+- [replace (with)](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-replace) - Performs a string replacement from the given substring with the provided string.
+- [trim](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-trim) - Removes any blank spaces from the beginning and end of the given string.
+- [upper](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-upper) - Returns the given string in uppercase characters.
+
+## String and Regex to Array
+
+**Input:** String, Regex | **Output:** Array
+
+- [find](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-find) - Returns indices of an input that match a specified value.
+- [match](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-match) - Matches the given regular expression from the given string and separates the results into capture groups inside an array. *Note: match will return a full match from the string. For several matches, use scan instead.*
+- [scan](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-scan) - Returns an array with all of the matches found in the given string, using the given regular expression. *Note: scan will return all of the matches from the string. For a full match, use match instead.*
+- [splitBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-splitby) - Splits the given string into an array based on the regular expression. *Note: this is the opposite operation of joinBy.*
+
+## String and Regex to Boolean
+
+**Input:** String, Regex | **Output:** Boolean
+
+- [contains](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-contains) - Returns true if an input contains a given value, false if not.
+- [matches](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-matches) - Returns true if an expression matches the entire given string, otherwise false.
+
+## String and Regex to String
+
+**Input:** String, Regex | **Output:** String
+
+- [replace (with)](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-replace) - Performs a string replacement from the substring found with the given regular expression.
+
+## Time and Date to DateTime
+
+**Input:** Time, Date | **Output:** DateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## TimeZone and Date to DateTime
+
+**Input:** TimeZone, Date | **Output:** DateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## TimeZone and LocalDateTime to DateTime
+
+**Input:** TimeZone, LocalDateTime | **Output:** DateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## TimeZone and LocalTime to DateTime
+
+**Input:** TimeZone, LocalTime | **Output:** DateTime
+
+- [Plus plus (++)](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-plusplus) - Concatenates two values.
+
+## Others
+
+Some of these next functions don't have any input parameters or don't return any output. Some accept more than two arguments.
+
+- [log](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-log) - Without changing the value of the input, log returns the input as a system log. So this makes it very simple to debug your code, because any expression or subexpression can be wrapped with log and the result will be printed out without modifying the result of the expression. The output is going to be printed in application/dw format.
+- [logDebug](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-logdebug) - Helper function that logs messages at Debug level.
+- [logError](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-logerror) - Helper function that logs messages at Error level.
+- [logInfo](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-loginfo) - Helper function that logs messages at Info level.
+- [logWarn](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-logwarn) - Helper function that logs messages at Warn level.
+- [logWith](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-logwith) - Without changing the value of the input, logWith returns the input as a system log at the specified level.
+- [match / case](https://docs.mulesoft.com/mule-runtime/4.3/dataweave-pattern-matching) - Pattern matching can be achieved by using a combination of match and case. Can be applied to literal values, expressions, data types, or regular expressions.
+- [now](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-now) - Returns current date and time in a DateTime.
+- [onNull](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-onnull) - Executes a callback function if the preceding expression returns a null value and then replaces the null value with the result of the callback.
+- [random](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-random) - Returns a pseudo-random number between 0.0 and 1.0.
+- [read](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-read) - Reads a string or binary and returns parsed content (for example: application/json, application/xml, application/csv, etc.).
+- [readUrl](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-readurl) - Reads a URL, including a classpath-based URL, and returns parsed content. *Note: similar to the read function.*
+- [then](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-then) - Works as a pipe that passes the value returned from the preceding expression to the next (a callback) only if the value returned by the preceding expression is not null.
+- [typeOf](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-typeof) - Returns the type of the given value.
+- [uuid](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-uuid) - Returns a v4 UUID using random numbers as the source.
+- [with](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-with) - Helper function used with [replace](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-replace), [update](https://docs.mulesoft.com/mule-runtime/4.3/dw-values-functions-update), or [mask](https://docs.mulesoft.com/mule-runtime/4.2/dw-values-functions-mask).
+- [write](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-write) - Writes a value as a string or binary in a supported format.
+- [xsiType](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-xsitype) - Creates a xsi:type type attribute. *Note: useful for XML data types.*
+- Additional to the plus plus (++) function, you can also concatenate objects by using the Object Destructor &#123;( )&#125;. Learn more about this approach [here](https://www.prostdev.com/post/combining-objects-concatenation-in-dw-2-0) or learn how to use $( ) to concatenate strings [here](https://blogs.mulesoft.com/dev-guides/how-to-tutorials/review-concatenation-functions-dataweave/).
+
+## Null-safe functions
+
+Here is a list of the functions that don't need an additional null-checker implemented.
+
+In other words, they accept null values and won't throw any error.
+
+- [distinctBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-distinctby)
+- [filter](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-filter)
+- [filterObject](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-filterobject)
+- [flatMap](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-flatmap)
+- [flatten](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-flatten)
+- [groupBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-groupby)
+- [isBlank](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isblank)
+- [isEmpty](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isempty)
+- [log](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-log)
+- [lower](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-lower)
+- [map](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-map)
+- [mapObject](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-mapobject)
+- [orderBy](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-orderby)
+- [pluck](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-pluck)
+- [trim](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-trim)
+- [typeOf](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-typeof)
+- [upper](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-upper)
+
+If you have any suggestions, comments, or noticed that something's wrong with the provided information; please reach out with a comment on this post or contact us [here](https://www.prostdev.com/contact).
+
+I hope this was useful for you!
+
+-Alex

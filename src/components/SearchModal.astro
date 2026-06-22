@@ -1,0 +1,119 @@
+---
+/**
+ * Site search, MuleSoft-docs style.
+ *
+ * - A header trigger button styled like a search input with a ⌘K badge
+ *   (rendered separately in Header via <SearchTrigger />).
+ * - This component renders the modal dialog + global ⌘K / "/" shortcut.
+ * - Pagefind's UI assets are generated at build time into /pagefind and are
+ *   lazy-loaded the first time the modal opens (kept out of every page load).
+ */
+---
+<dialog
+  id="search-dialog"
+  class="m-0 mx-auto mt-[8vh] w-full max-w-2xl rounded-2xl border border-default bg-surface-card p-0 text-default shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+>
+  <div class="flex items-center justify-between gap-2 border-b border-default px-4 py-3">
+    <span class="text-sm font-semibold text-muted">Search</span>
+    <button id="search-close" type="button" class="rounded-md px-2 py-1 text-xs text-muted hover:text-accent" aria-label="Close search">
+      Esc
+    </button>
+  </div>
+  <div class="p-4">
+    <div id="search-ui"></div>
+    <p id="search-hint" class="mt-2 text-sm text-muted">Loading search…</p>
+  </div>
+</dialog>
+
+<link rel="stylesheet" href="/pagefind/pagefind-ui.css" media="print" onload="this.media='all'" />
+
+<style is:global>
+  /* Theme Pagefind's default UI to match the site tokens. */
+  #search-ui {
+    --pagefind-ui-primary: var(--accent);
+    --pagefind-ui-text: var(--text);
+    --pagefind-ui-background: var(--bg-card);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-tag: var(--bg-subtle);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-font: var(--font-sans);
+  }
+  #search-dialog[open] {
+    display: block;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const dialog = document.getElementById('search-dialog');
+    if (!dialog) return;
+    const hint = document.getElementById('search-hint');
+    let loaded = false;
+
+    function focusInput() {
+      const input = dialog.querySelector('.pagefind-ui__search-input');
+      if (input) input.focus();
+    }
+
+    async function loadPagefind() {
+      if (loaded) return;
+      loaded = true;
+      try {
+        const mod = await import('/pagefind/pagefind-ui.js');
+        const Ctor = mod.PagefindUI || window.PagefindUI;
+        new Ctor({
+          element: '#search-ui',
+          showSubResults: true,
+          showImages: false,
+          resetStyles: false,
+          placeholder: 'Search videos, transcripts & posts…',
+        });
+        if (hint) hint.remove();
+      } catch (e) {
+        loaded = false;
+        if (hint)
+          hint.innerHTML =
+            'Search index is generated at build time — run <code>npm run build &amp;&amp; npm run preview</code> to try it locally.';
+      }
+    }
+
+    function openSearch() {
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+      loadPagefind().then(() => setTimeout(focusInput, 50));
+    }
+    function closeSearch() {
+      if (typeof dialog.close === 'function') dialog.close();
+      else dialog.removeAttribute('open');
+    }
+
+    // Triggers: anything with [data-search-open]
+    document.querySelectorAll('[data-search-open]').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openSearch();
+      });
+    });
+
+    document.getElementById('search-close')?.addEventListener('click', closeSearch);
+
+    // Click outside the inner panel closes (native dialog backdrop click).
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) closeSearch();
+    });
+
+    // Global keyboard shortcuts: ⌘K / Ctrl+K, and "/" when not typing.
+    document.addEventListener('keydown', (e) => {
+      const isCmdK = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k';
+      const tag = (e.target && e.target.tagName) || '';
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(tag) || e.target?.isContentEditable;
+      const isSlash = e.key === '/' && !typing;
+      if (isCmdK || isSlash) {
+        e.preventDefault();
+        if (dialog.open) closeSearch();
+        else openSearch();
+      }
+    });
+  })();
+</script>

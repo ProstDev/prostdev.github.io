@@ -1,0 +1,87 @@
+---
+title: "Simplified try-catch strategy in DataWeave with the default keyword (instead of try/orElse)"
+description: The other day I was reading some StackOverflow DataWeave questions and I got to this very interesting thread.
+pubDate: 2023-01-31
+category: Guides
+tags: [MuleSoft, DataWeave]
+draft: false
+heroImage: ../../assets/blog/simplified-try-catch-strategy-in-dataweave-with-the-default-keyword-instead-of-try-orelse-1.png
+youtubeId: QUc1Ffs8GY0
+---
+
+The other day I was reading some StackOverflow DataWeave questions (as one does) and I got to this very interesting thread: [Why the “default” keyword acts like “try + catch / orElse” in some cases](https://stackoverflow.com/questions/73785223/why-the-default-keyword-acts-like-try-catch-orelse-in-some-cases). I wanted to take a moment to create an article about my own explanation of what I see in that thread. I already created a video about it, so, I might as well create a blog post too :)
+
+P.S. You can try out the scripts in the [DataWeave Playground](https://dataweave.mulesoft.com/learn/playground) or in [Visual Studio Code](https://www.prostdev.com/post/how-to-move-your-code-from-the-dataweave-playground-to-visual-studio-code).
+
+## The question
+
+In summary, [Harshank Bansal](https://stackoverflow.com/users/10946202/harshank-bansal) notices that if you try to run the following script, you will receive an error message stating that *ABC cannot be coerced to Number* (which is expected).
+
+Script:
+
+```dataweave
+%dw 2.0
+output application/json
+---
+"ABC" as Number
+```
+
+Output:
+
+```
+Cannot coerce String (ABC) to Number
+
+4| "ABC" as Number
+   ^^^^^^^^^^^^^^^
+Trace:
+  at main::main (line: 4, column: 1)
+```
+
+Maybe your first instinct to try to fix this code - if you’re familiar with the [try](https://docs.mulesoft.com/dataweave/latest/dw-runtime-functions-try) function - would be to do a script similar to the one Harshank mentions in the question:
+
+```dataweave
+%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+try(() -> ("ABC" as Number)) orElse "Invalid number"
+```
+
+This correctly catches the error and outputs the “Invalid number” string instead. However, Harshank found an alternative for this specific use case which is using the [default](https://docs.mulesoft.com/dataweave/latest/dataweave-cookbook-defaults) keyword. Like so:
+
+```dataweave
+%dw 2.0
+output application/json
+---
+("ABC" as Number) default "Invalid number"
+```
+
+This previous script outputs the exact same “Invalid number” string as we did with the *try* function. However, this seems a bit weird since the *default* keyword is mainly used for *null* values and this is an error.
+
+Now let’s talk about the answer/explanation that Mariano de Achaval wrote on why this behavior happens.
+
+## The answer
+
+If you don’t know who [Mariano](https://stackoverflow.com/users/1472690/machaval) is, he’s one of the architects that started developing DataWeave years ago. That’s why his answer is a big deal :)
+
+Mariano mentions that the *default* keyword can be used for two things:
+
+- When the left-side value is *null*, the right-side value is returned.
+- To handle **some** exceptions like the coercion one we saw at the beginning of the post.
+
+Notice how I wrote **some** in bold there, that’s because Mariano and Harshank both mention it doesn’t work for all possible exceptions. It only works when:
+
+- You call a function that doesn’t support *null*.
+- You try to coerce a value to a data type (like the example we saw).
+
+Now, it is worth mentioning that this behavior is available to use but it is not recommended (as Mariano wrote). It is better to use the *try* function instead.
+
+## My takeaway
+
+Even though it’s not recommended to use, it doesn’t hurt to know it exists :)
+
+Sometimes you need to do a quick script where you need to ensure the type coercion doesn’t return an exception (like Harshank’s example) and the code isn’t really too complex to add the *try* function.
+
+What is **your** takeaway from this??
+
+-alex

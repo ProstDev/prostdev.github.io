@@ -1,0 +1,186 @@
+---
+/**
+ * CodeBlockEnhancer — progressive enhancement for fenced code blocks in blog posts.
+ *
+ * Renders NOTHING visible. It ships two hidden <template>s (the copy + check icons,
+ * single-sourced from Icon.astro so we stay icon-library-free) plus an inline script
+ * that, scoped to the post's `.prose` container, wraps each Shiki `pre.astro-code` in:
+ *   • a header bar with a language label + a per-block "Copy code" button, and
+ *   • for tall blocks (> ~480px), a collapsible body with a fade-out + an accessible
+ *     "Show all N lines" / "Show less" toggle.
+ *
+ * Why client-side (not a rehype plugin / expressive-code): it operates on the exact
+ * DOM Shiki already emits, keeps the carefully-tuned dual-theme [data-theme="dark"]
+ * CSS untouched, and never touches the 138 MDX files. Modeled on DocActions.astro's
+ * script style. The site has no View Transitions, so a run-once-on-load script is
+ * correct. With JS off, blocks render fully expanded + highlighted (graceful
+ * degradation) — the chrome is purely additive.
+ *
+ * Styling lives in src/styles/global.css under the `.code-block*` section.
+ */
+import Icon from './Icon.astro';
+---
+<template id="cb-icon-copy"><Icon name="copy" class="h-4 w-4" /></template>
+<template id="cb-icon-check"><Icon name="check" class="h-4 w-4" /></template>
+<template id="cb-icon-file"><Icon name="file-text" class="h-4 w-4" /></template>
+
+<script>
+  // Tall-block threshold in CSS px (≈ 25 lines at the prose line-height).
+  const COLLAPSE_PX = 480;
+
+  // Shiki emits the fence language on `pre.dataset.language`. DataWeave/dwl fences
+  // are aliased to `scala` in astro.config.mjs (Shiki has no DataWeave grammar), and
+  // real Scala isn't a topic on this MuleSoft site — so `scala` displays as
+  // "DataWeave". Unmapped languages get a capitalized fallback; `text`/none → no label.
+  const LANG_LABEL: Record<string, string> = {
+    scala: 'DataWeave', dataweave: 'DataWeave', dwl: 'DataWeave',
+    bash: 'Bash', sh: 'Bash', shell: 'Bash',
+    json: 'JSON', xml: 'XML', yaml: 'YAML', yml: 'YAML', sql: 'SQL',
+    java: 'Java', js: 'JavaScript', javascript: 'JavaScript',
+    ts: 'TypeScript', typescript: 'TypeScript', md: 'Markdown',
+    properties: 'Properties', groovy: 'Groovy', python: 'Python',
+    html: 'HTML', dockerfile: 'Dockerfile',
+  };
+  function labelFor(lang: string | undefined): string | null {
+    if (!lang || lang === 'text' || lang === 'plaintext' || lang === 'plain') return null;
+    return LANG_LABEL[lang] ?? lang.charAt(0).toUpperCase() + lang.slice(1);
+  }
+
+  function iconFrom(id: string): Node {
+    const tpl = document.getElementById(id) as HTMLTemplateElement | null;
+    return tpl ? tpl.content.cloneNode(true) : document.createElement('span');
+  }
+
+  function enhance(pre: HTMLElement, idx: number) {
+    if (pre.dataset.enhanced) return;
+    pre.dataset.enhanced = 'true';
+    pre.classList.add('is-enhanced');
+
+    // ── wrapper ──
+    const wrap = document.createElement('div');
+    wrap.className = 'code-block';
+    pre.parentNode!.insertBefore(wrap, pre);
+
+    // ── header bar: (optional filename) + language label + copy button ──
+    const bar = document.createElement('div');
+    bar.className = 'code-block__bar';
+
+    // Left-side label group: filename (if the fence carried `title="…"`) and the
+    // language label. When a filename is present it leads (with a file icon) and
+    // the language drops to a small muted badge beside it (.is-titled on the bar).
+    const left = document.createElement('div');
+    left.className = 'code-block__left';
+
+    const title = pre.dataset.title;
+    if (title) {
+      bar.classList.add('code-block__bar--titled');
+      const file = document.createElement('span');
+      file.className = 'code-block__file';
+      file.appendChild(iconFrom('cb-icon-file'));
+      const fileName = document.createElement('span');
+      fileName.textContent = title;
+      file.appendChild(fileName);
+      left.appendChild(file);
+    }
+
+    const label = labelFor(pre.dataset.language);
+    const lang = document.createElement('span');
+    lang.className = 'code-block__lang';
+    lang.textContent = label ?? '';
+    left.appendChild(lang);
+
+    bar.appendChild(left);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'code-block__copy';
+    copyBtn.setAttribute('aria-label', 'Copy code');
+    const idleIcon = document.createElement('span');
+    idleIcon.className = 'code-block__copy-idle';
+    idleIcon.appendChild(iconFrom('cb-icon-copy'));
+    const doneIcon = document.createElement('span');
+    doneIcon.className = 'code-block__copy-done hidden';
+    doneIcon.appendChild(iconFrom('cb-icon-check'));
+    const copyLabel = document.createElement('span');
+    copyLabel.className = 'code-block__copy-label';
+    copyLabel.textContent = 'Copy';
+    copyBtn.append(idleIcon, doneIcon, copyLabel);
+    bar.appendChild(copyBtn);
+
+    wrap.appendChild(bar);
+
+    // ── body (wraps the pre; becomes collapsible if tall) ──
+    const body = document.createElement('div');
+    body.className = 'code-block__body';
+    wrap.appendChild(body);
+    body.appendChild(pre);
+
+    // ── copy behavior (mirror DocActions.astro) ──
+    // Screen-reader announcement region (DocActions only swaps a visible label).
+    const live = document.createElement('span');
+    live.className = 'sr-only';
+    live.setAttribute('role', 'status');
+    live.setAttribute('aria-live', 'polite');
+    wrap.appendChild(live);
+
+    let resetTimer: number | undefined;
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent ?? '');
+        idleIcon.classList.add('hidden');
+        doneIcon.classList.remove('hidden');
+        copyLabel.textContent = 'Copied!';
+        live.textContent = 'Copied';
+        window.clearTimeout(resetTimer);
+        resetTimer = window.setTimeout(() => {
+          idleIcon.classList.remove('hidden');
+          doneIcon.classList.add('hidden');
+          copyLabel.textContent = 'Copy';
+          live.textContent = '';
+        }, 2000);
+      } catch {
+        // Clipboard unavailable (e.g. insecure context) — no-op, leave idle state.
+      }
+    });
+
+    // ── collapse (only tall blocks) ──
+    // Measure after layout. scrollHeight is reliable even with wrap:true.
+    if (pre.scrollHeight > COLLAPSE_PX) {
+      const regionId = `codeblock-${idx}`;
+      body.id = regionId;
+      body.classList.add('is-collapsible', 'is-collapsed');
+
+      const fade = document.createElement('div');
+      fade.className = 'code-block__fade';
+      fade.setAttribute('aria-hidden', 'true');
+      body.appendChild(fade);
+
+      const lineCount = pre.querySelectorAll('.line').length || 0;
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'code-block__toggle';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-controls', regionId);
+      toggle.textContent = lineCount ? `Show all ${lineCount} lines` : 'Show all';
+      wrap.appendChild(toggle);
+
+      toggle.addEventListener('click', () => {
+        const collapsed = body.classList.toggle('is-collapsed');
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        if (collapsed) {
+          toggle.textContent = lineCount ? `Show all ${lineCount} lines` : 'Show all';
+          // Don't strand the keyboard user below a now-shorter block.
+          wrap.scrollIntoView({ block: 'nearest' });
+          toggle.focus();
+        } else {
+          toggle.textContent = 'Show less';
+        }
+      });
+    }
+  }
+
+  const root = document.querySelector('.prose');
+  if (root) {
+    root.querySelectorAll<HTMLElement>('pre.astro-code').forEach((pre, i) => enhance(pre, i));
+  }
+</script>

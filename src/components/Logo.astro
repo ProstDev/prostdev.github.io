@@ -1,0 +1,11 @@
+---
+import { Image } from 'astro:assets';
+import logo from '@/assets/logo.png';
+
+/** ProstDev logo — the actual brand icon (rocket emerging from a monitor). */
+interface Props {
+  class?: string;
+}
+const { class: className = 'h-8 w-8' } = Astro.props;
+---
+<Image src={logo} alt="ProstDev" width={80} height={80} class={className} loading="eager" />

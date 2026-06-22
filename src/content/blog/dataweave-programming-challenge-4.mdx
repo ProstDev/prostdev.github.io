@@ -1,0 +1,303 @@
+---
+title: "DataWeave programming challenge #4: Solve the Tower of Hanoi mathematical puzzle"
+description: "Move the disks, one disk at a time, from tower A to tower C following the Tower of Hanoi puzzle rules."
+pubDate: 2023-03-21
+category: Challenges
+tags: [MuleSoft, DataWeave]
+youtubeId: _3GJtx-NK8M
+heroImage: ../../assets/blog/dataweave-programming-challenge-4.png
+---
+
+> [!NOTE]
+> This challenge is based on the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi) mathematical puzzle - **this is a tough one!**
+
+Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!
+
+> [!PLAYGROUND]
+> [Solve on the Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F4)
+
+> [!IMPORTANT]
+> There are 3 different scenarios to test your code is working properly and to ensure there are no hardcoded values. However, only the first scenario is provided in the Playground link below. Please copy+paste the other two scenarios to make sure your solution is working properly.
+
+## Input
+
+Consider the following JSON inputs:
+
+**SCENARIO 1**
+
+```
+{
+    "moves": 0,
+    "disks": 3,
+    "targetTower": "C",
+    "towers": {
+        "A": [
+            1,
+            2,
+            3
+        ],
+        "B": [],
+        "C": []
+    }
+}
+```
+
+**SCENARIO 2**
+
+```
+{
+    "moves": 0,
+    "disks": 4,
+    "targetTower": "C",
+    "towers": {
+        "A": [
+            1,
+            2,
+            3,
+            4
+        ],
+        "B": [],
+        "C": []
+    }
+}
+```
+
+**SCENARIO 3**
+
+```
+{
+    "moves": 0,
+    "disks": 7,
+    "targetTower": "Y",
+    "towers": {
+        "X": [],
+        "Y": [],
+        "Z": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ]
+    }
+}
+```
+
+## Explanation of the problem
+
+Create a DataWeave script to solve the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi) puzzle. The input payload contains the number of moves (starting at 0), the total number of disks in the game, the target tower where all the disks have to be moved, and the 3 towers containing each disk.
+
+(You can use [this link](https://www.mathsisfun.com/games/towerofhanoi.html) to play the game online)
+
+Here are the rules of the game:
+
+- With each move, you can only move one disk at a time from its current stack to a different stack.
+- You can only place smaller disks on top of bigger disks. For example, you can place disk 1 on top of disk 3 but you can't place disk 5 on top of disk 2.
+- You can only move the disk at the top of any stack.
+
+## Expected output
+
+For each of the three scenarios from the input, these are the expected outputs:
+
+**SCENARIO 1**
+
+```
+{
+  "moves": 7,
+  "disks": 3,
+  "targetTower": "C",
+  "towers": {
+    "A": [
+      
+    ],
+    "B": [
+      
+    ],
+    "C": [
+      1,
+      2,
+      3
+    ]
+  }
+}
+```
+
+**SCENARIO 2**
+
+```
+{
+  "moves": 15,
+  "disks": 4,
+  "targetTower": "C",
+  "towers": {
+    "A": [
+      
+    ],
+    "B": [
+      
+    ],
+    "C": [
+      1,
+      2,
+      3,
+      4
+    ]
+  }
+}
+```
+
+**SCENARIO 3**
+
+```
+{
+  "moves": 127,
+  "disks": 7,
+  "targetTower": "Y",
+  "towers": {
+    "X": [
+      
+    ],
+    "Y": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "Z": [
+      
+    ]
+  }
+}
+```
+
+## Clues
+
+If you're stuck with your solution, feel free to check out some of these clues to give you ideas on how to solve it!
+
+### Clue #1
+
+Read the [wikipedia page](https://en.wikipedia.org/wiki/Tower_of_Hanoi) to have more context from the algorithm perspective.
+
+### Clue #2
+
+From the wikipedia page, take special attention to this part:
+
+For an even number of disks:
+
+make the legal move between pegs A and B (in either direction),
+
+make the legal move between pegs A and C (in either direction),
+
+make the legal move between pegs B and C (in either direction),
+
+repeat until complete.
+
+For an odd number of disks:
+
+make the legal move between pegs A and C (in either direction),
+
+make the legal move between pegs A and B (in either direction),
+
+make the legal move between pegs B and C (in either direction),
+
+repeat until complete.
+
+### Clue #3
+
+If the previous clue wasn't what you needed, take a look at these other rules from the wikipedia page:
+
+Number the disks 1 through n (largest to smallest).
+
+If n is odd, the first move is from peg A to peg C.
+
+If n is even, the first move is from peg A to peg B.
+
+Now, add these constraints:
+
+No odd disk may be placed directly on an odd disk.
+
+No even disk may be placed directly on an even disk.
+
+There will sometimes be two possible pegs: one will have disks, and the other will be empty. Place the disk on the non-empty peg.
+
+Never move a disk twice in succession.
+
+### Clue #4
+
+If you see other solutions (in Python, C++, Java, etc) remember that those don't necessarily apply to DataWeave. Try to come up with your own solution instead.
+
+## Answer
+
+If you haven't solved this challenge yet, we encourage you to keep trying! It's ok if it's taking longer than you thought. We all have to start somewhere ✨ Check out the clues and read the docs before giving up. You got this!! 💙
+
+There are many ways to solve this challenge, but you can find here my solution. I'm sure you all can make it better! :) Mine is super long 😂
+
+### Solution
+
+```dataweave
+%dw 2.0
+import update from dw::util::Values
+import drop, take from dw::core::Arrays
+output application/json
+var towerNames:Array<String> = namesOf(payload.towers)
+var targetTower:String = payload.targetTower
+var initialTower:String = payload.towers
+    pluck (if (!isEmpty($)) $$ else "")
+    filter ($ != "") then $[0] as String
+var auxTower:String = (towerNames -- [targetTower, initialTower])[0]
+fun moveDisk(towers:Object, fromTower:String, toTower:String) = do {
+    var from = towers[fromTower]
+    var to = towers[toTower]
+    ---
+    towers 
+    update log("Moved from", fromTower) with (from drop 1)
+    update log("to",toTower) with (from take 1)[0] >> to
+}
+fun swapDisks(towers:Object, tower1:String, tower2:String) = do {
+    var disk1 = towers[tower1][0] default (payload.disks + 1)
+    var disk2 = towers[tower2][0] default (payload.disks + 1)
+    ---
+    if (disk1 < disk2)
+        moveDisk(towers, tower1, tower2)
+    else
+        moveDisk(towers, tower2, tower1)
+}
+fun play(game:Object, moveNumber:Number = 1) = do {
+    var isEvenGame = isEven(game.disks)
+    var isOddGame = isOdd(game.disks)
+    @Lazy
+    var newTowers = 
+        if (
+            (isEvenGame and moveNumber == 1)
+            or (isOddGame and moveNumber == 2)
+        ) swapDisks(game.towers, initialTower, auxTower)
+        else if (
+            (isEvenGame and moveNumber == 2)
+            or (isOddGame and moveNumber == 1)
+        ) swapDisks(game.towers, initialTower, targetTower)
+        else swapDisks(game.towers, auxTower, targetTower)
+    @Lazy
+    var newMoveNumber = if (moveNumber == 3) 1 else moveNumber + 1
+    var newGame = game 
+        update "towers" with newTowers
+        update "moves" with game.moves + 1
+    ---
+    if (sizeOf(game.towers[targetTower]) == game.disks)
+        game
+    else
+        play(newGame, newMoveNumber)
+}
+---
+play(payload)
+```
+
+I also recorded myself coming up with the solution, but without explanations. Just some lo-fi music and a screen :) you can leave the video in the background while working! :D let me know if you find this useful.
+
+Feel free to comment your code below for others to see! 😄
+
+Subscribe to receive notifications as soon as new content is published ✨

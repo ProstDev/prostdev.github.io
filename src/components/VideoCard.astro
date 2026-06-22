@@ -1,0 +1,40 @@
+---
+import { thumbnail, type Video } from '@/data/videos';
+import Icon from './Icon.astro';
+
+interface Props {
+  video: Video;
+  /** Compact variant used in horizontal playlist rows. */
+  compact?: boolean;
+}
+const { video, compact = false } = Astro.props;
+const href = `/video/${video.slug}`;
+---
+<article class:list={['group', compact ? 'w-64 shrink-0' : '']}>
+  <a href={href} class="block">
+    <div class="relative aspect-video w-full overflow-hidden rounded-xl border border-default bg-black">
+      <img
+        src={thumbnail(video.youtubeId)}
+        alt={`Thumbnail: ${video.title}`}
+        loading="lazy"
+        decoding="async"
+        width="480"
+        height="360"
+        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+      <span class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600/90 text-white">
+          <Icon name="play" class="h-6 w-6 translate-x-0.5" />
+        </span>
+      </span>
+      {video.duration && video.duration !== '—' && (
+        <span class="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">
+          {video.duration}
+        </span>
+      )}
+    </div>
+    <h3 class:list={['mt-3 font-semibold leading-snug text-default transition-colors group-hover:text-accent', compact ? 'text-sm line-clamp-2' : 'line-clamp-2']}>
+      {video.title}
+    </h3>
+  </a>
+</article>

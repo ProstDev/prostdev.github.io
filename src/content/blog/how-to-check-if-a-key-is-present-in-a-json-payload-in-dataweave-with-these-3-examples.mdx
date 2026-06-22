@@ -1,0 +1,141 @@
+---
+title: "How to check if a key is present in a JSON payload in DataWeave with these 3 examples"
+description: "Here are 3 examples where you can see how to check if a key in the input JSON payload is present or not."
+pubDate: 2022-01-18
+author: "Mohammed Shakir"
+category: Tutorials
+tags: [MuleSoft, DataWeave]
+heroImage: ../../assets/blog/how-to-check-if-a-key-is-present-in-a-json-payload-in-dataweave-with-these-3-examples-1.png
+---
+
+“In DataWeave, when a field in the input payload has a value and you append a **question mark (?)** at the end of the field, it will return **true**. On the other hand, if the field doesn’t exist, then it would return **false**.” Refer to the link below for more information:
+
+[https://blogs.mulesoft.com/dev-guides/how-to-tutorials/implement-logic-handling-in-dataweave/](https://blogs.mulesoft.com/dev-guides/how-to-tutorials/implement-logic-handling-in-dataweave/)
+
+Here are 3 examples where you can see how to check if a key in the input JSON payload is present or not.
+
+## 1. Single Object
+
+In this example, I have used a single JSON object to find if a key is present or not and the result will be a boolean value.
+
+**Input:**
+
+```json
+{
+    "id":1,
+    "company":"abc",
+    "Address":"USA",
+    "Phone":"123"
+}
+```
+
+**DataWeave Expression:**
+
+```dataweave
+%dw 2.0
+output application/json
+---
+payload.id?
+```
+
+**Output:**
+
+```
+true
+```
+
+## 2. Multiple Objects
+
+For this example, we have multiple objects in an array and we are going to check if the key is present or not with different DataWeave Expressions which will give us different results.
+
+In **DataWeave Expression 1** the output returned is just a boolean value which helps to combine the result. But we won't be able to know which object has **id** present in it. It just checks if there’s at least one value that matches the key and gives us a boolean value.
+
+In **DataWeave Expression 2** we will iterate through each item and then we can find out which item has **id** present in it. It gives complete information about a single object and the presence of the key in it.
+
+**Input:**
+
+```json
+[
+    {
+        "company":"abc",
+        "Address":"USA",
+        "Phone":"123"
+    },
+    {
+        "id":1,
+        "company":"def",
+        "Address":"UK",
+        "Phone":"345"
+    }
+]
+```
+
+**DataWeave Expression 1:**
+
+```dataweave
+%dw 2.0
+output application/json
+---
+payload.id?
+```
+
+**DataWeave Expression 2:**
+
+```dataweave
+%dw 2.0
+output application/json
+---
+payload map ((item, index) -> item.id?)
+```
+
+**Output 1:**
+
+```
+true
+```
+
+**Output 2:**
+
+```json
+[
+    false,
+    true
+]
+```
+
+## 3. Nested Objects
+
+In this example, we have objects present in another object (nested objects). In this case, we will first go to the parent object and then to the key to find out whether it is present or not.
+
+**Input:**
+
+```json
+{
+    "id":1,
+    "company":"abc",
+    "Address":{
+        "street":"xyz",
+        "zip":"080"
+    },
+    "Phone":"123"
+}
+```
+
+**DataWeave Expression:**
+
+```dataweave
+%dw 2.0
+output application/json
+---
+payload.Address.zip?
+```
+
+**Output:**
+
+```
+true
+```
+
+We have learned how we can check if the key is present or not within a different set of inputs and also observed different results obtained.
+
+I hope this was useful to you.

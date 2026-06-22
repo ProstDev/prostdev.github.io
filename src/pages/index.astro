@@ -1,0 +1,90 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LiteYouTube from '@/components/LiteYouTube.astro';
+import VideoCard from '@/components/VideoCard.astro';
+import PlaylistRow from '@/components/PlaylistRow.astro';
+import AiFriendly from '@/components/AiFriendly.astro';
+import Icon from '@/components/Icon.astro';
+import { SITE, SOCIAL } from '@/config';
+import { videosInPlaylist, latestVideos, featuredVideo, primaryPlaylists, sectionHref } from '@/data/videos';
+
+const latest = latestVideos(6);
+const featured = featuredVideo();
+const playlists = primaryPlaylists();
+---
+<BaseLayout
+  title="Learn MuleSoft: Video Tutorials, DataWeave & ACB"
+  description={SITE.description}
+  contained={false}
+  jsonLd={[
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SITE.name,
+      url: SITE.url,
+      description: SITE.description,
+    },
+  ]}
+>
+  <!-- Hero -->
+  <section class="mx-auto w-full max-w-5xl px-4 pt-10 pb-6 text-center sm:px-6 sm:pt-14">
+    <h1 class="text-4xl font-extrabold tracking-tight sm:text-6xl">
+      <span class="text-accent">ProstDev</span>
+      <span class="text-muted"> | </span>
+      <span class="text-default">learn MuleSoft</span>
+    </h1>
+    <p class="mx-auto mt-4 max-w-2xl text-base text-muted sm:text-lg">
+      Where MuleSoft mastery meets fun. Easy-to-follow video tutorials, AI experiments,
+      and deep dives to level up your integration skills. 🚀
+    </p>
+
+    <div class="mx-auto mt-8 max-w-3xl">
+      <LiteYouTube youtubeId={featured.youtubeId} title={featured.title} href={`/video/${featured.slug}`} class="shadow-xl" />
+      <p class="mt-3 text-sm font-medium text-muted">👆 most viewed</p>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+      <a href={SOCIAL.youtube} target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02]">
+        <Icon name="youtube" class="h-5 w-5" /> Subscribe on YouTube
+      </a>
+      <a href="/blog" class="inline-flex items-center gap-2 rounded-lg border border-default px-5 py-2.5 text-sm font-semibold text-default transition-colors hover:text-accent">
+        Read the blog
+      </a>
+    </div>
+  </section>
+
+  <!-- Latest videos -->
+  <section class="bg-surface-subtle">
+    <div class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+      <h2 class="mb-6 flex items-center gap-2 text-2xl font-bold">📺 Latest videos</h2>
+      <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+        {latest.map((v) => <VideoCard video={v} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Built for humans & AI -->
+  <AiFriendly />
+
+  <!-- Playlists -->
+  <section class="bg-surface-subtle">
+    <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+      <div class="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">▶️ More playlists</h2>
+          <p class="text-muted">Jump into a featured series.</p>
+        </div>
+        <a href="/videos" class="shrink-0 text-sm font-medium text-accent hover:underline">
+          Browse all videos →
+        </a>
+      </div>
+      {playlists.map((p) => (
+        <PlaylistRow
+          playlist={p}
+          videos={videosInPlaylist(p.id)}
+          headingHref={sectionHref(p)}
+        />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

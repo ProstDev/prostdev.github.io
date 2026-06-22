@@ -1,0 +1,20 @@
+---
+import { tagUrl } from '@/lib/content';
+
+interface Props {
+  tag: string;
+  /** Optional post count shown after the label (e.g. on the blog index / tags directory). */
+  count?: number;
+  /** Forwarded to the <a> (e.g. data-pagefind-filter="tag" on the post page). */
+  'data-pagefind-filter'?: string;
+}
+const { tag, count, ...rest } = Astro.props;
+---
+<a
+  href={tagUrl(tag)}
+  class="inline-flex items-center gap-1 rounded-md border border-[var(--border)] px-2.5 py-1 text-xs font-medium text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+  {...rest}
+>
+  {tag}
+  {count !== undefined && <span class="text-[var(--accent)]">{count}</span>}
+</a>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SearchTrigger from '@/components/SearchTrigger.astro';
+---
+<BaseLayout
+  title="Search"
+  description="Search ProstDev videos (including transcripts) and blog posts."
+  noindex={true}
+>
+  <div class="mx-auto max-w-2xl py-20 text-center">
+    <h1 class="mb-3 text-3xl font-extrabold tracking-tight text-accent">Search</h1>
+    <p class="mb-8 text-muted">
+      Search across blog posts <em>and</em> video transcripts. Tip: press
+      <kbd class="rounded border border-default bg-surface-subtle px-1.5 py-0.5 text-sm">⌘K</kbd>
+      anywhere on the site.
+    </p>
+    <div class="flex justify-center">
+      <SearchTrigger />
+    </div>
+  </div>
+</BaseLayout>
+
+<!-- Auto-open the search modal when landing directly on /search. -->
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('[data-search-open]')?.dispatchEvent(new Event('click'));
+  });
+</script>

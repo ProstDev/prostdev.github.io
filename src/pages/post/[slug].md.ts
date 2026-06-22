@@ -1,0 +1,56 @@
+import type { APIRoute } from 'astro';
+import { getPosts, formatDate, getSeriesParts } from '@/lib/content';
+import { getSeriesForPost, seriesPosition } from '@/data/series';
+import { SITE } from '@/config';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+export const GET: APIRoute = async ({ props }) => {
+  const { post } = props as { post: Awaited<ReturnType<typeof getPosts>>[number] };
+  const { title, description, author, pubDate, category, tags } = post.data;
+
+  const frontmatter = [
+    `# ${title}`,
+    '',
+    `> ${description}`,
+    '',
+    `- **Author:** ${author}`,
+    `- **Published:** ${formatDate(pubDate)}`,
+    `- **Category:** ${category}`,
+    tags.length ? `- **Tags:** ${tags.join(', ')}` : null,
+    `- **Source:** ${SITE.url}/post/${post.id}`,
+    '',
+    '---',
+    '',
+  ]
+    .filter((l) => l !== null)
+    .join('\n');
+
+  // Series navigation as a machine-readable block (AEO) — mirrors the on-page
+  // prev/next + jump menu, driven by src/data/series.ts.
+  let seriesBlock = '';
+  const series = getSeriesForPost(post.id);
+  if (series) {
+    const parts = await getSeriesParts(series, post.id);
+    const pos = seriesPosition(series, post.id);
+    seriesBlock =
+      `## Series: ${series.title} (Part ${pos} of ${parts.length})\n\n` +
+      parts
+        .map((p) =>
+          p.isCurrent
+            ? `${p.position}. ${p.title} (this post)`
+            : `${p.position}. [${p.title}](${SITE.url}/post/${p.slug})`
+        )
+        .join('\n') +
+      '\n\n---\n\n';
+  }
+
+  const body = post.body ?? '';
+
+  return new Response(frontmatter + seriesBlock + body, {
+    headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+  });
+};

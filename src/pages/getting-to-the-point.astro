@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistGrid from '@/components/PlaylistGrid.astro';
+import { getPlaylist, videosInPlaylist } from '@/data/videos';
+
+const playlist = getPlaylist('getting-to-the-point')!;
+const videos = videosInPlaylist('getting-to-the-point');
+---
+<BaseLayout title="Getting to the Point: Quick MuleSoft & DataWeave Tips" description={playlist.description}>
+  <PlaylistGrid
+    playlist={playlist}
+    videos={videos}
+    hook="Quick MuleSoft and DataWeave answers, each in under 30 seconds."
+  />
+</BaseLayout>

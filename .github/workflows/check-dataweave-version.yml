@@ -1,0 +1,87 @@
+name: Check DataWeave version
+
+# Watches the LIVE MuleSoft docs for a newer DataWeave version (or newly added
+# dw::Core functions) than the cheatsheet records, and opens/updates ONE tracking
+# issue when the article is out of date. It NEVER edits the article — the verbatim
+# sync is a human/`dataweave-reference-syncer` job (see CLAUDE.md).
+#
+# Trigger: weekly cron + manual. (MuleSoft publishes no RSS feed for releases, and
+# the version source is external to this repo, so a schedule is the right shape —
+# `push` would mostly re-check after unrelated commits. Run "Run workflow" anytime.)
+
+on:
+  schedule:
+    - cron: '0 13 * * 1' # every Monday 13:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: check-dataweave-version
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check cheatsheet vs. live DataWeave docs
+        id: check
+        run: node scripts/check-dataweave-version.mjs
+
+      - name: Open / update tracking issue
+        if: steps.check.outputs.outdated == 'true'
+        uses: actions/github-script@v7
+        env:
+          ISSUE_TITLE: ${{ steps.check.outputs.issue_title }}
+          ISSUE_BODY: ${{ steps.check.outputs.issue_body }}
+          LIVE_VERSION: ${{ steps.check.outputs.live_version }}
+        with:
+          script: |
+            const { ISSUE_TITLE, ISSUE_BODY, LIVE_VERSION } = process.env;
+            const label = 'dataweave-version';
+
+            // Ensure the label exists (ignore "already exists").
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner, repo: context.repo.repo,
+                name: label, color: '0e8a16',
+                description: 'DataWeave cheatsheet out of date vs. the live docs',
+              });
+            } catch (e) { if (e.status !== 422) throw e; }
+
+            // Reuse the existing open tracking issue if there is one (don't spam a
+            // new issue every week — update the body and ping instead).
+            const existing = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 100,
+            });
+
+            if (existing.length) {
+              const issue = existing[0];
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, title: ISSUE_TITLE, body: ISSUE_BODY,
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `🔁 Re-checked: docs \`latest\` is at **${LIVE_VERSION}**. Details updated above.`,
+              });
+              core.info(`Updated existing issue #${issue.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title: ISSUE_TITLE, body: ISSUE_BODY, labels: [label],
+              });
+              core.info(`Opened issue #${created.data.number}`);
+            }

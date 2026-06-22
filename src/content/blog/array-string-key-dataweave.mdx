@@ -1,0 +1,56 @@
+---
+title: "Why is my Array<String> not filtering correctly? It may be an Array<String | Key> instead"
+description: >-
+  A subtle DataWeave gotcha: when you read keys from an object, you don't always get
+  an Array<String> — you may get an Array<String | Key>, and that breaks equality
+  checks. Here's why, and how to fix it.
+pubDate: 2025-02-05
+category: Challenges
+tags: [MuleSoft, DataWeave]
+heroImage: ../../assets/blog/array-string-key-dataweave.png
+---
+
+## The Problem
+
+Ok so here's what was happening to me and I didn't know why.
+
+I was doing a bunch of transformations and at one point I'd add some keys and/or values into an array. So, some of the arrays were of type Array&lt;String> (because no key was added here) while some of them where Array&lt;Key | String>
+
+I didn't think much about it at first, since I would -incorrectly- see all the arrays in the JSON output were of type Array&lt;String>. Like this:
+
+> [!NOTE]
+> The item in line 4 was coerced into a Key for demonstration purposes.
+
+![DataWeave script with arr1 keyed and arr2 strings, both outputting the same JSON arrays](../../assets/blog/array-string-key-dataweave-1.png)
+
+So imagine my surprise when I tried to use a [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) function with the above arrays and I'd still get the same two arrays in the output.
+
+![distinctBy applied to the two arrays still returns both, since their item types differ](../../assets/blog/array-string-key-dataweave-2.png)
+
+I started losing my mind trying to troubleshoot the problem a million different ways because I didn't notice the items in the arrays were of different types!
+
+It was until one of those million times finally led me to see the array types were actually different 🤦
+
+## Possible Solutions
+
+### Solution 1
+
+There are different solutions for this problem. One would be to make sure any new items are of type String and not Key. This completely removes the issue since now you'd be comparing two arrays of type Array&lt;String>, which correctly returns only one array in the output.
+
+![Casting items to String before distinctBy now collapses the output to one array](../../assets/blog/array-string-key-dataweave-3.png)
+
+### Solution 2
+
+If you can't change the type of the items or it would take too many iterations to do, another thing you can do is to transform the items inside the [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) function itself. Like this:
+
+![distinctBy with a joinBy criteria collapses the two arrays into one in the output](../../assets/blog/array-string-key-dataweave-4.png)
+
+Since we're using the [joinBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-joinby) function, we're transforming the values of arr1 and arr2 into concatenated strings and THEN comparing them. Both arr1 and arr2 would be "key,string", which makes these values the same.
+
+I hope this post brings you more DataWeave knowledge or helps you fix some code :D
+
+Let me know your thoughts in the comments 👇
+
+Subscribe to receive notifications as soon as new content is published ✨
+
+💬 Prost! 🍻

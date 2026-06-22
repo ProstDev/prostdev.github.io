@@ -1,0 +1,148 @@
+---
+title: "DataWeave programming challenge #3: Count palindrome phrases using the Strings module"
+description: "Review each of the input phrases and find those that are palindromes. Then, retrieve the character count and sum the total characters."
+pubDate: 2023-03-07
+category: Challenges
+tags: [MuleSoft, DataWeave]
+youtubeId: 8owpvAhYfEs
+heroImage: ../../assets/blog/dataweave-programming-challenge-3.png
+---
+
+Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!
+
+> [!PLAYGROUND]
+> [Solve on the Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F3)
+
+> [!TIP]
+> For this challenge, we encourage you to make use of the [Strings module](https://docs.mulesoft.com/dataweave/latest/dw-strings)'s functions.
+
+## Input
+
+Consider the following input payload (can be of **txt** format):
+
+```
+this is not a palindrome
+blue
+Mr. Owl ate my metal worm
+Was it a car or a cat I saw?
+you're doing great!
+mug
+Rats live on no evil star
+what's taking so long?
+kayak
+Live on time, emit no evil
+Step on no pets
+boat
+Anna
+2020/02/02
+15/03/2001
+01/02/2010
+```
+
+## Explanation of the problem
+
+Each line of the input payload is considered a different phrase. Review each phrase and find those that are [palindromes](https://en.wikipedia.org/wiki/Palindrome). Notice that punctuation, spaces, or special characters should not be considered to ensure a phrase is a palindrome.
+
+For example,
+
+- **Anna** in reverse is **anna** - this is a palindrome.
+- **2020/02/02** in reverse is **20200202** - this is a palindrome.
+- **Mr. Owl ate my metal worm** in reverse is **mrowlatemymetalworm** - this is a palindrome.
+
+After that, retrieve the character count of the **original** phrase. Including punctuation, spaces, and special characters.
+
+For example,
+
+- Anna is **4**.
+- 2020/02/02 is **10**.
+- Mr. Owl ate my metal worm is **25**.
+
+Return the total sum of all the palindrome's character count.
+
+## Expected output
+
+In this case, the expected output would be:
+
+```
+148
+```
+
+The result for each of the phrases (whether they're palindrome or not) should be:
+
+- false
+- false
+- true
+- true
+- false
+- false
+- true
+- false
+- true
+- true
+- true
+- false
+- true
+- true
+- false
+- true
+
+## Clues
+
+If you're stuck with your solution, feel free to check out some of these clues to give you ideas on how to solve it!
+
+### Clue #1
+
+Read the documentation of the [Strings module](https://docs.mulesoft.com/dataweave/latest/dw-strings) to make yourself familiar with the existing functions.
+
+### Clue #2
+
+If you've been following the previous challenges, we've learned that `payload splitBy "\n"` can be replaced with the `lines()` function from the Strings module.
+
+### Clue #3
+
+Use the lower() function to make sure all the characters can be compared in lower-case.
+
+### Clue #4
+
+Instead of using map() to iterate through the string's characters, you can use mapString() from the Strings module.
+
+### Clue #5
+
+You don't need to use regex to find the alphanumeric characters. You can use isAlphanumeric() from the Strings module.
+
+### Clue #6
+
+Instead of using selectors, you can use the reverse() function from the Strings module.
+
+### Clue #7
+
+Use sizeOf() and sum() to retrieve the character count in an array and then sum the complete array of numbers.
+
+## Answer
+
+If you haven't solved this challenge yet, we encourage you to keep trying! It's ok if it's taking longer than you thought. We all have to start somewhere ✨ Check out the clues and read the docs before giving up. You got this!! 💙
+
+There are many ways to solve this challenge, but you can find here one of our solutions so you can compare your result with us.
+
+### Solution #1
+
+```dataweave
+%dw 2.0
+import lines, isAlphanumeric, mapString, reverse from dw::core::Strings
+output application/json
+---
+sum(lines(payload) map (line) -> do {
+    var clearLine = lower(line) mapString (
+        if (isAlphanumeric($)) $
+        else ""
+    )
+    var isPalindrome = clearLine == reverse(clearLine)
+    ---
+    if (isPalindrome) sizeOf(line)
+    else 0
+})
+```
+
+Feel free to comment your code below for others to see! 😄
+
+Subscribe to receive notifications as soon as new content is published ✨

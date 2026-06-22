@@ -1,0 +1,177 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LiteYouTube from '@/components/LiteYouTube.astro';
+import DocActions from '@/components/DocActions.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import ReportIssue from '@/components/ReportIssue.astro';
+import Icon from '@/components/Icon.astro';
+import { VIDEOS, getPlaylist, watchUrl, videosInPlaylist, playlistNeighbors } from '@/data/videos';
+import { getTranscript } from '@/lib/transcripts';
+import { SITE } from '@/config';
+
+export async function getStaticPaths() {
+  return VIDEOS.map((video) => ({ params: { slug: video.slug }, props: { video } }));
+}
+
+const { video } = Astro.props;
+const transcript = await getTranscript(video.youtubeId);
+
+let TranscriptContent: any = null;
+let transcriptHeadings: any[] = [];
+if (transcript) {
+  const rendered = await render(transcript);
+  TranscriptContent = rendered.Content;
+  transcriptHeadings = rendered.headings;
+}
+
+const primaryPlaylist = getPlaylist(video.playlists[0]);
+const related = primaryPlaylist
+  ? videosInPlaylist(primaryPlaylist.id).filter((v) => v.slug !== video.slug).slice(0, 4)
+  : [];
+
+// Prev/next within the primary playlist, so viewers can move through a series
+// without returning to the section page. Only meaningful for multi-video playlists.
+const { prev, next } = primaryPlaylist
+  ? playlistNeighbors(primaryPlaylist.id, video.slug)
+  : {};
+
+const url = new URL(`/video/${video.slug}`, SITE.url).href;
+const mdUrl = `/video/${video.slug}.md`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: video.title,
+    description: video.description,
+    thumbnailUrl: `https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg`,
+    uploadDate: video.publishedAt ? new Date(video.publishedAt).toISOString() : undefined,
+    contentUrl: watchUrl(video.youtubeId),
+    embedUrl: `https://www.youtube.com/embed/${video.youtubeId}`,
+    ...(transcript ? { transcript: transcript.body } : {}),
+    publisher: { '@type': 'Organization', name: SITE.name },
+  },
+];
+
+// On-this-page anchors: a fixed set plus transcript subheadings.
+const baseHeadings = [
+  { depth: 2, slug: 'about', text: 'About this video' },
+  ...(video.links && video.links.length > 0
+    ? [{ depth: 2, slug: 'resources', text: 'Resources' }]
+    : []),
+  ...(transcript ? [{ depth: 2, slug: 'transcript', text: 'Transcript' }] : []),
+];
+const headings = [...baseHeadings, ...transcriptHeadings.filter((h) => h.depth === 3)];
+---
+<BaseLayout
+  title={video.title}
+  description={video.description}
+  type="video.other"
+  contained={false}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto grid w-full max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+    <article data-pagefind-body>
+      <nav class="mb-4 text-sm text-muted" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-accent">Home</a> ›
+        {primaryPlaylist && <><a href={`/${primaryPlaylist.slug}`} class="hover:text-accent">{primaryPlaylist.title}</a> › </>}
+        <span class="text-default">Video</span>
+      </nav>
+
+      <h1 class="mb-4 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl">{video.title}</h1>
+
+      {(prev || next) && (
+        <nav class="mb-4 flex items-center gap-2" aria-label="Video">
+          {prev && (
+            <a
+              href={`/video/${prev.slug}`}
+              rel="prev"
+              title={`Previous: ${prev.title}`}
+              aria-label={`Previous video: ${prev.title}`}
+              class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-default text-accent transition-colors hover:border-accent hover:bg-accent hover:text-[var(--accent-contrast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            >
+              <Icon name="arrow-left" class="h-5 w-5" />
+            </a>
+          )}
+          {next && (
+            <a
+              href={`/video/${next.slug}`}
+              rel="next"
+              title={`Next: ${next.title}`}
+              aria-label={`Next video: ${next.title}`}
+              class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-default text-accent transition-colors hover:border-accent hover:bg-accent hover:text-[var(--accent-contrast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            >
+              <Icon name="arrow-right" class="h-5 w-5" />
+            </a>
+          )}
+        </nav>
+      )}
+
+      <LiteYouTube youtubeId={video.youtubeId} title={video.title} class="shadow-lg" />
+
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-4 border-y border-default py-3">
+        <a href={watchUrl(video.youtubeId)} target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
+          <Icon name="youtube" class="h-5 w-5" /> Watch on YouTube
+        </a>
+        <DocActions markdownUrl={mdUrl} />
+      </div>
+
+      <h2 id="about" class="mt-8 text-xl font-bold">About this video</h2>
+      <p class="mt-3 text-muted">{video.description}</p>
+
+      {video.links && video.links.length > 0 && (
+        <section class="mt-8">
+          <h2 id="resources" class="text-xl font-bold">Resources</h2>
+          <ul class="mt-3 space-y-2">
+            {video.links.map((link) => {
+              const isRepo = /github\.com/.test(link.url);
+              return (
+                <li>
+                  <a href={link.url} target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-accent hover:underline">
+                    <Icon name={isRepo ? 'github' : 'external'} class="h-4 w-4" />
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      {transcript ? (
+        <section class="mt-10">
+          <h2 id="transcript" class="text-xl font-bold">Transcript</h2>
+          <div class="prose prose-lg mt-4 max-w-none dark:prose-invert prose-headings:scroll-mt-24">
+            <TranscriptContent />
+          </div>
+        </section>
+      ) : (
+        <p class="mt-10 rounded-xl border border-dashed border-default p-5 text-sm text-muted">
+          📝 Transcript coming soon. In the meantime,
+          <a href={watchUrl(video.youtubeId)} target="_blank" rel="noopener" class="text-accent hover:underline">watch on YouTube</a>
+          where auto-generated captions are available.
+        </p>
+      )}
+
+      {related.length > 0 && (
+        <section class="mt-12 border-t border-default pt-8">
+          <h2 class="mb-4 text-lg font-bold">More from {primaryPlaylist?.title}</h2>
+          <ul class="space-y-2">
+            {related.map((r) => (
+              <li><a href={`/video/${r.slug}`} class="text-accent hover:underline">{r.title}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </article>
+
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 space-y-6">
+        <TableOfContents headings={headings} />
+      </div>
+    </aside>
+  </div>
+
+  <ReportIssue pageUrl={url} pageTitle={video.title} />
+</BaseLayout>

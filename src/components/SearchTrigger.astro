@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Compact = icon-only square (mobile); full = input-style box with ⌘K. */
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+---
+{compact ? (
+  <button
+    type="button"
+    data-search-open
+    class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-default text-muted transition-colors hover:text-accent"
+    aria-label="Search (press / or Cmd+K)"
+  >
+    <Icon name="search" class="h-5 w-5" />
+  </button>
+) : (
+  <button
+    type="button"
+    data-search-open
+    class="group inline-flex h-9 w-56 items-center gap-2 rounded-lg border border-default bg-surface-subtle px-3 text-sm text-muted transition-colors hover:border-accent"
+    aria-label="Search (press / or Cmd+K)"
+  >
+    <Icon name="search" class="h-4 w-4 shrink-0" />
+    <span class="flex-1 text-left">Search…</span>
+    <kbd class="hidden items-center gap-0.5 rounded border border-default bg-surface px-1.5 py-0.5 font-sans text-[11px] font-medium text-muted sm:inline-flex">
+      <span class="text-sm leading-none">⌘</span>K
+    </kbd>
+  </button>
+)}

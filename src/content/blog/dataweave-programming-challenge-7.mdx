@@ -1,0 +1,168 @@
+---
+title: "DataWeave programming challenge #7: Modify certain values from a JSON structure"
+description: "Create a DataWeave script that will update all the values to uppercase, except the ones in which the field equals thisname."
+pubDate: 2023-06-13
+category: Challenges
+tags: [MuleSoft, DataWeave]
+youtubeId: qBiFkditGbk
+heroImage: ../../assets/blog/dataweave-programming-challenge-7.png
+---
+
+Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!
+
+> [!PLAYGROUND]
+> [Solve on the Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F7)
+
+> [!TIP]
+> Instead of trying to write the whole code yourself, browse in the documentation for any function that would do the work for you 👀
+
+## Input
+
+Consider the following JSON input payload:
+
+```
+{
+    "name": "a",
+    "object": {
+      "name": "b",
+      "l": [
+        {
+          "other": "c",
+          "list": [
+            
+          ]
+        },
+        {
+          "thisname": "def",
+          "list": [
+            {
+              "this": "500e",
+              "l": [
+                {
+                  "finalname": "f"
+                },
+                {
+                  "finalname": "ghijk"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "array": [
+      {
+        "thisname": "h"
+      },
+      {
+        "xyz": "abc123"
+      }
+    ]
+  }
+```
+
+## Explanation of the problem
+
+Create a DataWeave script that will update all the values to uppercase, **except** the ones in which the field equals **thisname**.
+
+For example, the first field **name** with the value **"a"** has to be transformed to **"A"**. However, the field **thisname** with the value of **"def"** should stay the same.
+
+## Expected output
+
+In this case, the expected output would be:
+
+```
+{
+  "name": "A",
+  "object": {
+    "name": "B",
+    "l": [
+      {
+        "other": "C",
+        "list": [
+          
+        ]
+      },
+      {
+        "thisname": "def",
+        "list": [
+          {
+            "this": "500E",
+            "l": [
+              {
+                "finalname": "F"
+              },
+              {
+                "finalname": "GHIJK"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "array": [
+    {
+      "thisname": "h"
+    },
+    {
+      "xyz": "ABC123"
+    }
+  ]
+}
+```
+
+## Clues
+
+If you're stuck with your solution, feel free to check out some of these clues to give you ideas on how to solve it!
+
+### Clue #1
+
+Check out the [Tree](https://docs.mulesoft.com/dataweave/latest/dw-tree) module to see if any of those functions is useful for this case.
+
+### Clue #2
+
+Check out the [mapLeafValues](https://docs.mulesoft.com/dataweave/latest/dw-tree-functions-mapleafvalues) function.
+
+### Clue #3
+
+Use the [upper](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-upper) function to transform the strings to uppercase.
+
+### Clue #4
+
+Use **path[-1].selector** to retrieve the name of each value's field and compare it with a given string value.
+
+## Answer
+
+If you haven't solved this challenge yet, we encourage you to keep trying! It's ok if it's taking longer than you thought. We all have to start somewhere ✨ Check out the clues and read the docs before giving up. You got this!! 💙
+
+There are many ways to solve this challenge, but you can find here some solutions we are providing so you can compare your result with us.
+
+### Solution #1
+
+```dataweave
+%dw 2.0
+import mapLeafValues from dw::util::Tree
+output application/json
+---
+payload mapLeafValues ((value, path) -> 
+    if (path[-1].selector == "thisname") value
+    else upper(value)
+)
+```
+
+### Solution #2
+
+```dataweave
+%dw 2.0
+import mapLeafValues from dw::util::Tree
+output application/json
+---
+payload mapLeafValues
+    if ($$[-1].selector == "thisname") $
+    else upper($)
+```
+
+Feel free to comment your code below for others to see! 😄
+
+Subscribe to receive notifications as soon as new content is published ✨

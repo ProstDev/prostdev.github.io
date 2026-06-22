@@ -1,0 +1,173 @@
+---
+/**
+ * Series navigation for multi-part blog posts.
+ *
+ * Renders prev/next arrows (mirroring the video pager in src/pages/video/[slug].astro) plus a
+ * native <details> "jump to any part" menu. Driven entirely by the series registry
+ * (src/data/series.ts) via getSeriesParts() — no per-post duplication.
+ *
+ * - variant="top": compact (arrows + collapsed disclosure), placed under the post header.
+ * - variant="bottom": fuller ("More from this series" heading + arrows + expanded disclosure),
+ *   placed after the post body. Mirrors the video page's "More from {playlist}" section.
+ *
+ * No-JS / crawler-safe (build-time markup + native <details>). The current part is a non-link
+ * <span aria-current="true">, never a link to itself (WCAG 4.1.2). Colors use arbitrary CSS-var
+ * utilities on stateful links so the .text-* helper classes don't eat the hover variant.
+ */
+import Icon from '@/components/Icon.astro';
+
+interface Part {
+  slug: string;
+  title: string;
+  position: number;
+  isCurrent: boolean;
+}
+
+interface Props {
+  parts: Part[];
+  seriesTitle: string;
+  variant: 'top' | 'bottom';
+}
+
+const { parts, seriesTitle, variant } = Astro.props;
+
+const currentIdx = parts.findIndex((p) => p.isCurrent);
+const current = parts[currentIdx];
+const prev = currentIdx > 0 ? parts[currentIdx - 1] : undefined;
+const next = currentIdx < parts.length - 1 ? parts[currentIdx + 1] : undefined;
+
+const btnClass =
+  'inline-flex h-11 w-11 items-center justify-center rounded-lg border border-default text-accent transition-colors hover:border-accent hover:bg-accent hover:text-[var(--accent-contrast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]';
+---
+{variant === 'bottom' ? (
+  <section class="mt-12 border-t border-default pt-8">
+    <h2 class="mb-4 text-lg font-bold">More from this series</h2>
+    {(prev || next) && (
+      <nav class="mb-4 flex items-center gap-2" aria-label="Series">
+        {prev && (
+          <a
+            href={`/post/${prev.slug}`}
+            rel="prev"
+            title={`Previous part: ${prev.title}`}
+            aria-label={`Previous part: ${prev.title}`}
+            class={btnClass}
+          >
+            <Icon name="arrow-left" class="h-5 w-5" />
+          </a>
+        )}
+        {next && (
+          <a
+            href={`/post/${next.slug}`}
+            rel="next"
+            title={`Next part: ${next.title}`}
+            aria-label={`Next part: ${next.title}`}
+            class={btnClass}
+          >
+            <Icon name="arrow-right" class="h-5 w-5" />
+          </a>
+        )}
+      </nav>
+    )}
+    <details class="rounded-lg border border-default" open>
+      <summary class="series-summary flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-semibold text-[var(--text)] hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]">
+        <Icon name="book" class="h-4 w-4 text-accent" aria-hidden="true" />
+        <span>{seriesTitle}</span>
+        <span class="text-muted">· Part {current?.position} of {parts.length}</span>
+        <Icon name="chevron-down" class="series-chevron ml-auto h-4 w-4 transition-transform" aria-hidden="true" />
+      </summary>
+      <ol class="space-y-1.5 border-t border-default px-4 py-3 text-sm">
+        {parts.map((p) => (
+          <li>
+            {p.isCurrent ? (
+              <span aria-current="true" class="flex items-start gap-2 font-semibold text-[var(--accent)]">
+                <span class="text-muted tabular-nums">{p.position}.</span>
+                <span>{p.title}</span>
+              </span>
+            ) : (
+              <a
+                href={`/post/${p.slug}`}
+                class="flex items-start gap-2 rounded text-[var(--text)] hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              >
+                <span class="text-muted tabular-nums">{p.position}.</span>
+                <span>{p.title}</span>
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+    </details>
+  </section>
+) : (
+  <div class="mb-8">
+    {(prev || next) && (
+      <nav class="mb-3 flex items-center gap-2" aria-label="Series">
+        {prev && (
+          <a
+            href={`/post/${prev.slug}`}
+            rel="prev"
+            title={`Previous part: ${prev.title}`}
+            aria-label={`Previous part: ${prev.title}`}
+            class={btnClass}
+          >
+            <Icon name="arrow-left" class="h-5 w-5" />
+          </a>
+        )}
+        {next && (
+          <a
+            href={`/post/${next.slug}`}
+            rel="next"
+            title={`Next part: ${next.title}`}
+            aria-label={`Next part: ${next.title}`}
+            class={btnClass}
+          >
+            <Icon name="arrow-right" class="h-5 w-5" />
+          </a>
+        )}
+      </nav>
+    )}
+    <details class="rounded-lg border border-default">
+      <summary class="series-summary flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-semibold text-[var(--text)] hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]">
+        <Icon name="book" class="h-4 w-4 text-accent" aria-hidden="true" />
+        <span>{seriesTitle}</span>
+        <span class="text-muted">· Part {current?.position} of {parts.length}</span>
+        <Icon name="chevron-down" class="series-chevron ml-auto h-4 w-4 transition-transform" aria-hidden="true" />
+      </summary>
+      <ol class="space-y-1.5 border-t border-default px-4 py-3 text-sm">
+        {parts.map((p) => (
+          <li>
+            {p.isCurrent ? (
+              <span aria-current="true" class="flex items-start gap-2 font-semibold text-[var(--accent)]">
+                <span class="text-muted tabular-nums">{p.position}.</span>
+                <span>{p.title}</span>
+              </span>
+            ) : (
+              <a
+                href={`/post/${p.slug}`}
+                class="flex items-start gap-2 rounded text-[var(--text)] hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              >
+                <span class="text-muted tabular-nums">{p.position}.</span>
+                <span>{p.title}</span>
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+    </details>
+  </div>
+)}
+
+<style>
+  /* Hide the default disclosure triangle (we render our own chevron). */
+  .series-summary::-webkit-details-marker {
+    display: none;
+  }
+  /* Rotate the chevron when the disclosure is open. */
+  details[open] > .series-summary .series-chevron {
+    transform: rotate(180deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .series-chevron {
+      transition: none;
+    }
+  }
+</style>

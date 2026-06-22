@@ -1,0 +1,167 @@
+---
+title: Universal API Management, Anypoint Flex Gateway, and API Governance
+description: As you are aware that recently MuleSoft has introduced Universal API Management capabilities via Flex Gateway and API Governance components as part of Anypoint Platform. These two components are very important as a part of API lifecycle management and those will help to manage any APIs using a single platform and ensure that whatever API specs that you are designing are with best practices and all security aspects have been taken care of during API design.
+pubDate: 2022-05-31
+author: "Jitendra Bafna"
+category: Guides
+tags: [MuleSoft, Anypoint Platform, Flex Gateway, API, Docker]
+draft: false
+heroImage: ../../assets/blog/universal-api-management-anypoint-flex-gateway-and-api-governance-1.png
+---
+
+As you are aware that recently MuleSoft has introduced Universal API Management capabilities via Flex Gateway and API Governance components as part of Anypoint Platform. These two components are very important as a part of API lifecycle management and those will help to manage any APIs using a single platform and ensure that whatever API specs that you are designing are with best practices and all security aspects have been taken care of during API design.
+
+## Universal API Management
+
+Universal API Management allows you to manage, govern, or secure the APIs within a single control plane, it doesn’t matter whether they are Mule or non-Mule APIs or where they are located (on-premise, cloud, or anywhere).
+
+- It will allow the organizations or enterprises to control, manage, and secure the APIs under a single umbrella.
+- Adapt any architecture with a lightweight and flexible API Gateway to manage and secure the APIs.
+- Govern all APIs under a single platform.
+
+## Anypoint Flex Gateway
+
+Flex Gateway is ultrafast and manages the APIs running anywhere.
+
+- Secure and Manage APIs located anywhere.
+- Extend Anypoint Platform capabilities to Mule as well as non-Mule APIs.
+- Achieve consistent security and governance across every API operating in any environment.
+- Flex Gateway can be used in local or connected mode.
+
+**What are the benefits of Flex Gateway?**
+
+- Flex gateway is an ultra-fast gateway that can be used for any APIs (MuleSoft or Non-MuleSoft APIs), deployed anywhere (Cloud, Docker, Kubernetes, Customer Hosted, etc.).
+- Easily manage all the APIs within your organization from a single platform and under a single umbrella.
+- Extend the Anypoint Platform Capabilities to Mule and non-Mule APIs.
+- Secure, discover, govern, or engage the APIs (Mule and non-Mule APIs).
+- Set up the Flex Gateway easily in 2 modes (Local and Connected).
+- Adapt any architecture with a lightweight and flexible API Gateway to manage and secure the APIs.
+
+**Can we apply any out-of-the-box, as well as custom API policies to APIs, published to Flex Gateway?**
+
+Yes, you can apply any out-of-the-box as well as custom policies to APIs published to Flex Gateway. You can apply API Manager alerts and view APIs metrics.
+
+**Is Flex Gateway part of a 30-day free trial Anypoint Platform account?**
+
+Yes, you can find Flex Gateway as part of a 30-day free trial Anypoint Platform account.
+
+**Where to find MuleSoft documentation for Flex Gateway overview?**
+
+Here is the link: [https://docs.mulesoft.com/gateway/flex-gateway-overview](https://docs.mulesoft.com/gateway/flex-gateway-overview)
+
+**How to upgrade Flex Gateway?**
+
+Here is the link explaining how to upgrade Flex Gateway: [https://docs.mulesoft.com/gateway/flex-gateway-upgrade](https://docs.mulesoft.com/gateway/flex-gateway-upgrade)
+
+**How to uninstall Flex Gateway?**
+
+Here is the link explaining how to uninstall Flex Gateway:
+
+[https://docs.mulesoft.com/gateway/flex-gateway-uninstall](https://docs.mulesoft.com/gateway/flex-gateway-uninstall)
+
+**What is the shared responsibility for Flex Gateway between MuleSoft and you?**
+
+Here is the MuleSoft document explaining the shared responsibility model for Flex Gateway:
+
+[https://docs.mulesoft.com/gateway/flex-shared-responsibility](https://docs.mulesoft.com/gateway/flex-shared-responsibility)
+
+**What authentication mechanism is supported for installing Flex Gateway?**
+
+There are three types of authentication mechanisms supported for installing Flex Gateway:
+
+- Anypoint Username and Password
+- Auth Token
+- Connected App
+
+**Where can Flex Gateway be set up?**
+
+Flex Gateway can be set up on three different operating systems:
+
+- Install Flex Gateway as a Linux Service.
+- Install Flex Gateway as a Docker Container.
+- Install Flex Gateway as a Kubernetes Ingress Controller.
+
+**What are the different steps for setting up Flex Gateway?**
+
+Here is the MuleSoft documentation, showing what commands can be used to set up the Flex Gateway.
+
+- [Review Prerequisites](https://docs.mulesoft.com/gateway/flex-review-prerequisites)
+- [Install Flex Gateway](https://docs.mulesoft.com/gateway/flex-install)
+- [Run Flex Gateway (Connected Mode)](https://docs.mulesoft.com/gateway/flex-conn-reg-run)
+- [Run Flex Gateway (Local Mode)](https://docs.mulesoft.com/gateway/flex-local-reg-run)
+- [Add Replicas (Connected Mode)](https://docs.mulesoft.com/gateway/flex-conn-rep-run)
+- [Add Replicas (Local Mode)](https://docs.mulesoft.com/gateway/flex-local-rep-run)
+- [Manage APIs (Connected Mode)](https://docs.mulesoft.com/gateway/flex-conn-manage)
+- [Manage APIs (Local Mode)](https://docs.mulesoft.com/gateway/flex-local-manage)
+
+**Can you use a single Flex Gateway for multiple APIs agnostic of the technology and location where it is deployed?**
+
+Yes, we can use a single Flex Gateway for multiple APIs, it doesn’t matter where they are running and in which technologies they have been implemented. Here is a sample architecture showing a single Flex Gateway for multiple APIs.
+
+In the above Flex Gateway architecture, we are using a single Flex Gateway in Docker container with multiple replicas to connect multiple APIs implemented in any technology.
+
+Flex Gateway replicas actually run in the Docker container in the above architecture and it is registered in Anypoint Platform.
+
+**Can you use multiple Flex Gateways for multiple APIs?**
+
+Yes, we can use multiple Flex Gateways for multiple APIs deployed anywhere. Here is a sample architecture showing a multiple Flex Gateway for multiple APIs.
+
+In the above Flex Gateway architecture, we are using multiple Flex Gateways in Docker containers with multiple replicas to connect multiple APIs implemented in any technology. We are using one Flex Gateway for each API in the above architecture and this can be grouped according to your need and requirements.
+
+Flex Gateway replicas actually run in the Docker container in the above architecture and it is registered in Anypoint Platform.
+
+Here is the list of videos that will explain how to set up the Flex Gateway in both Connected and Local mode:
+
+- [Anypoint Universal API Management and Flex Gateway - Part I | MuleSoft](https://youtu.be/ZG9Si5w-hUA)
+- [Anypoint Universal API Management and Flex Gateway - Part II | Flex Gateway in Connected Mode](https://youtu.be/t_oevGDU3Ro)
+- [Anypoint Universal API Management and Flex Gateway - Part III | Manage, Secure API in Connected Mode](https://youtu.be/2dPfR7riEQI)
+- [Anypoint Universal API Management and Flex Gateway - Part IV | Flex Gateway in Local Mode](https://youtu.be/Ouzt2zyZNkM)
+- [Anypoint Universal API Management and Flex Gateway - Part V | Manage, Secure API in Local Mode](https://youtu.be/OY2EVsS3SPI)
+- [Anypoint Universal API Management and Flex Gateway - Part VI | Manage Multiple API in Local Mode](https://youtu.be/2meUTtANR_o)
+- [Surat MuleSoft Meetup#41 (Flex Gateway and API Governance)](https://youtu.be/ocaeFlBD9dA)
+
+## API Governance
+
+MuleSoft has recently introduced API Governance as a part of Anypoint Platform that enables you to apply governance ruleset to your APIs that ensures API Consistency and provides default several rulesets such as a Top 10 OWASP API Security, Anypoint API Best Practices, OpenAPI Best Practices governance rulesets, etc.
+
+API Governance will ensure the API designs across the enterprises are consistent and are designed with API best practices and guidelines. This will ensure the security of the API and improve the quality of the APIs.
+
+**What are the benefits of API Governance?**
+
+- Enable developers to apply governance rulesets at design time.
+- Produce consistent API specs across the enterprises.
+- Improved API Quality and Security.
+- API design with Anypoint best practices and OpenAPI best practices.
+- Ensure Design-Time conformance.
+- Reduce Top 10 OWASP security risks.
+
+**Are there any default rulesets for API Governance?**
+
+API Governance comes with the following default rulesets:
+
+- [Anypoint Best Practices](https://anypoint.mulesoft.com/exchange/68ef9520-24e9-4cf2-b2f5-620025690913/anypoint-best-practices/minor/1.0/)
+- [Authentication Security Best Practices](https://anypoint.mulesoft.com/exchange/68ef9520-24e9-4cf2-b2f5-620025690913/authentication-security-best-practices/minor/1.0/)
+- [HTTPS Enforcement](https://anypoint.mulesoft.com/exchange/68ef9520-24e9-4cf2-b2f5-620025690913/https-enforcement/minor/1.0/)
+- [OpenAPI Best Practices](https://anypoint.mulesoft.com/exchange/68ef9520-24e9-4cf2-b2f5-620025690913/openapi-best-practices/minor/1.0/)
+- [OWASP API Security Top 10 2019 Checklist](https://anypoint.mulesoft.com/exchange/68ef9520-24e9-4cf2-b2f5-620025690913/owasp-api-security/minor/1.0/)
+- [Required Examples](https://anypoint.mulesoft.com/exchange/68ef9520-24e9-4cf2-b2f5-620025690913/required-examples/minor/1.0/)
+
+**How to implement API Governance for the APIs?**
+
+The first step for creating API Governance is to create the profile in Anypoint Platform’s API Governance and select what are the rulesets that you need to enable for that profile and also you can add filters and notifications. Filters will ensure which APIs need to be scanned against the profile that we have created. Notifications will generate emails to the users in case the APIs haven't been designed according to rulesets associated with the profile and they will be marked as **Non-Conformant**.
+
+There are three statuses maintained for your APIs as part of the API Governance:
+
+- **Not Validated** - API is not validated against the API Governance profile.
+- **Conformant** - API has satisfied the rulesets that were associated with the profile.
+- **Non-Conformant** - API has not satisfied the rulesets that were associated with the profile.
+
+Below is the report generated for your APIs and it will show the status of the APIs with what are the rulesets failed and what are the violations in your APIs.
+
+Here is a video showing how to implement Anypoint API Governance: [Anypoint API Governance With MuleSoft](https://youtu.be/BZXbRWJ5Tro).
+
+## Conclusion
+
+As we have seen in the above article, how Flex Gateway can be used to manage any APIs agnostic of technologies and platforms. API Governance will ensure that the design of your APIs is consistent, secure, and defined with Anypoint API and OpenAPI best practices and Top 10 OWASP security has been taken care of. These are two important features that have been released recently as a part of Anypoint Platform.
+
+Next, you can explore the Flex Gateway and API Governance capabilities within Anypoint Platform.

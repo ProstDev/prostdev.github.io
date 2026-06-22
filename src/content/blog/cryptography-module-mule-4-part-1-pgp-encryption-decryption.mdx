@@ -1,0 +1,133 @@
+---
+title: "Cryptography Module Mule 4 - Part 1 (PGP Encryption/Decryption)"
+description: "Mule 4 has a Cryptography module which includes PGP, XML, and JCE. In this article, we will see the PGP technique — a cryptographic way that allows secure communication between two entities using public and private keys."
+pubDate: 2020-08-18
+author: "Vikalp Bhalia"
+category: Tutorials
+tags: [MuleSoft, Anypoint Studio, DataWeave]
+draft: false
+heroImage: ../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption.png
+---
+
+*GitHub repository with the Mule project can be found at the end of the post.*
+
+Mule 4 has a Cryptography module which includes these 3 different strategies:
+
+- PGP
+- XML
+- JCE
+
+In this article, we will see the PGP technique.
+
+## PGP
+
+Pretty Good Privacy (PGP) is a cryptographic way that allows secure communication between two entities. It uses the public and private key concepts to encrypt the data as shown in the below diagram.
+
+![PGP diagram: A encrypts a message with B's public key and B decrypts it with the private key](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-1.png)
+
+## Prerequisites
+
+**1. Install the Crypto Module from Exchange, located in the Mule palette.**
+
+> [!NOTE]
+> Here is the reference documentation on how to install new modules to your Mule Project: [Adding Modules to Your Project](https://docs.mulesoft.com/studio/7.5/add-modules-in-studio-to).
+
+![Mule Palette Crypto module listing PGP, JCE, and XML operations like Pgp encrypt and Pgp decrypt](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-2.png)
+
+**2. Create private and public keys**
+
+Please follow the below steps to generate a public/private key pair:
+
+- Download and install the GnuPG from [this link](https://www.gnupg.org/download/index.html).
+- Install [Kleopatra](https://www.openpgp.org/software/kleopatra/) to use a Graphical User Interface (GUI).
+- To generate the keys, click on “New Key Pair” and follow the instructions on the screen.
+
+![Kleopatra welcome screen with New Key Pair and Import buttons for managing PGP keys](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-3.png)
+
+- Once the keys are generated, export them to the file system.
+
+![Kleopatra context menu noting Export gives the public key and Export Secret Keys the private key](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-4.png)
+
+- The generated files are of ASC format, which is not supported by Mule yet, so we need to [dearmor](https://www.gnupg.org/documentation/manuals/gnupg/Operational-GPG-Commands.html) the keys first. Run the following command: `./gpg --dearmor <PATH_TO_YOUR_ASC_FILE>` for each of the keys. This command will create new files alongside the ASC files that will have .gpg appended to their filename which are supported in Mule.
+
+![File listing with private.asc and public.asc next to their dearmored .gpg versions](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-5.png)
+
+This is what you will get after following the previous steps:
+
+- Public/Private keys
+- Fingerprint
+- Passphrase
+- KeyId
+
+## Mule Code Implementation
+
+We will limit our scope to PGP encrypt/decrypt operation in this article.
+
+### Global configurations
+
+Create 2 global configurations:
+
+- Encryption – Configure public key, keyId, and fingerprint.
+- Decryption – Configure private key, keyId, and fingerprint.
+
+![**For projects: you should have these 2 configurations in different projects and all fields should be read from property files. The passphrase should be treated as a secure property.](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-6.png)
+
+### Usage
+
+**1. Encryption/Decryption of entire payload**
+
+**Encryption:**
+
+![**To log or use payload in the next processor, convert the encrypted stream to a base64 data type.](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-7.png)
+
+**Output:**
+
+![Postman POST to /encrypt returning a PGP-encrypted payload as a base64 string](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-8.png)
+
+**Decryption:**
+
+![Mule XML for the decryption flow converting the base64 payload to a stream and running Pgp decrypt](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-9.png)
+
+**Output:**
+
+![Postman POST to /decrypt returning the original JSON payload with name, city, and email](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-10.png)
+
+**2. Encryption/Decryption at field level**
+
+This is a very common non-functional requirement where sensitive fields should be encrypted.
+
+For this, we can still reuse the pgp-encryption-flow and pgp-decryption-flow flows. The only change would be the way we refer to these flows from the main flow, and for that, the DataWeave lookup function is very useful.
+
+**Encryption:**
+
+![**Used lookup function to invoke the pgp-encryption-flow.](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-11.png)
+
+**Output:**
+
+![Postman POST to /encrypt returning JSON where only the EMAIL field is PGP-encrypted](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-12.png)
+
+**Decryption:**
+
+![Mule XML using a DataWeave decrypt function with lookup to decrypt only the email field](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-13.png)
+
+**Output:**
+
+![Postman POST to /decrypt returning JSON with the email field decrypted back to its original value](../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption-14.png)
+
+## Conclusion
+
+So far we learned Mule code implementation for PGP. You can set this Mule code as a common service that will help to achieve the encryption/decryption non-functional requirement in many APIs.
+
+Here are the 2 ways to set up this Mule code as a common service:
+
+- Externalize the flow and publish it on the Anypoint Exchange.
+- Create a common API, which will encrypt/decrypt the payload.
+
+## References
+
+- [https://docs.mulesoft.com/mule-runtime/4.3/cryptography-pgp](https://docs.mulesoft.com/mule-runtime/4.3/cryptography-pgp)
+- [https://docs.mulesoft.com/mule-runtime/4.3/dw-mule-functions-lookup](https://docs.mulesoft.com/mule-runtime/4.3/dw-mule-functions-lookup)
+
+## GitHub repository
+
+[ProstDev GitHub - Demo PGP](https://github.com/ProstDev/demo-pgp)

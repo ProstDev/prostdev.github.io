@@ -1,0 +1,213 @@
+---
+title: "DataWeave programming challenge #2: Rock Paper Scissors game score system"
+description: "Create a script to keep your score on a series of Rock Paper Scissors games. 0 if you lose, 3 if it's a draw, and 6 if you win."
+pubDate: 2023-02-28
+category: Challenges
+tags: [MuleSoft, DataWeave]
+youtubeId: cZVwl55yTWo
+heroImage: ../../assets/blog/dataweave-programming-challenge-2.png
+---
+
+> [!NOTE]
+> This challenge is based on [Advent of Code 2022 day 2](https://adventofcode.com/2022/day/2)
+
+Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!
+
+> [!PLAYGROUND]
+> [Solve on the Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F2)
+
+## Input
+
+Consider the following input payload (can be of **txt** format):
+
+```
+R R
+R P
+R S
+P R
+P P
+P S
+S R
+S P
+S S
+R R
+```
+
+## Explanation of the problem
+
+Create a DataWeave script to keep your score on a series of Rock Paper Scissors games. The first column is what your **opponent** chose and the second column is what **you** chose. Each letter is a representation of the decision made:
+
+- R = Rock
+- P = Paper
+- S = Scissors
+
+The rules of the game are simple:
+
+- Rock defeats Scissors
+- Paper defeats Rock
+- Scissors defeat Paper
+
+As per the scoring system, you will have to keep track of whether you won, lost, or if it was a draw. Remember the second column is your choice. Here's how you will be counting the points:
+
+- 0 points if you lost the round
+- 3 points if the round was a draw
+- 6 points if you won the round
+
+For example,
+
+- The first round was **R R**, which means both your opponent and you chose Rock. This round results in a **draw**, so **3** points are added.
+- The second round was **R P**, which means your opponent chose Rock and you chose Paper. Paper defeats Rock, which means you win this round. **6** points are added.
+- The third round was **R S**, which means your opponent chose Rock and you chose Scissors. Rock defeats Scissors, which means you lose this round. **0** points are added.
+
+The final result will be the number of total points you earned in the 10 rounds.
+
+## Expected output
+
+In this case, the expected output would be:
+
+```
+30
+```
+
+The result for each of the 10 rounds should be:
+
+- 3
+- 6
+- 0
+- 0
+- 3
+- 6
+- 6
+- 0
+- 3
+- 3
+
+## Clues
+
+If you're stuck with your solution, feel free to check out some of these clues to give you ideas on how to solve it!
+
+### Clue #1
+
+Using `splitBy "\n"` is the same as using the lines() function from the Strings module
+
+### Clue #2
+
+You can use reduce() to keep the score in the accumulator
+
+### Clue #3
+
+If you don't want to use reduce, you can use map() to get the points of each round and add the numbers at the end
+
+### Clue #4
+
+You can use splitBy() to get your opponent's moves and yours to compare
+
+### Clue #5
+
+You can create a variable with the pointing system
+
+### Clue #6
+
+The rules can be made of objects in order to extract the points/moves
+
+### Clue #7
+
+If you used map() to get the points, you can use sum() to add all the numbers
+
+### Clue #8
+
+You can use the `do` operator to create localized variables
+
+## Answer
+
+If you haven't solved this challenge yet, we encourage you to keep trying! It's ok if it's taking longer than you thought. We all have to start somewhere ✨ Check out the clues and read the docs before giving up. You got this!! 💙
+
+There are many ways to solve this challenge, but you can find here some solutions we are providing so you can compare your result with us.
+
+### Solution #1 - based on Felix Schnabel's solution
+
+```dataweave
+%dw 2.0
+output application/json
+import lines from dw::core::Strings
+var defeats = {
+    R: "S",
+    P: "R",
+    S: "P"
+}
+fun getScore(opponent:String, me:String): Number =
+    if (opponent == me) 3
+    else if (defeats[me] == opponent) 6
+    else 0
+---
+sum(lines(payload) map getScore($[0],$[-1]))
+```
+
+### Solution #2
+
+```dataweave
+%dw 2.0
+output application/json
+var rules = {
+    R: {
+        R: 3,
+        P: 6,
+        S: 0
+    },
+    P: {
+        R: 0,
+        P: 3,
+        S: 6
+    },
+    S: {
+        R: 6,
+        P: 0,
+        S: 3
+    }
+}
+---
+payload splitBy "\n"
+reduce ((round, score=0) -> do {
+    var arr = round splitBy " "
+    var opponent = arr[0]
+    var me = arr[-1]
+    ---
+    score + rules[opponent][me]
+})
+```
+
+### Solution #3
+
+```dataweave
+%dw 2.0
+output application/json
+import lines from dw::core::Strings
+var rules = {
+    R: {
+        R: 3,
+        P: 6,
+        S: 0
+    },
+    P: {
+        R: 0,
+        P: 3,
+        S: 6
+    },
+    S: {
+        R: 6,
+        P: 0,
+        S: 3
+    }
+}
+---
+lines(payload) map do {
+    var arr = $ splitBy " "
+    ---
+    rules[arr[0]][arr[1]]
+}
+then sum($)
+```
+
+Feel free to comment your code below for others to see! 😄
+
+Subscribe to receive notifications as soon as new content is published ✨

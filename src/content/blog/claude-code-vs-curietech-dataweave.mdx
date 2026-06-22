@@ -1,0 +1,110 @@
+---
+title: 'Claude Code vs CurieTech AI: Which Writes Better DataWeave?'
+description: >-
+  Kicking off AI Showdown: MuleSoft Edition (2026) by pitting Claude Code against
+  CurieTech AI on Advent of Code 2025 — same inputs, benchmarked in the DataWeave
+  Playground. Who writes cleaner, faster MuleSoft transformations?
+pubDate: 2026-05-28
+category: Opinion
+tags: [MuleSoft, DataWeave, Visual Studio Code, AI, CurieTech AI, Claude Code]
+youtubeId: C0QB4Z1LwxM
+heroImage: ../../assets/blog/claude-code-vs-curietech-dataweave.png
+---
+
+Two AIs. Four DataWeave puzzles. One question:
+
+**Which one writes better MuleSoft code?**
+
+I put [Claude Code](https://claude.com/claude-code) (running in MAX effort mode) head-to-head against [CurieTech AI](https://platform.curietech.ai) to solve [Advent of Code 2025](https://adventofcode.com/2025) — Days 1 and 2, both parts. Same input. Same expected output. Side-by-side execution times in the [DataWeave Playground](https://dataweave.mulesoft.com/learn/playground).
+
+This is also the first video in a new series I'm starting: **AI Showdown: MuleSoft Edition (2026) 🥊**
+
+## TL;DR
+
+Both AIs got the **correct answer on all 4 puzzles**. Execution times in the Playground were within milliseconds of each other. The real differences showed up in how they got there — code readability, type usage, error handling, and whether the AI actually runs the code before handing it back.
+
+## The setup
+
+- **Claude Code** — VS Code extension, MAX effort mode, Sonnet 4.5
+- **CurieTech AI** — tested two ways:
+  - Day 1: via the CurieTech MCP server inside Claude Code
+  - Day 2: directly through the chat at [platform.curietech.ai](https://platform.curietech.ai/)
+- **Challenges**: Advent of Code 2025, Days 1 and 2 (both parts)
+- **Benchmarking**: dw::util::Timer::time() in the DataWeave Playground
+
+## What surprised me
+
+### ✅ Execution times were ridiculously close
+
+We're talking millisecond-level differences — even running in the browser-based Playground. Sometimes Claude edged out, sometimes CurieTech did. Honestly? Coin-flip territory.
+
+### ✅ CurieTech actually runs the code
+
+This is the big one. CurieTech executes the DataWeave it generates before returning the answer. Claude doesn't — it just produces code and hopes for the best.
+
+The result: I caught a runtime error in Claude's Day 2 solution that only surfaced when I ran it locally. Had to feed the error back into Claude for a second pass. CurieTech never had that problem.
+
+### ✅ CurieTech writes typed function signatures
+
+Look at the difference:
+
+Claude (untyped):
+
+```
+fun claude(input) = ...
+```
+
+CurieTech (typed):
+
+```
+fun curietech(input: Array<Number>): Number = ...
+```
+
+When you're reading code cold (or coming back to it months later), those types make a huge difference.
+
+### ✅ CurieTech adds performance notes
+
+On Day 2 Part 1, CurieTech proactively warned me:
+
+> "Ranges like this are tiny (~7 IDs), so brute forcing works here. If you ever face huge ranges, you'd want to generate candidates, loop over half-lengths, and concatenate instead of scanning every number."
+
+That kind of contextual insight is genuinely useful — especially for folks newer to DataWeave.
+
+### ✅ Claude Code wins on workflow
+
+If you live in VS Code or your terminal, Claude Code's integration is hard to beat. File context, multi-step tasks, the whole ecosystem. CurieTech's MCP server brings some of that into Claude Code, but the native experience is still tighter.
+
+### ❌ Claude can ship broken code
+
+As mentioned — Day 2 had a runtime error that wasted time. Not a dealbreaker, but worth knowing.
+
+### ❌ CurieTech needed a nudge on Day 1 Part 2
+
+The first attempt got the wrong answer. After I gave it more context about the input format, it produced a verified solution. Slight friction, but the recovery was clean.
+
+## So who wins?
+
+Honestly? There's no clear winner. Each has real strengths:
+
+- **Pick Claude Code** if you value workflow integration, live in VS Code, and don't mind catching the occasional runtime error.
+- **Pick CurieTech AI** if you value verified-running code, typed function signatures, and inline performance notes.
+
+For someone newer to DataWeave or AI coding tools, **CurieTech is probably the gentler entry point** — the chat UI is approachable and the verified-solution guarantee is reassuring.
+
+For experienced devs already deep in the Claude Code ecosystem, Claude Code with the CurieTech MCP server is a great hybrid — you get the workflow you want plus the verification when you need it.
+
+## All the code
+
+Every solution, every benchmark script, every Playground link is in the GitHub repo:
+
+🔗 [github.com/alexandramartinez/adventofcode-2025](http://github.com/alexandramartinez/adventofcode-2025)
+
+## What's next?
+
+This is the first video in **AI Showdown: MuleSoft Edition (2026)** — an ongoing series comparing AI coding tools on the same MuleSoft and DataWeave challenges. As I work through more Advent of Code days (and test more AIs), I'll keep posting the results here.
+
+🎯 What AI tool should I compare next? Drop a comment on the YouTube video or reply to this post.
+
+🔔 Subscribe so you don't miss the next round: [youtube.com/prostdev](https://www.youtube.com/prostdev)
+
+*Looking for the previous series? Check out "Adventures in MuleSoft + AI" on the channel for last year's explorations.*

@@ -1,0 +1,38 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TagChip from '@/components/TagChip.astro';
+import { getTags } from '@/lib/content';
+
+const tags = await getTags(); // {tag, count}[], alphabetized
+// "Popular" = the most-used tags, surfaced first as a quick-jump row.
+const popular = [...tags].sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag)).slice(0, 12);
+
+const title = 'Tags';
+const description =
+  'Browse every topic on the ProstDev blog — MuleSoft, DataWeave, Anypoint, AI, and more. Pick a tag to see all related tutorials, guides, and posts.';
+---
+<BaseLayout title={title} description={description}>
+  <div class="py-10">
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Tags</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-muted">
+        Browse every topic on the blog. Pick a tag to see all related posts, or head back to the
+        <a href="/blog" class="text-accent hover:underline">blog</a>.
+      </p>
+    </header>
+
+    <section class="mb-10">
+      <h2 class="mb-3 text-sm font-semibold text-default">Popular topics</h2>
+      <div class="flex flex-wrap gap-2">
+        {popular.map(({ tag, count }) => <TagChip tag={tag} count={count} />)}
+      </div>
+    </section>
+
+    <section>
+      <h2 class="mb-3 text-sm font-semibold text-default">All tags ({tags.length})</h2>
+      <div class="flex flex-wrap gap-2">
+        {tags.map(({ tag, count }) => <TagChip tag={tag} count={count} />)}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

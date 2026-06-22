@@ -1,0 +1,31 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import { SITE, SOCIAL } from '@/config';
+
+const subject = encodeURIComponent('Hello from prostdev.com');
+---
+<BaseLayout title="Contact" description="Get in touch with ProstDev — comments, suggestions, or questions about MuleSoft, DataWeave, and the videos.">
+  <div class="mx-auto max-w-2xl py-16 text-center">
+    <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Contact</h1>
+    <p class="mx-auto mt-4 max-w-lg text-muted">
+      Send your comments, suggestions, or questions. The fastest way to reach me is by
+      email or on social. 👋
+    </p>
+
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <a href={`mailto:${SITE.email}?subject=${subject}`} class="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 font-semibold text-[color:var(--accent-contrast)] transition-transform hover:scale-[1.02]">
+        <Icon name="mail" class="h-5 w-5" /> Email me
+      </a>
+    </div>
+
+    <div class="mt-10">
+      <p class="text-sm font-semibold text-default">Follow along</p>
+      <div class="mt-4 flex items-center justify-center gap-3">
+        <a href={SOCIAL.youtube} target="_blank" rel="noopener" aria-label="YouTube" class="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-default text-muted transition-colors hover:text-[#ff0000]"><Icon name="youtube" class="h-6 w-6" /></a>
+        <a href={SOCIAL.github} target="_blank" rel="noopener" aria-label="GitHub" class="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-default text-muted transition-colors hover:text-default"><Icon name="github" class="h-6 w-6" /></a>
+        <a href={SOCIAL.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn" class="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-default text-muted transition-colors hover:text-[#0a66c2]"><Icon name="linkedin" class="h-6 w-6" /></a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

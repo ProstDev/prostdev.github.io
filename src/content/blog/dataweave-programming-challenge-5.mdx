@@ -1,0 +1,123 @@
+---
+title: "DataWeave programming challenge #5: Reverse a phrase's words, but keep the punctuation"
+description: "Reverse the order of the words in the given phrases. However, the punctuation signs stay in the same place."
+pubDate: 2023-04-18
+category: Challenges
+tags: [MuleSoft, DataWeave]
+youtubeId: Dk1MZQ7T-GM
+heroImage: ../../assets/blog/dataweave-programming-challenge-5.png
+---
+
+> [!NOTE]
+> This challenge is based on [Codeacademy's Reverse Words challenge](https://discuss.codecademy.com/t/challenge-reverse-words/83796)
+
+Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!
+
+> [!PLAYGROUND]
+> [Solve on the Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F5)
+
+## Input
+
+Consider the following input payload (can be of **txt** format):
+
+```
+Hello world
+May the Fourth be with you
+Hello world!
+With you, be May the Fourth
+With you, be May the Fourth!
+```
+
+## Explanation of the problem
+
+Create a DataWeave script that will reverse the order of each one of the words in a phrase to form a new phrase. Each phrase or sentence is separated by a new line. Each word is separated by a space. However, the punctuation signs (! and ,) will have to stay in the same place. Lower/upper cases can be kept as-is.
+
+For example:
+
+- "Hello world!" becomes "world Hello!"
+- "With you, be May the Fourth!" becomes "Fourth the, May be you With!"
+
+## Expected output
+
+In this case, the expected output would be:
+
+```
+[
+  "world Hello",
+  "you with be Fourth the May",
+  "world Hello!",
+  "Fourth the, May be you With",
+  "Fourth the, May be you With!"
+]
+```
+
+> [!NOTE]
+> You can keep the output as a JSON or as a text, whatever your preference is.
+
+## Clues
+
+If you're stuck with your solution, feel free to check out some of these clues to give you ideas on how to solve it!
+
+### Clue #1
+
+Keep the index of each punctuation sign so you can insert it there later
+
+### Clue #2
+
+You can use the isAlphanumeric function from the Strings module
+
+### Clue #3
+
+You can use the scan function to separate each phrase in an Array of Strings
+
+### Clue #4
+
+You can use the joinBy function to transform from Array to String
+
+## Answer
+
+If you haven't solved this challenge yet, we encourage you to keep trying! It's ok if it's taking longer than you thought. We all have to start somewhere ✨ Check out the clues and read the docs before giving up. You got this!! 💙
+
+There are many ways to solve this challenge, but you can find here my solution. I'm sure you all can make it better! :) Mine is super long 😂
+
+### Solution #1
+
+```dataweave
+%dw 2.0
+import slice from dw::core::Arrays
+import lines, isAlphanumeric from dw::core::Strings
+output application/json
+---
+lines(payload) 
+map ((line) -> flatten(
+	line scan /[^\w\d\s]|[\w]*/
+) filter (!isEmpty($)))
+map ((words) -> do {
+	var wordsobj = (words map {
+		word: $,
+		originalIndex: $$,
+		move: isAlphanumeric($)
+	})
+	var reversed = (wordsobj filter ($.move))[-1 to 0]
+	var spechars = wordsobj filter (not $.move)
+	var endingStr = if (spechars[-1].originalIndex != null)
+			(reversed[spechars[-1].originalIndex to -1].word default [] joinBy " ")
+		else ""
+	---
+	if (isEmpty(spechars)) reversed.word joinBy " "
+	else spechars map ((charobj,coidx) ->
+		slice(
+			reversed,
+			if (coidx-1 >= 0) spechars[coidx-1].originalIndex else 0,
+			charobj.originalIndex
+		).word joinBy " "
+		then trim("$($)$(charobj.word) $(endingStr)")
+	) joinBy " "
+})
+```
+
+I also recorded myself coming up with the solution, but without explanations. Just some lo-fi music and a screen :) you can leave the video in the background while working! :D let me know if you find this useful.
+
+Feel free to comment your code below for others to see! 😄
+
+Subscribe to receive notifications as soon as new content is published ✨

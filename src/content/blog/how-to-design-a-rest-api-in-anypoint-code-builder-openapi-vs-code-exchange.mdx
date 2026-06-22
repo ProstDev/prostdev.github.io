@@ -1,0 +1,263 @@
+---
+title: 'Design a REST API in Anypoint Code Builder (OpenAPI + VS Code)'
+description: >-
+  Learn how to design a complete REST API in Anypoint Code Builder using OpenAPI 3.0 in VS
+  Code. Mock, test, and publish your API to Anypoint Exchange—no XML needed.
+pubDate: 2025-07-14
+category: Tutorials
+tags: [MuleSoft, Anypoint Code Builder, Visual Studio Code]
+youtubeId: cki1MOLC1CE
+heroImage: ../../assets/blog/how-to-design-a-rest-api-in-anypoint-code-builder-openapi-vs-code-exchange.png
+---
+
+Whether you’re new to MuleSoft or finally starting to explore Anypoint Code Builder (ACB), this post will walk you through designing a full REST API specification using OpenAPI 3.0 — directly inside VS Code, with no XML or flows yet.
+
+By the end, you’ll be able to:
+
+- Define a reusable OpenAPI spec for a To-Do API
+- Mock and test the endpoints inside ACB
+- Publish the spec to Anypoint Exchange so your team can reuse or scaffold flows from it later
+
+Let’s build the foundation for your next MuleSoft project — the right way.
+
+## 🛠️ What You’ll Need
+
+- New to ACB? Read our [Getting Started guide](https://www.prostdev.com/post/getting-started-with-anypoint-code-builder-in-vs-code-beginner-guide) first.
+- [Anypoint Platform](https://anypoint.mulesoft.com/) account to publish to Exchange.
+
+## 🧪 What We’re Building
+
+We’re designing a To-Do Task Management API that supports full CRUD operations for /tasks:
+
+- GET /tasks to list tasks with optional filters
+- POST /tasks to create a task
+- GET /tasks/&#123;taskId&#125;, PUT, and DELETE for individual task management
+- A schema for Task and a separate input model TaskInput
+
+> If you want to follow with the YAML file, you can check it out [here](https://gist.github.com/alexandramartinez/c7680921369627323b763905b9b28490).
+
+## 🧑‍💻 Step-by-Step API Design in ACB
+
+### 1. Create a New OpenAPI Spec
+
+From the ACB Welcome screen, choose "Design an API", then select:
+
+- Type: API Specification
+- Language: OpenAPI 3.0 (YAML)
+- Project name: todo-task-api
+
+You don’t need to log into Anypoint Platform just yet.
+
+### 2. Fill Out the API Info Block
+
+Update the metadata like this:
+
+```yaml
+info:
+    version: 1.0.0
+    title: To-Do Task Management API
+    description: A simple API for managing to-do tasks. Supports full CRUD operations for tasks in a single-user context.
+```
+
+This info will be displayed in Exchange later — so make it clear and helpful.
+
+### 3. Define Your Endpoints
+
+Start with the /tasks resource and support:
+
+- GET with optional query parameters (completed, dueDate)
+- POST with a JSON request body
+
+```yaml
+paths:
+    /tasks:
+        get:
+            summary: List all tasks
+            description: Retrieve a list of all tasks, with optional filtering by completion status and due date.
+            parameters:
+                - in: query
+                  name: completed
+                  schema:
+                    type: boolean
+                  description: Filter tasks by completion status (true or false)
+                - in: query
+                  name: dueDate
+                  schema:
+                    type: string
+                    format: date
+                  description: Filter tasks by due date (YYYY-MM-DD)
+            responses:
+                "200":
+                    description: A list of tasks
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Task"
+        post:
+            summary: Create a new task
+            description: Add a new task to the to-do list.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/TaskInput"
+            responses:
+                "201":
+                    description: Task created successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Task"
+```
+
+Then add the /tasks/&#123;taskId&#125; resource with GET, PUT, and DELETE methods.
+
+Make sure to handle the URI parameter.
+
+```yaml
+    /tasks/{taskId}:
+        parameters:
+            - in: path
+              name: taskId
+              required: true
+              schema:
+                  type: string
+        get:
+            summary: Get a task by ID
+            description: Retrieve a specific task by its unique ID.
+            responses:
+                "200":
+                    description: Task details
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Task"
+                "404":
+                    description: Task not found
+        put:
+            summary: Update a task
+            description: Update an existing task by its ID.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/TaskInput"
+            responses:
+                "200":
+                    description: Task updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Task"
+                "404":
+                    description: Task not found
+        delete:
+            summary: Delete a task
+            description: Remove a task from the list by its ID.
+            responses:
+                "204":
+                    description: Task deleted successfully
+                "404":
+                    description: Task not found
+```
+
+### 4. Add Reusable Schemas
+
+In the components section, define two schemas:
+
+#### Task
+
+```yaml
+components:
+    schemas:
+        Task:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: "1"
+                title:
+                    type: string
+                    example: Buy groceries
+                description:
+                    type: string
+                    example: Milk, bread, eggs
+                dueDate:
+                    type: string
+                    format: date
+                    example: 2026-01-01
+                completed:
+                    type: boolean
+                    default: false
+                    example: false
+            required: 
+                - id
+                - title
+                - completed
+```
+
+#### TaskInput
+
+```yaml
+        TaskInput:
+            type: object
+            properties:
+                title:
+                    type: string
+                    example: Buy groceries
+                description:
+                    type: string
+                    example: Milk, bread, eggs
+                dueDate:
+                    type: string
+                    format: date
+                    example: 2026-01-01
+                completed:
+                    type: boolean
+                    default: false
+                    example: false
+            required:
+                - title
+                - completed
+```
+
+### 5. Test Using the API Console
+
+> Your API Specification should look like [this](https://gist.github.com/alexandramartinez/c7680921369627323b763905b9b28490).
+
+Click API Console to try out each endpoint — no flows required.
+
+[You](http://required.You)’ll see:
+
+- Query parameter validation
+- 404 handling
+- Schema errors if you send the wrong type
+- Simulated responses using your example data
+
+This is perfect for quick iteration or mocking out APIs.
+
+### 6. Publish to Anypoint Exchange
+
+When you're ready to share:
+
+- Log into Anypoint Platform via ACB
+- Press Cmd/Ctrl + Shift + P → "Publish API Project to Exchange"
+- Choose a business group and version, then publish!
+
+You can now discover and reuse this API inside your org — or scaffold flows from it in the next step.
+
+## 📦 What’s Next?
+
+In the next tutorial, we’ll take this exact API spec and use it to auto-generate the MuleSoft flows. You’ll implement the endpoints inside VS Code without writing a line of XML manually.
+
+👉 Subscribe to the [YouTube playlist](https://www.youtube.com/playlist?list=PLb61lESgk6hh9SszYvsAnLYiV9-WCpqPP) for new ACB videos every week.
+
+## **💡 Pro Tip**
+
+**If you ever get stuck, I offer** **Anypoint Code Builder Office Hours** **to help you troubleshoot and get unblocked.**
+
+**👉 Book a session** [here](https://calendly.com/mule-alexmartinez/acb-troubleshooting)**.**

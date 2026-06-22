@@ -1,0 +1,523 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* Dark mode driven by data-theme="dark" on <html> (set before paint to avoid FOUC) */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  /* Brand palette — ProstDev cyan/blue */
+  --color-brand-50: #e6f7fd;
+  --color-brand-100: #c3ecfa;
+  --color-brand-200: #8fdcf5;
+  --color-brand-300: #54c8ee;
+  --color-brand-400: #29abe2;
+  --color-brand-500: #1593cc;
+  --color-brand-600: #0f76a8;
+  --color-brand-700: #105f87;
+  --color-brand-800: #134f6f;
+  --color-brand-900: #14425d;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', Menlo,
+    Consolas, monospace;
+}
+
+/* Semantic surface tokens — flip with theme */
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f5f8fa;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f1b24;
+  --text-muted: #5b6b78;
+  --accent: var(--color-brand-500);
+  /* Darker accent for solid fills behind --accent-contrast text (WCAG AA: brand-500
+     fill + white text is only 3.46:1; brand-600 reaches 5.03:1). */
+  --accent-strong: var(--color-brand-600);
+  --accent-contrast: #ffffff;
+
+  /* Inline code chip (light). Accent-tinted fill + a visible accent border so an inline
+     `var` clearly reads as code (the old --bg-subtle fill was ~invisible on --bg). Text
+     stays --text (#0f1b24 on #e6f7fd ≈ 14:1, well past WCAG AA) — NOT accent-colored, so a
+     code chip isn't confused with a link. See `.prose code` below. */
+  --code-bg: #e6f7fd;
+  --code-border: var(--color-brand-500); /* #1593cc — 3.46:1 vs page #fff, a crisp visible edge (WCAG 1.4.11) */
+  --code-text: var(--text);
+
+  /* Callout/admonition status colors (light). Each type: pale tint bg + a saturated
+     border/icon accent + a dark label that clears WCAG AA (>=4.5:1) on the tint. Body text
+     inside a callout stays --text (>=14:1 on these near-white tints). See .callout* below
+     and src/lib/remark-callouts.mjs. */
+  --callout-note-bg: #eff6ff;       --callout-note-border: #2563eb;       --callout-note-label: #1e40af;
+  --callout-tip-bg: #ecfdf5;        --callout-tip-border: #059669;        --callout-tip-label: #065f46;
+  --callout-important-bg: #f5f3ff;  --callout-important-border: #7c3aed;  --callout-important-label: #5b21b6;
+  --callout-warning-bg: #fffbeb;    --callout-warning-border: #d97706;    --callout-warning-label: #92400e;
+  --callout-caution-bg: #fef2f2;    --callout-caution-border: #dc2626;    --callout-caution-label: #991b1b;
+  --callout-docs-bg: #ecfeff;       --callout-docs-border: #0891b2;       --callout-docs-label: #155e75;
+}
+
+[data-theme='dark'] {
+  --bg: #0b1015;
+  --bg-subtle: #121a22;
+  --bg-card: #151f28;
+  --border: #243240;
+  --text: #e8eef3;
+  --text-muted: #93a4b3;
+  --accent: var(--color-brand-300);
+  /* Dark mode: the light accent + dark text already clears AA (9.85:1), so the
+     solid-fill accent matches the regular accent. */
+  --accent-strong: var(--color-brand-300);
+  --accent-contrast: #07111a;
+
+  /* Inline code chip (dark). Deep accent-tinted fill + a brighter accent border. Text stays
+     --text (#e8eef3 on #0e2230 ≈ 12:1, well past WCAG AA). */
+  --code-bg: #0e2230;
+  --code-border: #3a6e8a; /* 3.44:1 vs page #0b1015 — a crisp visible edge (WCAG 1.4.11) */
+  --code-text: var(--text);
+
+  /* Callout status colors (dark). Deep-but-subtle tint + a brighter border/icon + a light
+     label that clears AA (>=8:1) on the tint. Body text stays --text (>=13:1). */
+  --callout-note-bg: #0e1f33;       --callout-note-border: #60a5fa;       --callout-note-label: #93c5fd;
+  --callout-tip-bg: #0d2419;        --callout-tip-border: #34d399;        --callout-tip-label: #6ee7b7;
+  --callout-important-bg: #1c1433;  --callout-important-border: #a78bfa;  --callout-important-label: #c4b5fd;
+  --callout-warning-bg: #2a1f06;    --callout-warning-border: #fbbf24;    --callout-warning-label: #fcd34d;
+  --callout-caution-bg: #2a1214;    --callout-caution-border: #f87171;    --callout-caution-label: #fca5a5;
+  --callout-docs-bg: #07262c;       --callout-docs-border: #22d3ee;       --callout-docs-label: #67e8f9;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Utility shortcuts mapped to semantic tokens */
+.bg-surface { background-color: var(--bg); }
+.bg-surface-subtle { background-color: var(--bg-subtle); }
+.bg-surface-card { background-color: var(--bg-card); }
+.text-default { color: var(--text); }
+.text-muted { color: var(--text-muted); }
+.border-default { border-color: var(--border); }
+.text-accent { color: var(--accent); }
+.bg-accent { background-color: var(--accent); }
+
+/* Focus visibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Interactive controls get the pointer cursor.
+   Tailwind v4 Preflight doesn't set this on <button>; <a href> already gets it. */
+button:not(:disabled),
+summary,
+[role='button'] {
+  cursor: pointer;
+}
+
+/* Hide scrollbar on horizontal playlist rows but keep scrolling */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Shiki dual-theme dark mode.
+   shikiConfig.themes (astro.config.mjs) emits github-light as inline styles
+   (background-color/color) and stores github-dark values in --shiki-dark* CSS vars.
+   Astro doesn't auto-activate them — and we toggle theme via [data-theme="dark"], not
+   Shiki's default `.dark` class — so without this rule code blocks stay light-on-dark.
+   Inline styles beat class selectors, so !important is required to swap them. */
+[data-theme='dark'] .astro-code,
+[data-theme='dark'] .astro-code span {
+  background-color: var(--shiki-dark-bg) !important;
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/* Code block container: padding, rounding, and a visible boundary in BOTH themes.
+   github-light's inline background is ~#fff (== --bg in light mode), so a code block
+   would otherwise blend into the page with no edge. Tint it to the subtle surface and
+   add a hairline border. In dark mode the rule above repaints the bg via Shiki vars, so
+   we only set the border there (don't override the dark background). */
+.astro-code {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-subtle) !important;
+  overflow-x: auto;
+}
+.astro-code span {
+  background-color: transparent !important;
+}
+[data-theme='dark'] .astro-code {
+  /* keep the Shiki dark bg from the rule above; just carry the border */
+  border-color: var(--border);
+}
+
+/* ── Enhanced code blocks (src/components/CodeBlockEnhancer.astro) ──
+   Client-side JS wraps each `pre.astro-code` in a `.code-block` (header bar with a
+   language label + copy button; tall blocks get a collapsible body + fade + toggle).
+   The WRAPPER owns the border/radius now, so neutralize them on the enhanced `pre`
+   to avoid a double box. All colors via semantic tokens so it flips per theme. */
+.code-block {
+  margin: 1.25rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden; /* clip the rounded corners over the bar + body */
+}
+/* The Shiki block, once wrapped, drops its own frame + outer margin. */
+.astro-code.is-enhanced {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.code-block__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.85rem;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+/* Left label group: optional filename + language label, sharing one row. */
+.code-block__left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0; /* let a long filename truncate instead of pushing Copy off */
+}
+.code-block__lang {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Filename chip (only when the fence carried `title="…"`). The filename is the
+   primary label, so it reads in full --text; the file icon sits before it. */
+.code-block__file {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.code-block__file svg {
+  flex: none;
+  color: var(--text-muted);
+}
+.code-block__file > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* With a filename present, the language drops to a small muted secondary badge.
+   Keep the full --text-muted token (5.5:1 light / 6.5:1 dark, AA) — do NOT dim it
+   with opacity: at 0.68rem it's small text, and opacity:0.85 sinks light mode to
+   3.99:1 (fails WCAG AA). --text-muted is already the "muted" treatment. */
+.code-block__bar--titled .code-block__lang {
+  font-size: 0.68rem;
+}
+
+/* Copy button — dense in-component control (matches DocActions sizing, not the 44px
+   standalone rule). focus ring offset against the BAR background (--bg-card). */
+.code-block__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background-color: transparent;
+  border: 1px solid transparent;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.code-block__copy:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--border);
+}
+.code-block__copy:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--bg-card);
+}
+.code-block__copy-done { color: #22c55e; } /* green-500, matches DocActions check */
+.code-block__copy .hidden { display: none; }
+
+/* Body — full height by default (no-JS / short blocks). Collapsible only when JS adds
+   .is-collapsible; the collapsed state clamps height and the ::fade overlays the cut. */
+.code-block__body { position: relative; }
+.code-block__body.is-collapsible.is-collapsed {
+  max-height: 480px;
+  overflow: hidden;
+}
+.code-block__fade {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4.5rem;
+  pointer-events: none;
+  /* fade to the code body's background — differs per theme (light = --bg-subtle,
+     dark = Shiki's repainted --shiki-dark-bg). */
+  background: linear-gradient(to bottom, transparent, var(--bg-subtle));
+}
+[data-theme='dark'] .code-block__fade {
+  background: linear-gradient(to bottom, transparent, var(--shiki-dark-bg));
+}
+.code-block__body.is-collapsible.is-collapsed .code-block__fade { display: block; }
+
+.code-block__toggle {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background-color: var(--bg-card);
+  border: 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  transition: background-color 0.15s;
+}
+.code-block__toggle:hover { background-color: var(--bg-subtle); }
+.code-block__toggle:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* Don't let @tailwindcss/typography inject curly quotes around blockquotes.
+   The plugin defaults add `content: open-quote/close-quote` on the first/last <p>
+   inside a blockquote — but migrated Wix posts already contain the author's literal
+   quote marks in the text, so the CSS quotes DOUBLE them (`""Ranges …""`). Suppress
+   the pseudo-element quotes and keep only the real ones from the content. */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: none;
+}
+
+/* ── Callouts / admonitions (src/lib/remark-callouts.mjs) ──
+   GitHub alert blockquotes (`> [!NOTE]`) are transformed at build time into
+   `<div class="callout callout--TYPE" role="note">` with a `.callout__title` label row
+   (icon + word) and a `.callout__body` holding the prose. Five types, each color-keyed via the
+   --callout-*-{bg,border,label} tokens (defined per theme above), so they flip automatically.
+   WCAG 1.4.1: the visible label word — not color/icon — carries the meaning. */
+.prose .callout {
+  margin: 1.5rem 0;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--cl-border);
+  border-radius: 8px;
+  background-color: var(--cl-bg);
+}
+.prose .callout--note      { --cl-bg: var(--callout-note-bg);      --cl-border: var(--callout-note-border);      --cl-label: var(--callout-note-label); }
+.prose .callout--tip       { --cl-bg: var(--callout-tip-bg);       --cl-border: var(--callout-tip-border);       --cl-label: var(--callout-tip-label); }
+.prose .callout--important { --cl-bg: var(--callout-important-bg); --cl-border: var(--callout-important-border); --cl-label: var(--callout-important-label); }
+.prose .callout--warning   { --cl-bg: var(--callout-warning-bg);   --cl-border: var(--callout-warning-border);   --cl-label: var(--callout-warning-label); }
+.prose .callout--caution   { --cl-bg: var(--callout-caution-bg);   --cl-border: var(--callout-caution-border);   --cl-label: var(--callout-caution-label); }
+.prose .callout--docs      { --cl-bg: var(--callout-docs-bg);      --cl-border: var(--callout-docs-border);      --cl-label: var(--callout-docs-label); }
+
+.prose .callout__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--cl-label);
+}
+.prose .callout__icon {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--cl-border); /* the saturated accent reads as the icon color */
+}
+/* Body inherits prose styling; just neutralize the outer child margins so the box padding
+   reads evenly, and keep links on the type's label color for cohesion. */
+.prose .callout__body > :first-child { margin-top: 0; }
+.prose .callout__body > :last-child { margin-bottom: 0; }
+
+/* ── Playground CTA pill (src/lib/remark-callouts.mjs `[!PLAYGROUND]`) ──
+   A `> [!PLAYGROUND]` blockquote becomes a block-level accent PILL anchor (rocket + label +
+   external-arrow), NOT a callout box. Opt-in + repeatable mid-post (one per code stage in a
+   gradual tutorial). SOLID fill ⇒ --accent-strong (plain --accent under white is only 3.46:1,
+   FAILS AA); text is --accent-contrast (flips white↔dark per theme). Both pairings clear AA in
+   BOTH themes. The `.prose .playground-btn` class beats the zero-specificity `.prose :where(a)`
+   link rule, so no underline/link-color leaks through without !important. */
+.prose .playground-btn {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem; /* 44px — WCAG 2.5.5 AAA target size for a standalone control */
+  margin: 1.5rem auto; /* centered in the prose column (width:fit-content keeps it pill-sized) */
+  padding: 0.5rem 1.1rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--accent-contrast);
+  background-color: var(--accent-strong);
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  transition: background-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+/* Hover + focus share the same affordance (darken via overlay + lift), so mouse and keyboard
+   users get equal feedback. The overlay keeps the --accent-contrast text contrast intact (no
+   opacity dimming of the text itself, which would break WCAG). */
+.prose .playground-btn:hover {
+  background-image: linear-gradient(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.12));
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
+  transform: translateY(-1px);
+}
+.prose .playground-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--bg); /* WCAG 2.4.7, ring offset = page bg */
+}
+@media (prefers-reduced-motion: reduce) {
+  .prose .playground-btn { transition: none; }
+  .prose .playground-btn:hover { transform: none; }
+}
+.prose .playground-btn__ext {
+  flex: none;
+  width: 1rem;
+  height: 1rem; /* slightly smaller — reads as a "new tab" hint, not a peer */
+}
+/* Rocket is now an emoji glyph, not an SVG — size it via font-size, not width/height. */
+.prose .playground-btn__icon {
+  flex: none;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* ── Tables (GFM, wrapped by src/lib/rehype-tables.mjs) ──
+   Migrated Wix tables render as GFM pipe tables → `<div class="table-wrap"><table>…`.
+   The WRAPPER is the horizontal-scroll region (WCAG 1.4.10 Reflow): a wide table scrolls
+   inside its own box on a ~360px screen instead of pushing the whole page sideways. It's
+   focusable (tabindex/role/aria-label in the plugin) so keyboard users can scroll it too.
+   Styling uses the semantic --bg-subtle/--border/--text-muted tokens so it flips per theme;
+   the typography plugin's own table rules are wrapped in :where() (zero specificity), so these
+   single-class rules win without !important. */
+.prose .table-wrap {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  /* a faint inset so a scrollable table reads as a bounded panel */
+  -webkit-overflow-scrolling: touch;
+}
+.prose .table-wrap > table {
+  margin: 0;              /* the wrapper owns the outer spacing now */
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.925rem;
+}
+.prose .table-wrap :where(th, td) {
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  border: 0;              /* rows are separated by horizontal rules only (see below) */
+}
+/* Header row: subtle fill + a stronger bottom rule so it reads as the column labels. */
+.prose .table-wrap thead th {
+  background-color: var(--bg-subtle);
+  color: var(--text);
+  font-weight: 700;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;    /* short labels like "URL part"/"Step" shouldn't wrap */
+}
+/* Zebra striping for row scanning; hairline between body rows. */
+.prose .table-wrap tbody tr { border-top: 1px solid var(--border); }
+.prose .table-wrap tbody tr:first-child { border-top: 0; }
+.prose .table-wrap tbody tr:nth-child(even) td { background-color: var(--bg-subtle); }
+/* The first body row's top border is redundant with the thead's heavier rule. */
+.prose .table-wrap thead + tbody tr:first-child { border-top: 0; }
+
+/* ── Body images (migrated inline screenshots) ──
+   Inline body images render inside `.prose`, where @tailwindcss/typography styles `img` as a
+   left-aligned block at its NATURAL width. Wide images fill the column and read fine, but a
+   low-res screenshot keeps its small intrinsic width and hugs the LEFT edge — looking like a
+   layout bug. Center every body image (and its figure/caption) so narrow images sit in the
+   middle of the column regardless of resolution; `max-width:100%` still keeps wide ones in
+   bounds. The typography img rule is :where()-wrapped (zero specificity), so this single-class
+   rule wins without !important. (The hero <Image> lives OUTSIDE .prose, so it's untouched.) */
+.prose :where(img) {
+  display: block;
+  margin-inline: auto;
+  max-width: 100%;
+  height: auto;
+}
+.prose :where(figure) {
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* ── Inline code (`var` / `CONNECTED_APP_CLIENT_ID`) ──
+   @tailwindcss/typography styles inline `code` by ADDING literal backtick characters via
+   `code::before/::after { content: "`" }` and gives it no background — so an inline var read
+   as `` `var` `` with stray backticks and no visual chip. Render it as a proper bordered chip
+   using the semantic tokens (flips per theme). Scoped to EXCLUDE `pre code` so Shiki code
+   BLOCKS are untouched (they own their own frame). The typography rules are :where()-wrapped
+   (zero specificity), so these single-class rules win without !important. */
+.prose :where(code):not(pre code) {
+  background-color: var(--code-bg);
+  border: 1px solid var(--code-border);
+  color: var(--code-text);
+  border-radius: 4px;
+  padding: 0.125em 0.375em;
+  font-size: 0.875em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.prose :where(code):not(pre code)::before,
+.prose :where(code):not(pre code)::after {
+  content: none;
+}
+
+/* ── Prose links ──
+   `post/[slug].astro` carries `prose-a:text-accent`, but `accent` is NOT a registered Tailwind
+   color (only a hand-written `.text-accent` helper exists), so the `prose-a:` variant compiles
+   to NOTHING — links fell through to @tailwindcss/typography's defaults: near-black in light,
+   pure #fff in dark (both ~indistinguishable from body text, the only cue being the underline).
+   On this site the ACCENT blue is the link signal, so color it here with a semantic token.
+   Use --accent-STRONG, not --accent: plain --accent (brand-500 #1593cc) is only 3.46:1 on white
+   (FAILS WCAG AA 4.5:1 for normal text); --accent-strong is brand-600 in light (5.03:1) and
+   brand-300 in dark (~9.9:1) — AA in BOTH themes. Underline stays (WCAG 1.4.1 — color is not the
+   only distinguishing cue). Typography's `a` rule is :where()-wrapped (zero specificity), so this
+   single-class rule wins without !important. Scoped to exclude code-block links (none today, but
+   future-proof) is unnecessary since `pre` has no anchors. */
+.prose :where(a) {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  transition: text-decoration-thickness 0.12s ease;
+}
+.prose :where(a):hover {
+  text-decoration-thickness: 2px;
+}
+.prose :where(a):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

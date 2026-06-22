@@ -1,0 +1,61 @@
+---
+import { SITE } from '@/config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Open Graph image (absolute or root-relative path). */
+  image?: string;
+  /** og:type — 'website', 'article', 'video.other' */
+  type?: string;
+  /** Canonical URL override; defaults to the current page. */
+  canonical?: string;
+  /** Mark page as noindex (e.g. search results). */
+  noindex?: boolean;
+  /**
+   * When noindex is set, still allow crawlers to FOLLOW links (emit `noindex, follow` instead of
+   * `noindex, nofollow`). Used by thin tag-archive pages so they pass link equity to the posts.
+   */
+  follow?: boolean;
+  /** Arbitrary JSON-LD objects to embed. */
+  jsonLd?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = SITE.description,
+  image = '/og-default.svg',
+  type = 'website',
+  canonical,
+  noindex = false,
+  follow = false,
+  jsonLd = [],
+} = Astro.props;
+
+const pageTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, SITE.url).href;
+const imageUrl = new URL(image, SITE.url).href;
+---
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+{noindex && <meta name="robots" content={follow ? 'noindex, follow' : 'noindex, nofollow'} />}
+
+<!-- Open Graph -->
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:locale" content={SITE.locale} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+{jsonLd.map((obj) => (
+  <script type="application/ld+json" set:html={JSON.stringify(obj)} />
+))}

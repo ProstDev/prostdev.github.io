@@ -1,0 +1,93 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Path to the raw markdown endpoint, e.g. /post/foo.md or /video/bar.md */
+  markdownUrl: string;
+}
+const { markdownUrl } = Astro.props;
+---
+<!-- MuleSoft-docs-style split button: primary = Copy as Markdown, caret opens menu. -->
+<div class="doc-actions relative inline-flex" data-md-url={markdownUrl}>
+  <button
+    type="button"
+    data-action="copy"
+    class="inline-flex items-center gap-2 rounded-l-lg border border-default bg-surface-card px-3 py-1.5 text-sm font-semibold text-accent transition-colors hover:bg-[color:var(--bg-subtle)]"
+  >
+    <span data-copy-idle><Icon name="copy" class="h-4 w-4" /></span>
+    <span data-copy-done class="hidden text-green-500"><Icon name="check" class="h-4 w-4" /></span>
+    <span data-copy-label>Copy as Markdown</span>
+  </button>
+  <button
+    type="button"
+    data-action="toggle"
+    class="inline-flex items-center justify-center rounded-r-lg border border-l-0 border-default bg-surface-card px-2 py-1.5 text-accent transition-colors hover:bg-[color:var(--bg-subtle)]"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-label="More markdown options"
+  >
+    <Icon name="chevron-down" class="h-4 w-4" />
+  </button>
+
+  <div
+    data-menu
+    class="absolute right-0 top-full z-30 mt-1 hidden w-56 overflow-hidden rounded-lg border border-default bg-surface-card py-1 shadow-lg"
+    role="menu"
+  >
+    <a href={markdownUrl} target="_blank" rel="noopener" role="menuitem" class="flex items-center justify-between gap-2 px-4 py-2 text-sm text-default hover:bg-[color:var(--bg-subtle)]">
+      View as Markdown <Icon name="external" class="h-4 w-4 text-muted" />
+    </a>
+    <a href="/llms.txt" target="_blank" rel="noopener" role="menuitem" class="flex items-center justify-between gap-2 px-4 py-2 text-sm text-default hover:bg-[color:var(--bg-subtle)]">
+      View llms.txt <Icon name="external" class="h-4 w-4 text-muted" />
+    </a>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.doc-actions').forEach((root) => {
+    const url = root.dataset.mdUrl!;
+    const menu = root.querySelector<HTMLElement>('[data-menu]')!;
+    const toggle = root.querySelector<HTMLButtonElement>('[data-action="toggle"]')!;
+    const copyBtn = root.querySelector<HTMLButtonElement>('[data-action="copy"]')!;
+    const idle = root.querySelector<HTMLElement>('[data-copy-idle]')!;
+    const done = root.querySelector<HTMLElement>('[data-copy-done]')!;
+    const label = root.querySelector<HTMLElement>('[data-copy-label]')!;
+
+    const closeMenu = () => {
+      menu.classList.add('hidden');
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = menu.classList.toggle('hidden') === false;
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        await navigator.clipboard.writeText(text);
+        idle.classList.add('hidden');
+        done.classList.remove('hidden');
+        label.textContent = 'Copied!';
+        setTimeout(() => {
+          idle.classList.remove('hidden');
+          done.classList.add('hidden');
+          label.textContent = 'Copy as Markdown';
+        }, 2000);
+      } catch {
+        // Fallback: open the raw markdown in a new tab.
+        window.open(url, '_blank');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!root.contains(e.target as Node)) closeMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+  });
+</script>

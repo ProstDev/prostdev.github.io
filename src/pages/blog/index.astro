@@ -1,0 +1,86 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PostCard from '@/components/PostCard.astro';
+import TagChip from '@/components/TagChip.astro';
+import { getPosts, getTags } from '@/lib/content';
+import { CATEGORIES } from '@/content.config';
+
+const posts = await getPosts();
+const tags = await getTags();
+const categories = ['All', ...CATEGORIES];
+---
+<BaseLayout
+  title="Blog"
+  description="Articles on MuleSoft, DataWeave, Anypoint Code Builder, AI, and integration — SEO- and AI-friendly write-ups that pair with the videos."
+>
+  <div class="py-10">
+    <header class="mb-10 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Blog</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-muted">
+        Deep dives, tutorials, and opinions on MuleSoft, DataWeave & AI. Each post is
+        machine-readable — grab the markdown or
+        <a href="/llms.txt" class="text-accent hover:underline">llms.txt</a>.
+      </p>
+    </header>
+
+    <!-- Categories -->
+    <div class="mb-4 flex flex-wrap items-center gap-2">
+      <span class="text-sm font-semibold text-default">Categories:</span>
+      {categories.map((c) => (
+        <button
+          type="button"
+          data-category={c}
+          class="category-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+          data-active={c === 'All' ? 'true' : undefined}
+        >
+          {c}
+        </button>
+      ))}
+    </div>
+
+    <!-- Tags -->
+    {tags.length > 0 && (
+      <details class="mb-8">
+        <summary class="cursor-pointer text-sm font-semibold text-default">Tags ({tags.length})</summary>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {tags.map(({ tag, count }) => (
+            <TagChip tag={tag} count={count} />
+          ))}
+        </div>
+        <p class="mt-3 text-xs text-muted">
+          Browse all topics in the <a href="/tags" class="text-accent hover:underline">tag directory</a>.
+        </p>
+      </details>
+    )}
+
+    {posts.length === 0 ? (
+      <p class="rounded-xl border border-dashed border-default p-10 text-center text-muted">
+        No posts yet — check back soon!
+      </p>
+    ) : (
+      <div id="post-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <div class="post-item h-full" data-category={post.data.category}>
+            <PostCard post={post} />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.category-btn');
+  const items = document.querySelectorAll<HTMLElement>('.post-item');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.category;
+      buttons.forEach((b) => b.removeAttribute('data-active'));
+      btn.setAttribute('data-active', 'true');
+      items.forEach((item) => {
+        const show = cat === 'All' || item.dataset.category === cat;
+        item.classList.toggle('hidden', !show);
+      });
+    });
+  });
+</script>

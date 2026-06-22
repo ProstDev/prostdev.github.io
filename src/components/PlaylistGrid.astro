@@ -1,0 +1,36 @@
+---
+import type { Playlist, Video } from '@/data/videos';
+import VideoCard from './VideoCard.astro';
+
+interface Props {
+  playlist: Playlist;
+  videos: Video[];
+  /** Extra intro paragraph (e.g. the "Ready to move beyond Studio?" hook). */
+  hook?: string;
+  /** Heading tag for the title — use 'h2' for secondary playlists on a page. */
+  as?: 'h1' | 'h2';
+}
+const { playlist, videos, hook, as: Heading = 'h1' } = Astro.props;
+---
+<section class="py-10">
+  <!-- Header band -->
+  <div class="grid gap-6 md:grid-cols-2 md:items-start">
+    <Heading class="text-3xl font-extrabold tracking-tight text-accent sm:text-5xl">
+      {playlist.title}
+    </Heading>
+    <div class="space-y-4 text-muted">
+      {hook && <p class="text-default">{hook}</p>}
+      <p>{playlist.description}</p>
+      {playlist.playlistUrl && (
+        <a href={playlist.playlistUrl} target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-[color:var(--accent-contrast)] hover:opacity-90">
+          YouTube Playlist 🔗
+        </a>
+      )}
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="mt-10 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+    {videos.map((v) => <VideoCard video={v} />)}
+  </div>
+</section>

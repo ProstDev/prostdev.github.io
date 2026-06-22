@@ -1,0 +1,33 @@
+---
+/**
+ * Floating "Report a problem with this page" bubble (bottom-right, all screen sizes).
+ *
+ * No backend: opens the visitor's mail client via mailto: with the page URL + title
+ * prefilled, so the report reaches the owner knowing which page is wrong. Rendered on
+ * /post/<slug> and /video/<slug> pages. Reuses the SITE.email + encodeURIComponent
+ * mailto idiom from Header/Footer/contact.
+ */
+import { SITE } from '@/config';
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Absolute URL of the page, e.g. https://prostdev.com/post/<slug> */
+  pageUrl: string;
+  /** Post/video title, used in the email subject */
+  pageTitle: string;
+}
+const { pageUrl, pageTitle } = Astro.props;
+
+const subject = encodeURIComponent(`Issue report: ${pageTitle}`);
+const body = encodeURIComponent(`I found a problem on this page:\n${pageUrl}\n\nWhat's wrong:\n`);
+const mailto = `mailto:${SITE.email}?subject=${subject}&body=${body}`;
+---
+<a
+  href={mailto}
+  aria-label="Report a problem with this page"
+  title="Report a problem with this page"
+  class="fixed bottom-4 right-4 z-40 inline-flex h-11 items-center gap-2 rounded-full border border-[var(--border)] bg-surface-card px-3 text-sm font-semibold text-[var(--text-muted)] shadow-lg transition-colors hover:text-accent hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:bottom-6 sm:right-6 print:hidden"
+>
+  <Icon name="alert-circle" class="h-5 w-5" />
+  <span class="hidden sm:inline">Report an issue</span>
+</a>

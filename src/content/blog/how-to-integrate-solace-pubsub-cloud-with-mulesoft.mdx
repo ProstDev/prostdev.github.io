@@ -1,0 +1,312 @@
+---
+title: How to integrate Solace PubSub+ Cloud with MuleSoft
+description: >-
+  In this article, I will demonstrate how to integrate Solace PubSub+ with
+  MuleSoft to publish and consume the messages.
+pubDate: 2021-04-06
+author: "Pravallika Nagaraja"
+category: Tutorials
+tags: [MuleSoft, Solace, JMS, Salesforce, Anypoint Studio]
+draft: false
+heroImage: ../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft.png
+---
+
+*GitHub repository with the Mule project can be found at the end of the post.*
+
+In this article, I will demonstrate how to integrate Solace PubSub+ with MuleSoft to publish and consume the messages.
+
+## What is PubSub+?
+
+PubSub+ is a platform that enables the design, discovery, streaming and full lifecycle management of events across distributed enterprises. It provides all of the tools necessary to support a modern event-driven architecture. The main components of the platform are PubSub+ Event Brokers, PubSub+ Event Portal and PubSub+ Cloud Console.
+
+*More information in the* [PubSub+ for Developers](https://www.solace.dev/) *website.*
+
+## Advantages and Disadvantages of Event-Driven Approach
+
+Advantages
+
+- Flexibility
+- Scalability
+- Agility
+- Responsiveness
+- Real-time Interactions
+- Processing on-demand
+
+Disadvantages
+
+- More careful design required
+- More thought goes in design and tracking
+
+Now let us see the steps involved in Integrating Solace and MuleSoft.
+
+## 1. Creating a Solace Cloud Trial Account
+
+You can create a Free Solace trial account using the following link: [https://console.solace.cloud/login](https://console.solace.cloud/login)
+
+![Solace PubSub+ Cloud login page with email and password fields](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-1.png)
+
+Click on “Sign Up” and fill in all the details. You will receive a welcome email in your inbox. Now you will be able to sign in with your credentials in the login page.
+
+![Solace 60-day free trial sign-up form with name and password fields](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-2.png)
+
+## 2. Creating the Messaging Service
+
+Once you login with your credentials, you will see a welcome screen like the following one.
+
+![PubSub+ Cloud welcome console showing Event Management and Event Streaming tiles](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-3.png)
+
+Now click on “Cluster Manager,” located at the left side of the screen to create a Service.
+
+According to the [official Solace documentation for Managing Services](https://docs.solace.com/Configuring-and-Managing/Managing-Services.htm#mc-main-content) - Solace PubSub+ event brokers support the following Services:
+
+- Solace Message Format (SMF)—This Service allows clients to communicate with an event broker on the Message Backbone interface.
+- Solace Element Management Protocol (SEMP)—This Service allows management applications to communicate with an event broker on the Management interface.
+- Web transport—This Service allows Web clients to communicate with an event broker.
+- Solace Representational State Transfer (REST)—This Service allows REST clients to communicate with an event broker using standard HTTP requests.
+- Message Queuing Telemetry Transport (MQTT)—This Service allows clients to communicate with an event broker using the MQTT messaging protocol.
+- Advanced Message Queuing Protocol (AMQP)—This Service allows AMQP clients to communicate with an event broker using the AMQP open standard application layer protocol.
+
+Let us spin up a Service.
+
+First select the Service Type you want to use. There are two types of Services:
+
+- Enterprise: A highly available Service on dedicated infrastructure with customizable connections
+- Developer: A Service on dedicated infrastructure with 100 connections.
+
+In this case, I have selected “Developer.”
+
+![Create Service screen with Enterprise and Developer service type options](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-4.png)
+
+Then, select the Cloud. In my case, I chose “Amazon Web Services,” or “AWS” for short. As you can see from the following screenshot, there are different clouds that you can choose from. Select any cloud depending on your need.
+
+![Cloud picker dropdown listing AWS, Google Cloud, Microsoft Azure and Private Cloud](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-5.png)
+
+![Create Service form with Amazon Web Services chosen and a region map](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-6.png)
+
+Select the Region. In my case, I chose “US East (N. Virginia)” because it’s closer to me.
+
+![AWS region selector with US East N. Virginia highlighted on the world map](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-7.png)
+
+Give the Service a name. A good naming convention is to create it using the Cloud and the Environment name, like “sol-aws-dev.” You can check with your team if there are any standards to name the Messaging Services.
+
+![Service Details step with broker version and service name sol-aws-dev entered](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-8.png)
+
+After that, select the Message VPN name and start the Service by clicking “Start Service.”
+
+Your Service should now be up and running.
+
+![Cluster Manager Services list showing the sol-aws-dev developer service Running](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-9.png)
+
+## 3. Configuring the Solace KeyStore in MuleSoft
+
+Once we have a Messaging Service, we’ll need to configure the KeyStore in MuleSoft in order to connect to the Service.
+
+Click on the Messaging Service to open the Services’ settings.
+
+Once inside, click on the “Connect” tab, located at the top of the screen, and select the protocol you want to use to connect the Service. In our POC, we use the “Solace Messaging” option.
+
+![Connect tab listing client libraries: Solace Messaging, AMQP, MQTT and REST](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-10.png)
+
+After you select the protocol, you will see all the Connection Details, which will be used in MuleSoft (JMS Config) in order to connect to Solace.
+
+![Solace Messaging connection details: username, password, VPN, host and Download PEM](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-11.png)
+
+As you can see from the screenshot above, you can download the TrustStore certificate by clicking on the “Download PEM” link.
+
+This PEM file must be converted to a JKS format.
+
+In order to convert this file, we’ll use the KeyStore Explorer tool *(you can download it here -* [https://keystore-explorer.org/downloads.html](https://keystore-explorer.org/downloads.html)*).*
+
+Open KeyStore Explorer and create a new JKS KeyStore Type as shown in the following screenshot.
+
+![KeyStore Explorer New KeyStore Type dialog with JKS selected](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-12.png)
+
+To import the PEM certificate, select the “Import Trusted Certificate” option (command+T or Ctrl+T).
+
+![KeyStore Explorer context menu with Import Trusted Certificate highlighted](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-13.png)
+
+Select the downloaded PEM certificate from Solace and give it a name to import it.
+
+![KeyStore Explorer showing the imported digicert global root ca RSA certificate](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-14.png)
+
+Click on “File” and “Save As.”
+
+Enter the password of your choice and confirm. Please keep a note of the password you entered as you have to use this in the MuleSoft Configuration (JMS Config). You will see a screen similar to the next one to save the converted JKS file to your system.
+
+![Save KeyStore As dialog saving DigicertCA.jks into a keystore folder](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-15.png)
+
+Now all you have to do is import this JKS file into your Mule Project. I put it under `src/main/resources/keystores/` but you can use it as long as it’s under `src/main/resources`.
+
+![Studio Package Explorer with DigicertCA.jks under src/main/resources/keystores](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-16.png)
+
+## 4. Configuring the Message Service
+
+In order to establish a connectivity between the clients and the event broker, we need to configure the Messaging Service as per our needs.
+
+Click on the “Manage” tab at the top of the screen, or next to the “Connect” tab that we just used.
+
+![Manage tab showing Event Broker settings and PubSub+ Broker Manager quick settings](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-17.png)
+
+Locate and click the “Message VPN” button in the middle, under the PubSub+ Broker Manager Quick Settings label. A new window will open.
+
+![PubSub+ Broker Manager Message VPN summary dashboard with usage gauges](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-18.png)
+
+If you click on the “Services” tab, you will see all the Services that are enabled.
+
+![Message VPN Services tab listing REST settings, ports and client connection limits](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-19.png)
+
+Here are the settings that I created for the Proof of Concept. You can configure your own settings or based on mine if you’re experimenting.
+
+You can also modify the message VPN settings by clicking on the “Show Advanced Settings” as shown in the following screenshot.
+
+![Message VPN Settings tab with the Show Advanced Settings link circled](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-20.png)
+
+In the “Stats” you will be able to see the number of messages published in your message VPN, the number of messages received, etc.
+
+![Message VPN Stats tab showing message counts and data rate statistics](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-21.png)
+
+### Client Connections
+
+There is no need to explicitly set the client connections since all these settings are pre-filled.
+
+![Client Connections list showing connected Solace clients and their addresses](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-22.png)
+
+### Access Control - Client Authentication
+
+This tab contains details about what authentication method you wish to use. By default “Basic Authentication” is enabled. If you want to use the “Client Certificate Authentication,” you could enable that. In my case I am using “Basic Authentication.” You could also see the settings of “Client Profiles,” “ACL Profiles” and “Client Usernames” as shown in the following screenshots.
+
+![Access Control Client Authentication tab with Basic Authentication enabled](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-23.png)
+
+### Access Control - Client Usernames
+
+![Client Usernames tab listing default and solace-cloud-client usernames](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-24.png)
+
+## 5. Configuring Queues
+
+Guaranteed messages in Solace PubSub+ are stored in event broker endpoints. There are two types of endpoints: queues and topic endpoints. Topic endpoints are used by JMS (that is, durable topic subscriptions).
+
+*To understand the basics of Messaging, exchange Patterns, Queues and Topics, please refer to this site:* [https://docs.solace.com/PubSub-Basics/Message-What-Is.htm](https://docs.solace.com/PubSub-Basics/Message-What-Is.htm)*.*
+
+I have created the following 3 Queues by clicking on the “+ Queue” button as shown in the screenshot.
+
+![Queues list with sample-test-queue, error-queue and dead-letter-queue, all durable](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-25.png)
+
+### Differences between Queues and Topics
+
+Queues:
+
+- Allow one-to-one communication (Point-to-Point).
+- Typically used when you want to send a single event to exactly one consumer.
+
+Topics:
+
+- Allow one-to-many communication (Publish-Subscribe).
+- Typically used when you want to send a single event to multiple consumers.
+
+I have created a Topic Subscription for each Queue as shown in the following screenshots.
+
+*To understand why we need to map a Topic to a Queue please refer to* [https://docs.solace.com/PubSub-Basics/Core-Concepts-Endpoints-Queues.htm](https://docs.solace.com/PubSub-Basics/Core-Concepts-Endpoints-Queues.htm)*.*
+
+![Subscriptions tab for sample-test-queue mapped to sample-test-topic](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-26.png)
+
+![Subscriptions tab for sample-test-error-queue mapped to sample-test-error-topic](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-27.png)
+
+![Subscriptions tab for the dead-letter-queue mapped to sample-test-dead-letter-topic](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-28.png)
+
+## 6. Configuring the MuleSoft Project
+
+In the MuleSoft Project, the following dependencies must be added in the `pom.xml` file. There are three ways to do this. You can add the modules directly into the pom, you can add them through Exchange from the Mule Palette, or you can right click on the project > Manage Dependencies > Manage (or Add) Modules.
+
+We need to add the Solace and JMS modules to develop our Mule Application.
+
+After adding these modules, the JMS connectors will be available in the Mule Palette:
+
+![Studio Mule Palette searching JMS, showing Ack, Consume, Publish operations](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-29.png)
+
+Once you have these, create a Global Element for the JMS Configuration with your desired settings and the connection information from Solace (as mentioned in the “Configuring the Solace KeyStore in MuleSoft” section). For more information on the JNDI Connection properties refer to [https://docs.solace.com/Solace-JMS-API/JNDI-Connection-Properti.htm#mc-main-content](https://docs.solace.com/Solace-JMS-API/JNDI-Connection-Properti.htm#mc-main-content)
+
+Here’s an example:
+
+> [!NOTE]
+> The GitHub repository with all this code can be found at the end of the post. You can double-check the settings and properties there if you have some doubts.
+
+![JMS Config global element with connection factory and JNDI name resolver settings](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-30.png)
+
+![JMS Config provider properties mapping Solace JNDI and SSL truststore values](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-31.png)
+
+## 7. Publishing Message to Solace Topic
+
+In my case, I added an HTTP Listener in my Mule flow to be able to listen to a request with the content that I want to publish into the Solace Topic. Here you can see how I have configured the JMS Publish connector:
+
+![Mule publish flow with Listener, JMS Publish to Solace Topic and a Logger](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-32.png)
+
+## 8. Testing the “Happy Path”
+
+Start the Mule App in your local to make sure that everything was correctly configured.
+
+Once the app is up and running, send a POST request from [Postman](https://www.postman.com/downloads/) (you can also use the [Advanced REST Client](https://install.advancedrestclient.com/install), [cURL](https://curl.se/), or any other tool to send a request to your local app).
+
+The Mule app will read the payload you send here and will publish it into the Solace Topic.
+
+![Postman POST to localhost:8081/publish with a JSON account body](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-33.png)
+
+For this demo, I sent a JSON Body like this one:
+
+```json
+[
+   {
+      "name":"Elon Musk",
+      "billingAddress":"Royalwest Drive",
+      "billingCity":"Toronto",
+      "billingCountry":"USA",
+      "billingPostalCode":"mp3lp7",
+      "billingState":"NY"
+   }
+]
+```
+
+As you can see in the following screenshot, the message published to the Topic can be seen in the Solace Queue mapped to it.
+
+![Messages Queued tab for sample-test-queue showing one spooled 353-byte message](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-34.png)
+
+## 9. Subscribing a Message from the Solace Queue
+
+The queued messages must now be processed. In my case, the message that is queued contains information from a Salesforce Account. I have to subscribe to this queue in a flow, transform it, and create an Account object in SFDC. To achieve this, I have created a new flow called “solace-jms-subscribe.”
+
+![Mule subscribe flow consuming the queue, transforming and creating an SFDC Account](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-35.png)
+
+In the “On New Message” component settings, please note that the “Acknowledgement Mode” is set to “Manual” since we want to delete the message in the queue only after further processing it and sending the positive Acknowledgement.
+
+![On New Message JMS settings with Queue consumer and MANUAL acknowledge mode](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-36.png)
+
+There are different Acknowledgement modes as shown.
+
+*More information on all the settings can be found in* [https://docs.mulesoft.com/jms-connector/1.7/jms-ack](https://docs.mulesoft.com/jms-connector/1.7/jms-ack)*.*
+
+![Acknowledge Mode dropdown listing AUTO, DUPS_OK, IMMEDIATE and MANUAL options](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-37.png)
+
+When the project is deployed in Anypoint Studio, this message is automatically consumed by the “On New Message” JMS Subscriber as shown in the following screenshot:
+
+![Mule Debugger showing the consumed message payload and the deployed app console](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-38.png)
+
+The message is then transformed to the required format.
+
+![Transform Message DataWeave mapping queue fields to Salesforce account fields](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-39.png)
+
+And the account is created in Salesforce successfully using the “Create” Connector. After this, a positive Acknowledgement is sent back to Solace using the “Positive Ack” JMS connector.
+
+![Salesforce All Accounts list including the newly created Elon Musk account](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-40.png)
+
+The message in the Queue is now deleted:
+
+![Messages Queued tab for sample-test-queue now showing zero messages queued](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-41.png)
+
+Thank you so much for reading my post and I hope it will be of some use. In the next post we'll dive into the negative scenario and error handling.
+
+Happy Learning :)
+
+Pravallika Nagaraja
+
+## GitHub repository
+
+[ProstDev GitHub - Solace MuleSoft Integration](https://github.com/ProstDev/solace-mulesoft-integration)

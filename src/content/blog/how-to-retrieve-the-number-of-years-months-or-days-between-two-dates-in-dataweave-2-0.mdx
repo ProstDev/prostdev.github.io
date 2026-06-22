@@ -1,0 +1,84 @@
+---
+title: "How to retrieve the number of years, months, or days between two dates in DataWeave 2.0"
+description: >-
+  I needed to get a person's age. I started using "daysBetween" but this was a
+  wrong way. In this post, I'll show you how to use the "between" function from
+  the Periods module to retrieve the number of years, months, or days between
+  two dates.
+pubDate: 2021-06-15
+category: Tutorials
+tags: [MuleSoft, DataWeave]
+youtubeId: MAZC_pLl-2c
+draft: false
+heroImage: ../../assets/blog/how-to-retrieve-the-number-of-years-months-or-days-between-two-dates-in-dataweave-2-0.png
+---
+
+I was working on a pretty fun API for some demo purposes, and I needed to get a person’s age. Of course, my first instinct was to jump right into it and start using different core functions. *(By the way, if you haven’t seen my DataWeave 2.0 core functions cheat sheet, check it out* [here](https://www.prostdev.com/post/dataweave-2-0-core-functions-cheatsheet)*!)*
+
+I started using “[daysBetween](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-daysbetween)”, and then I manually counted the days to convert them to years. You know, like, 365 days equals a year, so divide all the days in between...You know what? It’s not even worth explaining how I got to a *wrong* answer.
+
+In this post, I’ll show you how to use the “between” function from the Periods module (*which I can’t seem to find in the Mule docs, but here’s a link to what a* [Period](https://docs.mulesoft.com/mule-runtime/4.3/dataweave-types#dw_type_dates_period) *is in DataWeave*) to retrieve the number of years, months, or days between two dates.
+
+## Using the “between” function
+
+Since the “between” function is from a different module, we’re going to need to import that module first. I’m going to explicitly import just this function from the Periods module.
+
+```dataweave
+%dw 2.0
+output application/json
+import between from dw::core::Periods
+---
+payload
+```
+
+*Note: For a detailed explanation of the different ways to import a module, please refer to* [this post](https://www.prostdev.com/post/3-ways-to-import-a-function-module-in-dataweave-2-0)*.*
+
+I’ll create a variable that keeps the person’s birth date while not having to copy and paste for different tests.
+
+```dataweave
+%dw 2.0
+output application/json
+import between from dw::core::Periods
+var birthdate = "1990-01-01" as Date
+---
+payload
+```
+
+Now let’s create a variable that keeps the period that we’ll get back from the function (so we can refer to it in different fields).
+
+```dataweave
+%dw 2.0
+output application/json
+import between from dw::core::Periods
+var birthdate = "1990-01-01" as Date
+var period = between("2021-03-20" as Date, birthdate)
+---
+payload
+```
+
+*Note that I’m using a specific date instead of the function “*[now](https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-now)*” because this way, you’ll receive the same outputs as me. You can use “now()” (without the quotes) instead of “2021-03-20” to refer to today’s date.*
+
+Finally, let’s create an object with different fields to see the other numbers it returns for years, months, and days.
+
+```dataweave
+%dw 2.0
+output application/json
+import between from dw::core::Periods
+var birthdate = "1990-01-01" as Date
+var period = between("2021-03-20" as Date, birthdate)
+---
+{
+   period: period, // "P31Y2M19D"
+   years: period.years, // 31
+   months: period.months, // 2
+   days: period.days // 19
+}
+```
+
+In the first field, you’ll see the complete period that was returned, and we can extract the specified number of years, months, or days from this period just by using a field selector.
+
+That’s it! Let me know if this was useful to you. Hopefully, I saved you some minutes or hours of manual work.
+
+*Prost!*
+
+-Alex

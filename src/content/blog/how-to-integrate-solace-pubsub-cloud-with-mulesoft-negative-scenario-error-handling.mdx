@@ -1,0 +1,101 @@
+---
+title: 'How to integrate Solace PubSub+ Cloud with MuleSoft - Negative Scenario (Error Handling)'
+description: >-
+  Even though the error handling logic varies depending on use cases, business
+  requirements, organizational processes, etc. I believe the core approach to
+  error handling for message-based integrations would more or less remain the
+  same for different applications. The most common approach consists of the
+  following steps.
+pubDate: 2021-04-13
+author: "Pravallika Nagaraja"
+category: Tutorials
+tags: [MuleSoft, Solace, JMS, Salesforce]
+draft: false
+heroImage: ../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling.png
+---
+
+*GitHub repository with the Mule project can be found at the end of the post.*
+
+In my previous post ([How to integrate Solace PubSub+ Cloud with MuleSoft](https://www.prostdev.com/post/how-to-integrate-solace-pubsub-cloud-with-mulesoft)), I explained the happy path of the Solace PubSub+ and MuleSoft Integration. In this post, let us see how we can handle an error efficiently.
+
+Even though the error handling logic varies depending on use cases, business requirements, organizational processes, etc. I believe the core approach to error handling for message-based integrations would more or less remain the same for different applications.
+
+The most common approach consists of the following steps:
+
+- In case of an error, the error is captured in the error handler logic.
+- Enrich the message with additional information that could be later used for reprocessing.
+- Keep track of the “deliveryCount” and other useful information in the “User Properties.”
+- Publish the message to an Error Topic for retrying.
+- Process the message from the error queue and depending on the “redelivery_count” attribute, either route it back to the source queue or the dead letter queue (or Dead Message Queue). Further reprocessing can happen by the operations team.
+
+Let us see how I have implemented the above approach in the following use case. Before that, please take a look at my [previous blog post](https://www.prostdev.com/post/how-to-integrate-solace-pubsub-cloud-with-mulesoft) on how to publish the message to the Solace Topic using the JMS “Publish” connector.
+
+**1)** The message is received by the “On New Message” JMS Connector. The incoming message is transformed in the “Request Transformation” component, While attempting to create the Salesforce Account using the “Create” connector, there is an error (in case the account already exists). The choice router validates if a successful response is received from SFDC. In case of failure, an error is thrown.
+
+(Note that you can also add an “Until Successful” block around the “Create” SFDC connector to retry for a specified amount of time before throwing an error.)
+
+![Subscribe flow receiving a JMS message, transforming it, and creating a Salesforce Account with a Choice router](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-1.png)
+
+The error is caught in the “On Error Propagate” error handler and invokes the “processSFDCError” flow.
+
+![Choice router branches plus an On Error Propagate handler referencing the processSFDCError flow](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-2.png)
+
+![processSFDCError flow: Transform Message, Logger, and a sendNegativeAck Flow Reference](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-3.png)
+
+In case of Salesforce Connectivity error, then the error is thrown in the “Create” SFDC connector and caught in the “SFDC:ERROR” (On Error Propagate) as the error mapping is done in the connector level as shown in the following screenshot.
+
+![Salesforce Create connector Error Mapping mapping ANY error type to SFDC:ERROR](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-4.png)
+
+**2)** The message is published to the Error Topic as shown in the following screenshot:
+
+![sendNegativeAck flow setting error variables then publishing the message to the error queue](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-5.png)
+
+Note that I am capturing the “DELIVERYCOUNT”, “EXCEPTIONDETAILS” and “TIMESTAMP” in the “User Properties” field.
+
+![JMS Publish config to the error topic with DELIVERYCOUNT, EXCEPTIONDETAILS, and TIMESTAMP user properties](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-6.png)
+
+**3)** The message from the Error Queue is received in the retry-flow. In this flow, if the “redelivery_count” (`attributes.properties.jmsxProperties.jmsxDeliveryCount`) value is less than or equal to the “maxRedeliveryCount” variable, which will be fetched from the properties file, then the message will be published to the source Topic.
+
+![retry-flow listening on the error destination and setting flow, destinationTopic, and deadLetterTopic variables](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-7.png)
+
+![Solace sample-test-error-queue showing one queued message after the first failure](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-8.png)
+
+Since the redelivery count is 1, the message is published back to the source Topic.
+
+![Mule Debugger on the retry-processing-flow Choice that checks redelivery_count against maxRedeliveryCount](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-9.png)
+
+![Solace sample-test-queue showing the message republished to the source queue](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-10.png)
+
+**4)** The message is received by the subscribing flow and tries to process it. In case of error during the second time, the message is again published to the Error Topic with redelivery_count=2.
+
+![Mule Debugger variables showing redelivery_count = 2 after the second failure](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-11.png)
+
+**5)** In case of failure during the third retry, the message is again published to the Error Topic with redelivery_count=3.
+
+![Mule Debugger variables showing redelivery_count = 3 after the third failure](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-12.png)
+
+**6)** Since the “redelivery_count” now equals the “maxRedeliveryCount” variable, the message is published to the Dead Letter Topic or Dead Message Topic. A notification email can be triggered to the operations team for further processing of this message.
+
+![Debugger showing redelivery_count equals maxRedeliveryCount 3, so the message is published to the DLQ](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-13.png)
+
+![Solace sample-test-dead-letter-queue showing the message after the max retries were exceeded](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-14.png)
+
+![Solace Queues list with the dead-letter, error, and source test queues and their message counts](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-15.png)
+
+The message in the Error Topic is Acknowledged with the “retryAckId” variable as shown in the following screenshot.
+
+![retry-flow acknowledging the error-topic message with the retryAckId variable](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-16.png)
+
+**7)** In case of a Transformation error, the message can be sent directly to the Dead Letter Queue as retrying does not make any sense.
+
+![process-transformation-error flow publishing the message straight to the DLQ instead of retrying](../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling-17.png)
+
+Thank you for reading my blog post :)
+
+Happy Learning,
+
+Pravallika Nagaraja
+
+## GitHub repository
+
+[ProstDev GitHub - Solace MuleSoft Integration](https://github.com/ProstDev/solace-mulesoft-integration)

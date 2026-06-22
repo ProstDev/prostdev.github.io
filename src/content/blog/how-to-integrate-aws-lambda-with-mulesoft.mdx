@@ -1,0 +1,206 @@
+---
+title: 'How to Integrate AWS Lambda with MuleSoft'
+description: In this blog post, I will demonstrate how to Integrate AWS Lambda with MuleSoft.
+pubDate: 2022-07-12
+author: "Pravallika Nagaraja"
+category: Tutorials
+tags: [MuleSoft, AWS, Anypoint Studio]
+draft: false
+heroImage: ../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-1.png
+---
+
+In this blog post, I will demonstrate how to Integrate AWS Lambda with MuleSoft. The GitHub repository with the Mule Project can be found at the end of the post.
+
+AWS Lambda is an on-demand cloud computing resource offered as a function-as-a-service by AWS. AWS Lambda allows you to add custom logic to AWS resources such as Amazon S3 buckets and Amazon DynamoDB tables, so you can easily apply it to compute data as it enters or moves through the cloud. AWS Lambda was designed for use cases such as image or object uploads to [Amazon S3](https://en.wikipedia.org/wiki/Amazon_S3), updates to [DynamoDB](https://en.wikipedia.org/wiki/DynamoDB) tables, responding to website clicks, or reacting to sensor readings from an [IoT](https://en.wikipedia.org/wiki/Internet_of_Things)-connected device. AWS Lambda can also be used to automatically provision back-end services triggered by custom [HTTP requests](https://en.wikipedia.org/wiki/HTTP_request), and "spin down" such services when not in use, to save resources.
+
+Anypoint Connector for Amazon Lambda (Amazon Lambda Connector) enables you to execute AWS Lambda operations within your Mule flows. You can then use the response of the Lambda operation to process another Mule flow as needed.
+
+In this article, we will see how we can use the Anypoint Lambda Connector to Integrate.
+
+For more information on Amazon Lambda Connector 1.0 - Mule 4, refer to this [link](https://docs.mulesoft.com/amazon-lambda-connector/1.0/).
+
+## 1. Create an AWS Free tier account
+
+Open the link [https://aws.amazon.com/console/](https://aws.amazon.com/console/). The below page opens up:
+
+![AWS Management Console landing page with a Sign In to the Console button](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-2.png)
+
+Click **Sign In to the Console** and then create a new AWS account.
+
+![AWS sign-in page with the Create a new AWS account button highlighted](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-3.png)
+
+Provide the required details and click on **Verify email address.**
+
+![Sign up for AWS form asking for root user email address and AWS account name](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-4.png)
+
+A verification code will be sent to your email. Enter the code and click on **Verify**.
+
+![AWS "Verify your email address" email containing a verification code](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-5.png)
+
+![AWS sign-up "Confirm you are you" screen with a field to enter the verification code](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-6.png)
+
+Once the verification is successful, provide the password and click on **continue (step 1 of 5)**.
+
+![AWS sign-up Create your password step after the email was successfully verified](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-7.png)
+
+Provide all the contact information and click on **continue (step 2 of 5)**.
+
+![AWS sign-up Contact Information form for full name, phone number, and address](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-8.png)
+
+It asks for credit card information. You can safely provide as you won't be charged unless you exceed the free tier limit. For more information on this please watch this video on YouTube ([AWS Free Tier Overview](https://www.youtube.com/watch?v=Qou3oKcvyww&t=3s)). After this step click on **Create Account**.
+
+After this sign in to the AWS console by selecting the Root user.
+
+![AWS sign-in page with the Root user option selected](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-9.png)
+
+You will now be logged in to the AWS Console as shown below:
+
+![AWS Console Home showing recently visited services including IAM, Lambda, and S3](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-10.png)
+
+## 2. Manage Access to AWS resources
+
+First, select the region of your choice from the list given below:
+
+![AWS region dropdown open, listing US and Asia Pacific regions](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-11.png)
+
+Click on **Services** -> **Security, Identity & Compliance** -> **IAM.**
+
+![AWS Services menu open on Security, Identity and Compliance with IAM listed](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-12.png)
+
+Click on **Users** and on **Add Users.**
+
+![IAM Users list showing one user with an Add users button](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-13.png)
+
+Provide the User Name and Select AWS Credential type as shown below:
+
+![IAM Add user step 1 setting a user name and selecting programmatic access key](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-14.png)
+
+Click on **Next: Permissions** and on **Attach existing policies directly.**
+
+![IAM permissions step with Attach existing policies directly and AWSLambda search](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-15.png)
+
+Click on **AWSLambda_FullAccess** and **Next: Tags.**
+
+![Policy list with AWSLambda_FullAccess checkbox selected](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-16.png)
+
+Click on **Review** and click on **Create User.**
+
+![IAM Review screen summarizing the user with AWSLambda_FullAccess attached](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-17.png)
+
+The User is created successfully. Make a note of the Access Key ID and Secret access key as you cannot retrieve them again.
+
+![IAM success screen showing the new user's Access key ID and Secret access key](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-18.png)
+
+![IAM user detail page showing AWSLambda_FullAccess attached directly](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-19.png)
+
+## 3. Create a Lambda Function in AWS
+
+In the AWS console search Lambda and click on the search result Lambda.
+
+![AWS console search for Lambda showing the Lambda service result](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-20.png)
+
+Click on **Create Function.**
+
+![AWS Lambda Functions page with a Create function button](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-21.png)
+
+I used a simple “hello world” blueprint.
+
+![Create function screen with Use a blueprint and hello-world blueprint selected](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-22.png)
+
+Provide all the basic information and click on **Create Function**.
+
+![Lambda Basic information form setting a function name and execution role](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-23.png)
+
+![Lambda Functions list showing the created test-hello-world-mule-poc function on Node.js 12.x](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-24.png)
+
+![Lambda function overview page showing the function ARN and Add trigger options](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-25.png)
+
+The Source Code of the function can be seen below:
+
+![Lambda Code source editor showing the index.js hello world handler](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-26.png)
+
+You can execute the script by clicking on **Test** and the execution result is as shown below:
+
+![Lambda test execution result showing status Succeeded with function logs](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-27.png)
+
+## 4. Configure Amazon Lambda Connector in MuleSoft
+
+First, we need to create a new project in Anypoint Studio and manage dependencies as shown below:
+
+![Anypoint Studio project right-click menu opening Manage Dependencies then Manage Modules](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-28.png)
+
+Add the **Amazon Lambda Connector** dependency -> **Finish** -> **Apply and close.**
+
+![Add Dependencies dialog with Amazon Lambda Connector 1.0.4 added to selected modules](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-29.png)
+
+Now, this dependency will be added to the `pom.xml`.
+
+![pom.xml showing the mule4-amazon-lambda-connector dependency added](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-30.png)
+
+You will now be able to see all the Amazon Lambda Connectors available in the Mule Palette.
+
+![Mule Palette search for Lambda listing Get Function, Invoke, Invoke Async and List Functions](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-31.png)
+
+## 5. How to use the Invoke, Get Function, and List Functions Lambda Connectors
+
+More information on these connectors can be found at [https://docs.mulesoft.com/amazon-lambda-connector/1.0/amazon-lambda-connector-reference](https://docs.mulesoft.com/amazon-lambda-connector/1.0/amazon-lambda-connector-reference)
+
+### Invoke Connector
+
+"Invokes a Lambda function. You can invoke a function synchronously (and wait for the response), or asynchronously.
+
+To invoke a function asynchronously, set InvocationType to Event.
+
+For synchronous invocation, details about the function response, including errors, are included in the response body and headers. For either invocation type, you can find more information in the execution log and trace."
+
+More information at [this link](https://docs.mulesoft.com/amazon-lambda-connector/1.0/amazon-lambda-connector-reference#Create20150331FunctionsInvocationsByFunctionName).
+
+![Mule flow with Invoke operation configured with function name and request-response invocation type](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-32.png)
+
+The access key and the secret key are obtained as shown in the “Manage Access to AWS resources” step.
+
+![Amazon Lambda Connector global config with Access Key, Secret Key and us-east-1 region](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-33.png)
+
+Now let us test this using Postman.
+
+![Postman calling lambdaInvoke with a JSON body returning value1 and a 200 OK status](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-34.png)
+
+### Get Function Connector
+
+"Returns information about the function or function version, with a link to download the deployment package that’s valid for 10 minutes. If you specify a function version, only details that are specific to that version are returned."
+
+More information at [this link](https://docs.mulesoft.com/amazon-lambda-connector/1.0/amazon-lambda-connector-reference#Get20150331FunctionsByFunctionName).
+
+![Mule flow with the Get Function operation configured with the function name](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-35.png)
+
+The response from the Get Function is as shown below.
+
+![Mule Debugger showing the Get Function JSON response with function configuration details](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-36.png)
+
+![Postman calling lambdaGet returning the function Configuration JSON](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-37.png)
+
+### List Functions Connector
+
+"Returns a list of Lambda functions, with the version-specific configuration of each function. Lambda returns up to 50 functions per call. Set FunctionVersion to ALL to include all published versions of each function in addition to the unpublished version. The ListFunctions action returns a subset of the FunctionConfiguration fields."
+
+More information at [this link](https://docs.mulesoft.com/amazon-lambda-connector/1.0/amazon-lambda-connector-reference#Get20150331Functions).
+
+![Mule flow with the List Functions operation configured with empty optional fields](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-38.png)
+
+![Postman calling lambdaList returning a Functions array of Lambda functions](../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-39.png)
+
+## Conclusion
+
+This is how we can easily create functions in AWS Lambda and Integrate with MuleSoft using the **Amazon Lambda Connectors**.
+
+## Best practices
+
+For the purpose of simplification, I have mentioned the configuration details directly. But it is always recommended to externalize these details and encrypt the sensitive data.
+
+## GitHub repository
+
+- [https://github.com/ProstDev/aws-lambda-mulesoft](https://github.com/ProstDev/aws-lambda-mulesoft)
+
+Thanks for reading my article and I hope it will be of some use! See you in the next post!
+
+-Pravallika

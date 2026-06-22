@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistGrid from '@/components/PlaylistGrid.astro';
+import { getPlaylist, videosInPlaylist } from '@/data/videos';
+
+const playlist = getPlaylist('learn-acb')!;
+const videos = videosInPlaylist('learn-acb');
+---
+<BaseLayout title="Learn Anypoint Code Builder (ACB)" description={playlist.description}>
+  <PlaylistGrid
+    playlist={playlist}
+    videos={videos}
+    hook="Ready to move beyond Anypoint Studio?"
+  />
+</BaseLayout>

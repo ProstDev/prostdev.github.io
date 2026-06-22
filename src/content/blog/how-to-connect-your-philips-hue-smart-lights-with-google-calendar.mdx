@@ -1,0 +1,122 @@
+---
+title: "How to connect your Philips Hue Smart Lights with Google Calendar"
+description: "Synchronize your Philips Hue Smart Lights with your Google Calendar using IFTTT so your lights turn red when you're in a meeting."
+pubDate: 2020-10-27
+category: Tutorials
+tags: [Smart Home]
+draft: false
+heroImage: ../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar.png
+---
+
+If you’ve been working from home recently, you probably have had one of those dreaded WFH nightmares. You know the one I’m talking about. The one where you’re giving a presentation or you’re in the middle of a meeting with your webcam on, and your roommate or family suddenly enters the room.
+
+Wouldn’t it be great to be able to use your Philips Hue Smart Lights and synchronize them with your Google Calendar so that they show a red light when you’re busy? This way, they’ll know when you’re in the middle of a meeting and they won’t enter the room.
+
+For this post, I’ll guide you through some simple steps to synchronize your Philips Hue and Google account.
+
+## Before starting
+
+If you're new to Philips Hue or you're thinking of purchasing, you should read this post first: [Things to consider before buying a Philips Hue Smart Light](https://www.prostdev.com/post/things-to-consider-before-buying-a-philips-hue-smart-light).
+
+I will be assuming that you already have your Google account (to use the Google Calendar) and your Smart Lights all set up with the [Hue application](https://www.philips-hue.com/en-ca/philips-hue-app).
+
+> [!NOTE]
+> This post will not guide you through the synchronization or installation of your Philips Hue Lights.
+
+You should also create a [Philips Hue account](https://account.meethue.com/) where you will be storing all the data from Hue - your lights, rooms, scenes, zones, etc.
+
+## 1. Sign in to your Philips Hue account
+
+Go to [account.meethue.com](https://account.meethue.com/) and sign in with your credentials.
+
+If you go into the [Bridge tab](https://account.meethue.com/bridge), you should be able to see an online status for your bridge.
+
+![Philips Hue account Bridge page showing the Hue Bridge status as online](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-1.png)
+
+You can also go into the [Apps tab](https://account.meethue.com/apps) to check some of the other applications that you may already have synced up with your Hue account.
+
+## 2. Connecting IFTTT to your Google account
+
+Go into [ifttt.com](https://ifttt.com/home) (If This Then That) and create a new account using the Google account connected to your Google Calendar.
+
+You can simply click on [Sign Up](https://ifttt.com/join) and then choose the “Continue with Google” button. This will open a new browser window (or tab), so you can sign in to your Google account. This will automatically link your Google account to your brand-new IFTTT account.
+
+If you want to use a different email address from your Google account, you can create an IFTTT account with any email. Go into your [IFTTT account’s settings](https://ifttt.com/settings) and click on “Linked accounts” for Google.
+
+![IFTTT Linked accounts settings showing Apple, Google, and Facebook all not linked](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-2.png)
+
+This will also open a new browser window (or tab), so you can sign in to your Google account. After doing this, your Google account will be linked.
+
+![IFTTT Linked accounts now showing the Google account is linked with an Unlink option](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-3.png)
+
+## 3. Configuring the trigger (If This)
+
+Click on the [Create button](https://ifttt.com/create/) on the top right side of the screen. This will open the screen where you will be able to program the integration (If This Then That).
+
+![IFTTT "Create your own" screen with the "If This" Add button above "Then That"](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-4.png)
+
+Click on “If This” and search for Google Calendar. Click on the Google Calendar icon.
+
+![IFTTT "Choose a service" search for "google calendar" showing the Google Calendar tile](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-5.png)
+
+Now select the “Any event starts” trigger.
+
+![Google Calendar trigger options including "New event from search added" and "Any event starts"](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-6.png)
+
+Select the calendar you want to use from your Google account. You can also select how much time before the event starts that you want this integration to trigger.
+
+![Trigger fields for "Any event starts" with a calendar picker and "Time before event starts" set to 0 minutes](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-7.png)
+
+Click on “Create trigger,” which will return you to the create screen so you can set up the “Then That” part.
+
+## 4. Configuring the behavior (Then That)
+
+Click on this second button to continue with the configuration.
+
+![IFTTT applet with the "If Any event starts" trigger set and "Then That" still to add](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-8.png)
+
+Now search for “Philips Hue” and click on the icon.
+
+![IFTTT "Choose a service" search for "philips hue" showing the Philips Hue tile](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-9.png)
+
+You can choose any action you want your lights to perform. I’m going to choose “Change color.”
+
+![Philips Hue action choices including Turn on/off lights, Blink, Dim, and Change color](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-10.png)
+
+Click on “Connect” to select your Philips Hue account.
+
+![IFTTT "Connect service" screen for Philips Hue with a Connect button](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-11.png)
+
+This will open a new browser window (or tab), so you can sign in to your Philips Hue account. Select “Yes” to finish the setup.
+
+![Philips Hue "Grant permission" page asking to trust IFTTT, with Yes and No buttons](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-12.png)
+
+Now you can select the light, room, or zone from your Philips Hue account that will change its color, and you can write the color name (ignore the “Add ingredient” button). Click on “Create action” when you’re done.
+
+![Change color action fields with the Meeting Zone light selected and color set to Red](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-13.png)
+
+It’s all set up now! Just click on “Continue” to finish the configuration.
+
+![Completed applet showing "If Any event starts, Then Change color" with a Continue button](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-14.png)
+
+You can also set a name so you can remember what this integration will do. You can choose whether you want to receive a notification when the Applet runs or leave it turned off. Click on “Finish.”
+
+![Review and finish screen with the applet titled "Set Meeting Zone to Red when a new event starts"](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-15.png)
+
+## 5. Did it work?
+
+Try it out! Create an event on your Google Calendar and wait for the lights to change. :)
+
+![Google Calendar showing a test event from 8 to 9pm used to trigger the applet](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-16.png)
+
+Worked for me!
+
+![A Philips Hue wall light glowing red after the calendar event triggered the applet](../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar-17.png)
+
+You can check out all the different integrations or Applets that you can create in IFTTT - you’ll have a lot of fun!
+
+Let me know what else you create or if you have any questions.
+
+*Prost!*
+
+-Alex

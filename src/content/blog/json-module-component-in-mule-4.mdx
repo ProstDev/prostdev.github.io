@@ -1,0 +1,86 @@
+---
+title: "JSON Module Component in Mule 4"
+description: "The JSON Module Connector is used to validate a JSON Payload against the predefined JSON Schema of your choice. Since schema validation falls outside the scope of DataWeave Functionality, the JSON Module can be used in MuleSoft. Learn about the possible exceptions you can get when using this component."
+pubDate: 2020-06-16
+author: "Pravallika Nagaraja"
+category: Tutorials
+tags: [MuleSoft, JSON, Anypoint Studio]
+draft: false
+heroImage: ../../assets/blog/json-module-component-in-mule-4.png
+---
+
+*GitHub repository with the Mule Project can be found at the end of the post.*
+
+The JSON Module Connector is used to validate a JSON Payload against the predefined JSON Schema of your choice. Since schema validation falls outside the scope of DataWeave Functionality, the JSON Module can be used.
+
+To use the JSON module, add it manually to your Mule app in Anypoint Studio or Design Center; or, if you want to use Maven, you can add the following dependency into your `pom.xml` file:
+
+```xml
+<dependency>
+	<groupId>org.mule.modules</groupId>
+	<artifactId>mule-json-module</artifactId>
+	<version>RELEASE</version>
+	<classifier>mule-plugin</classifier>
+</dependency>
+```
+
+For better understanding of how the JSON Module works, I did a proof of Concept. Below is the screenshot of the flow which includes the JSON Module component.
+
+![Anypoint Studio flow: Scheduler, Read, Logger, Validate schema, plus an On Error Propagate handler](../../assets/blog/json-module-component-in-mule-4-1.png)
+
+To validate the JSON payload, I need an example JSON file (in my case, `document.json`) and I would need the JSON schema file (`mySchema.json`) to validate my example JSON file against it. Since I chose to read the `document.json` file, I placed it below `src/main/resources/examples`:
+
+![Project tree under src/main/resources showing document.json in examples and mySchema.json in schemas](../../assets/blog/json-module-component-in-mule-4-2.png)
+
+The `document.json` file looks like this:
+
+![document.json array of employee records with some empty employeeID and employeeName values](../../assets/blog/json-module-component-in-mule-4-3.png)
+
+The schema against which the `document.json` file would be validated is defined as below:
+
+![mySchema.json defining an array of objects requiring employeeID and employeeName with length limits](../../assets/blog/json-module-component-in-mule-4-4.png)
+
+A fixed frequency scheduler is set to run the flow every few seconds/minutes. The `document.json` file is read using the File Read operation as shown below:
+
+![File Read operation configuration with File Path set to examples/document.json](../../assets/blog/json-module-component-in-mule-4-5.png)
+
+Once the file is read, the payload is saved in the Target Variable *jsonDoc* as shown below:
+
+![Read operation Advanced tab with Target Variable set to jsonDoc and Target Value to payload](../../assets/blog/json-module-component-in-mule-4-6.png)
+
+After the file is saved in the *jsonDoc* variable, it is validated against the schema using the JSON Module as shown below:
+
+![Validate schema component configured with the schema path and content set to the jsonDoc variable](../../assets/blog/json-module-component-in-mule-4-7.png)
+
+As per our example, `document.json` does not match `mySchema.json`, so, it throws a `JSON:SCHEMA_NOT_HONOURED` exception. This exception is caught in the error handler and the `error.errorMessage.payload` is written to a file as shown below:
+
+![Write operation in the error handler saving the error payload to errorMessage-pay.csod](../../assets/blog/json-module-component-in-mule-4-8.png)
+
+The file will contain the following error message payload:
+
+![JSON validation error output listing schema violations like values too short and missing required properties](../../assets/blog/json-module-component-in-mule-4-9.png)
+
+![Continued JSON validation error report detailing more per-record schema violations](../../assets/blog/json-module-component-in-mule-4-10.png)
+
+The JSON Module can throw any of these exceptions:
+
+- `JSON:INVALID_INPUT_JSON`
+- `JSON:INVALID_SCHEMA`
+- `JSON:SCHEMA_NOT_FOUND`
+- `JSON:SCHEMA_NOT_HONOURED`
+
+Some JSON schemas might reference other schemas through a public URI. However, you might not want to fetch those schemas from the internet, mainly for performance and security reasons.
+
+The JSON Module has an option to redirect the schema, which lets you replace an external reference with a local one, without the need to modify the schema itself.
+
+The JSON Module also has an option called "Allow Duplicate Keys", which when set true, it will allow the duplication of keys; otherwise, it will fail.
+
+This is why the JSON Module is a very useful component for schema validation. Enjoy the benefits of using this component :)
+
+Thank you for reading.
+
+-Pravallika Nagaraja
+
+## GitHub repository
+
+[ProstDev GitHub - JSON Module Component Mule 4](https://github.com/ProstDev/JSONModuleComponentMule4)

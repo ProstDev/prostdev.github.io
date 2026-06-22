@@ -1,0 +1,153 @@
+---
+title: "How to upsert fields from an object in an array with the update operator in DataWeave"
+description: >-
+  In this post, we'll learn how to use the update operator along with the upsert and
+  conditional options. We'll also learn different ways of handling null values for our fields.
+pubDate: 2024-09-16
+category: Tutorials
+tags: [MuleSoft, DataWeave]
+heroImage: ../../assets/blog/upsert-object-from-array.png
+---
+
+In this post, we'll learn how to use the update operator along with the upsert and conditional options. We'll also learn different ways of handling null values for our fields.
+
+You can follow along by clicking on the "Open in Playground" buttons to see how the code is being developed and to try it out yourself!
+
+## Use case
+
+Let's say you have an array of objects *Array&lt;Object>* like so:
+
+```dataweave
+[
+    {
+        id: 1,
+        name: "alex1",
+        notes: "NA"
+    },
+    {
+        id: 2,
+        name: "alex2",
+        notes: "NA"
+    },
+    {
+        id: 3,
+        name: "alex3",
+        notes: "NA"
+    }
+]
+```
+
+And you want to update one of those objects depending on the ID. For example, using this variable:
+
+```dataweave
+var updateUser = {
+    id: 2,
+	notes: "this is my new note",
+    newField: "abc"
+}
+```
+
+The first observations we can make, based on this information, are:
+
+- The field "name" is not available from the *updateUser* variable. If we don't want to lose this field, we can't just replace the whole object. We'll need to check each field separately.
+- The field "newField" is not available from the original user. We will need to insert this field and not just update the current user.
+
+A quick solution to this problem is to use the [update](https://docs.mulesoft.com/dataweave/latest/dw-operators#update-operator)[operator](https://docs.mulesoft.com/dataweave/latest/dw-operators#update-operator) because it has an upsert option to it. Let's see how to do this.
+
+## Solution
+
+First of all, we need to find in the array the user we want to update. To do this, we'll use a [map](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-map) function and a conditional based on the ID field:
+
+```dataweave
+users map ((user) -> 
+    if (user.id ~= updateUser.id) ???
+    else user
+)
+```
+
+Once we meet the condition, we can get started with the *update* operator. Since we want to have the possibility of updating all the fields (except the ID), we'll have to create *cases* for all of these. Like so:
+
+```dataweave
+users map ((user) -> 
+    if (user.id ~= updateUser.id) user update {
+        case na at .name -> updateUser.name
+        case no at .notes -> updateUser.notes
+        case nf at .newField -> updateUser.newField
+    } else user
+)
+```
+
+Click on the previous button to see the code better. In summary, the object we want to update has two issues that we need to solve:
+
+```json
+  {
+    "id": 2,
+    "name": null,
+    "notes": "this is my new note"
+  }
+```
+
+- The field "name" now has a *null* value
+- The field "newField" is not being inserted yet
+
+Issue [#1](https://www.prostdev.com/blog/hashtags/1) is happening because we are updating the field *name* with this: *updateUser.name* - and since this field does not exist, it's returning a *null* value.
+
+The solution is quite simple: we need to add a *default* keyword with the original value, like so:
+
+```dataweave
+case na at .name -> updateUser.name default na
+```
+
+Now it will take the value from the original object and use that if the *updateUser* variable does not contain this value. We can add this to the other fields just in case.
+
+Issue [#2](https://www.prostdev.com/blog/hashtags/2) is where we will be using our upsert operator because we do not have this field in our original value, so, we have to tell the operator that we want it to insert it if it doesn't exist. We do that by adding an exclamation point (!) right next to the field. Like so:
+
+```dataweave
+case nf at .newField! -> updateUser.newField
+```
+
+Ta-da! 🎉 Now we are correctly inserting this new value and updating the other fields from the original object.
+
+## Handling null values
+
+What would happen though, if the *newField* is not available in either of the two objects? Not in the original and not in the *updateUser* variable.
+
+In that case, the *update* operator will still add the field because you are using the *upsert* operator. It will just be added with a *null* value.
+
+```dataweave
+"newField": null
+```
+
+Depending on your business requirements, maybe this is the way it should work. But in case it's not, you can fix it two ways: adding a conditional to each field or adding a *skipNullOn* configuration to the output directive.
+
+### With a conditional
+
+This is the less fancy approach, but you may need to choose this if you only need to remove specific fields and not ALL the fields with null values.
+
+```dataweave
+case nf at .newField! if(!isEmpty(updateUser.newField default nf)) -> updateUser.newField default nf
+```
+
+> [!TIP]
+> You can create a local scope with [do](https://docs.mulesoft.com/dataweave/latest/dataweave-flow-control#control_flow_do) if you don't want to re-type "updateUser.newField default nf" twice.
+
+### With skipNullOn
+
+This will get rid of all the fields that have a null value. It's super effective if that's what you're looking for, but it may be confusing if later on you're expecting to see actual null values from other fields.
+
+To add this, you have to change the output directive on the top of your DataWeave script. Like so:
+
+```dataweave
+output application/json skipNullOn="everywhere"
+```
+
+> [!DOCS]
+> To learn more about the JSON writer properties, see [JSON Format](https://docs.mulesoft.com/dataweave/latest/dataweave-formats-json#writer_properties).
+
+There are a lot more ways to personalize your DataWeave scripts. These are just a few options that you can use to make the best of the operators available!
+
+I hope you found this article useful. Add a comment if you found an easier way to do this! ;)
+
+Subscribe to receive notifications as soon as new content is published ✨
+
+💬 Prost! 🍻

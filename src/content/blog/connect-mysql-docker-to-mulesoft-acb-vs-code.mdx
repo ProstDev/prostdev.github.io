@@ -1,0 +1,228 @@
+---
+title: 'Implement MySQL with Docker in Anypoint Code Builder (ACB)'
+description: >-
+  Learn how to connect MySQL in Docker to your MuleSoft project in Anypoint Code Builder
+  using VS Code. Build dynamic queries with DataWeave.
+pubDate: 2025-07-28
+category: Tutorials
+tags: [MuleSoft, DataWeave, Anypoint Code Builder, Docker, MySQL]
+youtubeId: uV_ncdIoJQI
+draft: false
+heroImage: ../../assets/blog/connect-mysql-docker-to-mulesoft-acb-vs-code.png
+---
+
+In this tutorial, you’ll learn how to connect a **MySQL database running in Docker** to a MuleSoft project in **Anypoint Code Builder (ACB)** — all inside **VS Code**, without ever leaving your IDE.
+
+We’ll use three powerful VS Code extensions:
+
+- [Container Tools](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-containers) → run MySQL with a single click
+- [Database Client](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-database-client2) → create tables and test queries
+- [Postcode](https://marketplace.visualstudio.com/items?itemName=rohinivsenthil.postcode) → test your API endpoints
+
+By the end, you’ll have a Mule flow that returns live MySQL data in JSON.
+
+**Follow up with the GitHub repo**: [https://github.com/alexandramartinez/todo-api-impl](https://github.com/alexandramartinez/todo-api-impl)
+
+## Prerequisites
+
+Make sure you already have:
+
+- An **Anypoint Code Builder project scaffolded**
+- **VS Code** with the following extensions installed:
+  - Anypoint Extension Pack
+  - Container Tools
+  - Database Client
+  - Postcode
+- **Docker Desktop** running
+
+## Step 1: Launch MySQL with Container Tools
+
+- In your project folder, create a file called `docker-compose.yml` and paste this in:
+- Click on the **Run All Services** button inside this file (you have to have the Containers extension for VS Code)
+
+```yaml
+version: '3'
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: mysqldb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  db_data:
+```
+
+✅ MySQL is now running inside a Docker container.
+
+## Step 2: Connect Using the Database Client Extension
+
+- Open the **Database** panel in VS Code.
+- Click **+ New Connection** and select **MySQL**.
+- Enter:
+  - **Host**: 127.0.0.1
+  - **Port**: 3306
+  - **User**: user
+  - **Password**: password
+  - **Database**: mysqldb
+- Save and test the connection — you should see it succeed.
+- Run the following SQL to create your table:
+
+```sql
+CREATE TABLE tasks(  
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    dueDate VARCHAR(255),
+    completed BOOLEAN NOT NULL
+);
+```
+
+✅ The table is ready — no data inserted yet.
+
+## Step 3: Implement the get-all-tasks Sub-Flow in ACB
+
+Now that the database is running and the table is created, let’s implement the flow that will fetch tasks from MySQL.
+
+In your scaffolded Mule project, add the following sub-flow to your implementation XML file (for example: `get-all-tasks.xml`):
+
+```xml
+<sub-flow name="get-all-tasks-subflow">
+    <logger doc:name="Logger" doc:id="ndehql" message="Start - Get all tasks - HELLOOOOO" />
+    <ee:transform doc:name="create sql query" doc:id="fkcolw">
+        <ee:message>
+            <ee:set-payload doc:name="Set payload" doc:id="xhyrro" resource="dw/get-all-tasks-request.dwl" />
+        </ee:message>
+    </ee:transform>
+    <db:select doc:name="Select" doc:id="pigbzt" config-ref="Mysql_Database_Config">
+        <db:sql>
+            <![CDATA[#[payload]]]>
+        </db:sql>
+    </db:select>
+    <ee:transform doc:name="to json response" doc:id="hkvahu">
+        <ee:message>
+            <ee:set-payload doc:name="Set payload" doc:id="miiqpi" resource="dw/get-all-tasks-response.dwl" />
+        </ee:message>
+    </ee:transform>
+    <logger doc:name="Logger" doc:id="vuuads" message="End - Get all tasks" />
+</sub-flow>
+```
+
+### How This Sub-Flow Works
+
+- **Start Logger -** Marks the beginning of the flow. This is helpful for debugging and tracking execution in your logs.
+- **Build the SQL Query -** Uses a DataWeave script (`dw/get-all-tasks-request.dwl`) to generate the SQL query dynamically. This keeps SQL logic separate from the flow.
+- **Database Select -** Executes the SQL query against MySQL using the connection defined in Mysql_Database_Config.
+- #[payload] tells Mule to use the SQL string produced by the previous step.
+- **Transform DB Results to JSON -** Applies a second DataWeave script (`dw/get-all-tasks-response.dwl`) to shape the raw DB results into a clean JSON response for the API.
+- **End Logger -** Marks the successful completion of the sub-flow.
+
+Here are the two DataWeave script files:
+
+```dataweave
+%dw 2.0
+output application/java
+var completed = attributes.queryParams.completed
+var dueDate = attributes.queryParams.dueDate
+var whereClause = if (isEmpty(completed) and isEmpty(dueDate)) "" else "WHERE " ++ (
+    [
+        ("completed = $completed") if (!isEmpty(completed)),
+        ("dueDate = $dueDate") if (!isEmpty(dueDate))
+    ] joinBy " AND "
+)
+---
+"SELECT * FROM tasks $whereClause"
+```
+
+```dataweave
+%dw 2.0
+output application/json
+---
+payload map {
+    id: $.id as String,
+    title: $.title,
+    description: $.description,
+    dueDate: $.dueDate,
+    completed: $.completed
+}
+```
+
+## Step 4: Run and Test with Postcode
+
+- Start your Mule app from ACB.
+- Open the Postcode extension in VS Code.
+- Create a new request:
+
+```
+GET http://localhost:8081/api/tasks
+```
+
+- Click Send
+
+✅ You’ll see an empty JSON array ([]) until you insert rows later — but your flow is working and ready for data.
+
+## Final Thoughts
+
+You’ve successfully implemented a **MySQL-backed flow in Anypoint Code Builder** using Docker and VS Code extensions.
+
+- **Container Tools** handles your database with one click
+- **Database Client** makes schema management simple
+- **Postcode** keeps testing inside VS Code
+
+⚡ Next step: Add a **POST /tasks** flow to insert new tasks into your database!
+
+## 🔔 Want More Tutorials?
+
+Subscribe to [ProstDev on YouTube](https://www.youtube.com/@prostdev?sub_confirmation=1) for weekly videos on:
+
+- Anypoint Code Builder (ACB)
+- API design and implementation
+- MUnit testing
+- MuleSoft best practices
+
+## 🤖 FAQ
+
+### 1. Why should I use Docker for my database in MuleSoft projects?
+
+Docker makes it easy to spin up a clean, isolated database environment without needing a manual install. It ensures consistency across development machines and avoids “works on my machine” issues.
+
+### 2. Do I need to know Docker commands to follow this approach?
+
+Not necessarily. With the right VS Code extensions (like Container Tools), you can manage containers with simple clicks instead of terminal commands.
+
+### 3. What’s the benefit of using a Database Client extension instead of an external tool like MySQL Workbench?
+
+Using a Database Client inside VS Code keeps everything in one place. You can manage schemas, run queries, and debug directly alongside your MuleSoft code.
+
+### 4. How do DataWeave scripts improve database flows?
+
+DataWeave lets you dynamically generate SQL queries and format responses. This makes your flows more flexible, avoids hardcoding, and ensures cleaner separation between logic and data.
+
+### 5. Is it safe to build SQL queries dynamically with DataWeave?
+
+Yes, as long as you validate and sanitize inputs properly. For production, always guard against SQL injection by using parameters or prepared statements when possible.
+
+### 6. What are common use cases for integrating MuleSoft flows with a database?
+
+Typical use cases include CRUD operations for APIs, syncing data between systems, generating reports, or validating user information during API requests.
+
+### 7. How do I test MuleSoft endpoints without leaving VS Code?
+
+You can use REST client extensions like Postcode. They let you send HTTP requests and view responses without switching to external tools.
+
+### 8. Why should I separate request and response transformations into different DataWeave files?
+
+This improves maintainability. If your SQL logic or JSON response format changes, you only need to update the relevant .dwl file without touching the main flow.
+
+### 9. What’s the advantage of using sub-flows in MuleSoft projects?
+
+Sub-flows let you break down complex logic into reusable, modular components. This improves readability, makes testing easier, and allows you to reuse common logic across multiple flows without duplicating code.
+
+### 10. Can I reuse this approach with other databases besides MySQL?
+
+Absolutely. You can adapt the same setup for PostgreSQL, Oracle, SQL Server, or any database supported by MuleSoft’s Database connector — just update the Docker image and connector configuration.

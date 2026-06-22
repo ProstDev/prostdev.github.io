@@ -1,0 +1,101 @@
+---
+title: "DataWeave programming challenge #6: Using tail-recursion to get the factorial of a number"
+description: "Create a tail-recursive function to get the factorial of each positive number from the payload."
+pubDate: 2023-05-09
+category: Challenges
+tags: [MuleSoft, DataWeave]
+youtubeId: fgzImvWfgHY
+heroImage: ../../assets/blog/dataweave-programming-challenge-6.png
+---
+
+Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!
+
+> [!PLAYGROUND]
+> [Solve on the Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F6)
+
+## Input
+
+Consider the following input payload (can be of **txt** format):
+
+```
+3
+5
+-6
+300
+```
+
+## Explanation of the problem
+
+- Create a [tail-recursive function](https://youtu.be/3UbTlLVNrVE) to get the [factorial](https://en.wikipedia.org/wiki/Factorial) of each **positive** number from the payload.
+- Sum the results.
+- Retrieve the digits/characters located at positions 20-25.
+- Make sure to return a number and not a string.
+- Numbers 0 or less won't be calculated.
+
+For example:
+
+- The factorial of 3 is 6 (3 x 2 x 1)
+- The factorial of 5 is 120 (5 x 4 x 3 x 2 x 1)
+- The factorial of -6 won't be calculated so the result will be 0
+- And so on
+- Once the results are summed (6 + 120 + 0...), extract the digits at indexes 20 to 25.
+- Return this last 6-digit number.
+
+## Expected output
+
+In this case, the expected output would be:
+
+```
+537046
+```
+
+## Clues
+
+If you're stuck with your solution, feel free to check out some of these clues to give you ideas on how to solve it!
+
+### Clue #1
+
+Use lines() from the Strings module or splitBy() to process every line.
+
+### Clue #2
+
+Make sure to use tail-recursiveness and not regular recursiveness. Otherwise, your script might not work.
+
+### Clue #3
+
+Make sure to create an if statement before calling the function in recursion. Otherwise, you might get stuck in an infinite loop!
+
+### Clue #4
+
+You can use the keyword `as` to transform to/from strings and numbers.
+
+### Clue #5
+
+You can extract characters from a string with the range selector [ x to y ]
+
+## Answer
+
+If you haven't solved this challenge yet, we encourage you to keep trying! It's ok if it's taking longer than you thought. We all have to start somewhere ✨ Check out the clues and read the docs before giving up. You got this!! 💙
+
+There are many ways to solve this challenge, but you can find here one of my solutions!
+
+### Solution #1
+
+```dataweave
+%dw 2.0
+import lines from dw::core::Strings
+output application/json
+fun factorial(num:Number, result:Number=1):Number = do {
+	if (num == 0) result
+	else if (num < 0) 0
+	else factorial(num - 1, result * num)
+}
+---
+lines(payload) map factorial($)
+then sum($) as String 
+then $[20 to 25] as Number
+```
+
+Feel free to comment your code below for others to see! 😄
+
+Subscribe to receive notifications as soon as new content is published ✨

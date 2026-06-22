@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistGrid from '@/components/PlaylistGrid.astro';
+import { getPlaylist, videosInPlaylist } from '@/data/videos';
+
+const playlist = getPlaylist('dataweave-challenges')!;
+const videos = videosInPlaylist('dataweave-challenges');
+---
+<BaseLayout title="DataWeave Challenges" description={playlist.description}>
+  <PlaylistGrid
+    playlist={playlist}
+    videos={videos}
+    hook="Sharpen your DataWeave skills, one puzzle at a time."
+  />
+</BaseLayout>

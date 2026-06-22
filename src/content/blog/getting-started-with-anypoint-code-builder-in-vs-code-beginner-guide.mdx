@@ -1,0 +1,131 @@
+---
+title: 'Getting Started with Anypoint Code Builder in VS Code (Beginner Guide)'
+description: >-
+  Install MuleSoft Anypoint Code Builder (ACB) in VS Code and build your first
+  "Hello World" Mule app from scratch — the modern, code-first way to develop APIs.
+pubDate: 2025-07-07
+category: Tutorials
+tags: [MuleSoft, Anypoint Code Builder, Visual Studio Code]
+youtubeId: GgCUNWGDaS4
+heroImage: ../../assets/blog/getting-started-with-anypoint-code-builder-in-vs-code-beginner-guide.png
+---
+
+If you're new to MuleSoft—or making the switch from Anypoint Studio—you might be wondering: **how do I even begin with Anypoint Code Builder (ACB)?** This post will walk you through the **entire setup process of ACB locally in Visual Studio Code**, from installation to building and testing your very first “Hello World” Mule application.
+
+Whether you're a developer curious about the future of MuleSoft or a seasoned Studio user adjusting to ACB, this is your go-to beginner’s guide.
+
+## 🛠️ Step 1: Install the Required Tools
+
+Before using ACB, make sure you have the following installed:
+
+- **Git**: [Download Git here](https://git-scm.com/downloads)
+- **Visual Studio Code**: [Download VS Code](https://code.visualstudio.com/)
+
+## 🔌 Step 2: Install the Anypoint Extension Pack
+
+✅ **Important:** Only install the Anypoint Extension Pack *after* Git and VS Code are installed and up to date. If needed, uninstall and reinstall to get the latest version of VS Code.
+
+- Open VS Code.
+- Go to the Extensions tab.
+- Search for Anypoint Extension Pack.
+- **Install the full pack** (not individual extensions).
+- Restart VS Code completely after installation.
+
+🔁 If you've already installed extensions one by one, uninstall them, restart VS Code, and then install the full pack.
+
+## 🧠 Step 3: Get Comfortable with VS Code
+
+Open the **Command Palette**:
+
+- Mac: Shift + Command + P
+- Windows: Shift + Ctrl + P
+
+You’ll use this for everything—from changing themes to running Mule apps. Try searching for:
+
+- Preferences: Color Theme
+
+Customize your theme or install fun ones like *Halloween* or *MuleSoft Community Theme*.
+
+## 🐴 Step 4: Understand the ACB Layout
+
+Unlike Anypoint Studio, ACB runs inside VS Code. Here's how it differs:
+
+- **Start a Project** from the MuleSoft tab (not from the “File > New Project” menu).
+- You can’t import JAR files or projects directly.
+- Always **open the root folder** (with your src, `pom.xml`, etc.) to work on projects.
+
+### Quick Actions in ACB:
+
+- Design an API
+- Implement an API
+- Develop an Integration (what we’ll use)
+
+## 🧩 Step 5: Install Additional VS Code Extensions (Optional)
+
+VS Code has a powerful extension ecosystem. For example:
+
+- Docker
+- Kubernetes
+- Postman
+- MySQL Viewer
+- GitHub Actions
+
+These aren’t required for ACB, but they supercharge your workflow.
+
+## ⚙️ Step 6: Configure ACB Settings
+
+In the MuleSoft tab:
+
+- Click the gear ⚙️ icon to adjust **autocompletion**, **default runtimes**, and **VM arguments**.
+- You *don’t need to install Java manually*—ACB does it for you.
+- In future versions, ACB may also install Git automatically.
+
+## 🔐 Step 7: Log In to Anypoint Platform
+
+Click your profile icon or use the “Sign in with Anypoint Platform” option in the ACB panel. (You can skip this for now if you’re just testing locally.)
+
+## 👋 Step 8: Build a "Hello World" Mule App
+
+Let’s create our first integration:
+
+- Go to the **MuleSoft tab** → “Develop an Integration.”
+- Name it: helloworld
+- Choose a folder and select the latest runtime and Java version.
+- Once the project is created:
+  - Use the UI builder to add an **HTTP Listener**.
+  - Set the path to /hello.
+  - Add a **Transform Message** component and output "Hello World".
+  - Add a **Logger** to print the payload.
+
+You now have a fully working Mule app that returns “Hello World” at [http://localhost:8081/hello](http://localhost:8081/hello).
+
+## 🐞 Step 9: Run and Debug Your App
+
+- Use the **Run and Debug** panel in VS Code.
+- Click “Start Debugging.”
+- Test with a tool like Postcode (or Postman).
+- Hit [localhost:8081/hello](http://localhost:8081/hello) to get your response.
+
+### Debugging Tips:
+
+- Add breakpoints directly in the XML or use the UI.
+- Watch variables like payload or check flow attributes.
+- Use the Command Palette to format XML files with Format Document.
+
+## 🧪 Final Thoughts
+
+You’ve now:
+
+✅ Installed ACB
+
+✅ Created a Hello World Mule App
+
+✅ Tested and Debugged it—all inside VS Code!
+
+This is just the beginning. In the next tutorial, we’ll build a real REST API using API specifications and flow logic.
+
+## 💡 Pro Tip
+
+If you ever get stuck, I offer **Anypoint Code Builder Office Hours** to help you troubleshoot and get unblocked.
+
+👉 Book a session [here](https://calendly.com/mule-alexmartinez/acb-troubleshooting).

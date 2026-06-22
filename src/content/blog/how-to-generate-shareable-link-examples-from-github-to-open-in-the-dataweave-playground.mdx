@@ -1,0 +1,73 @@
+---
+title: "How to generate shareable link examples from GitHub to open in the DataWeave Playground"
+description: "Learn how to create shareable links from a GitHub repository to open directly in the online DataWeave Playground."
+pubDate: 2023-02-07
+category: Tutorials
+tags: [MuleSoft, DataWeave, GitHub]
+youtubeId: WzfFkgw0xhw
+draft: false
+heroImage: ../../assets/blog/how-to-generate-shareable-link-examples-from-github-to-open-in-the-dataweave-playground.png
+---
+
+Some months ago, the DataWeave engineering team created this beautiful functionality to be able to open DataWeave examples (including inputs and scripts) directly in the Playground with a single link.
+
+[Here’s an example.](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-scripts&path=functions%2FmaskFields)
+
+In this post, we’re going to learn how to create these shareable links from a GitHub repository to open directly in the online DataWeave Playground.
+
+## The link's anatomy
+
+Let’s use as an example the link I shared at the beginning of the post. This is the complete URL:
+
+```
+https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-scripts&path=functions%2FmaskFields
+```
+
+Now let’s separate this to make it more readable:
+
+| URL part | Description |
+|---|---|
+| https://dataweave.mulesoft.com/learn/playground | The link should always start with this. This is the URL to open the Playground. |
+| ? | Marks the start of the query parameters in this URI. |
+| & | Marks the concatenation of more query parameters. |
+| `projectMethod`=GHRepo | This query parameter should always stay the same. |
+| `repo`=alexandramartinez%2Fdataweave-scripts | This query parameter indicates where the GitHub repository is located.<br/>This has to be a **public** repo.<br/>In this case, it’s referencing this repo: [github.com/alexandramartinez/dataweave-scripts](https://github.com/alexandramartinez/dataweave-scripts) |
+| `path`=functions%2FmaskFields | This query parameter indicates the path inside the repo where the inputs and scripts are located.<br/>In this case, it’s referencing this folder: [alexandramartinez/dataweave-scripts/tree/main/functions/maskFields](http://github.com/alexandramartinez/dataweave-scripts/tree/main/functions/maskFields) |
+
+You may have noticed that there are some weird characters in the query parameters’ values (%2F). This is just the representation of a slash (/) to make it safe to pass it down in a URL.
+
+To make sure your values for the *repo* and *path* query parameters are URL-safe, you can use this tool: [urlencoder.org](https://www.urlencoder.org/). Simply input your value at the top and click Encode. The encoded value will be returned under the button.
+
+Now that we have a better understanding of how the link is built, let’s now make sure our folder structure inside our repo (the *maskFields* folder from the previous example) is correctly set.
+
+## The folder structure
+
+Since we are only passing the main folder to the Playground, we have to make sure everything is where it’s supposed to be. For that, we have to set the correct folder structure.
+
+The folder structure from the previous [maskFields](https://github.com/alexandramartinez/dataweave-scripts/tree/main/functions/maskFields)[folder](https://github.com/alexandramartinez/dataweave-scripts/tree/main/functions/maskFields) example would look like this:
+
+```
+maskFields/
+  - inputs/
+    - payload.xml
+  - transform.dwl
+```
+
+As you can see, this is a simple example where there’s only one payload and only one main script (`transform.dwl`).
+
+Let’s see a more detailed explanation of what this all means.
+
+| **Folder/file** | **Description** | [Playground section](https://developer.mulesoft.com/tutorials-and-howtos/dataweave/learn-dataweave-with-the-dataweave-playground-getting-started/) |
+|---|---|---|
+| inputs/ | This folder should always be named ‘inputs’. This is where you can add several inputs if needed.<br/>Make sure the files have the appropriate extension (.xml, .json, .txt) for the Playground to know which data format it is.<br/>If you’re adding several payloads (for example, one JSON and one XML), make sure they are named differently. You reference these payloads from your scripts using the file name without the extension. | Input Explorer |
+| `transform.dwl` | This is the main file where your DataWeave script is located. The file name should always be `transform.dwl`. | Script Explorer / Script |
+| Additional modules | If you want to add custom DataWeave modules to the repo, you should do it at the same level as the `transform.dwl` file. These modules can have different names but they should all have the .dwl extension. | Script Explorer / Script |
+
+Once you have everything set up and committed/pushed to your **public** GitHub repository, you will be able to use the link to share your examples :)
+
+> [!NOTE]
+> It may take up to 30 minutes for the Playground to be updated after you make any changes to the repository. So, if you do not see your changes being reflected immediately, just wait a bit.
+
+Feel free to contact me for any questions or troubleshooting steps regarding this. I’m happy to help!
+
+-alex

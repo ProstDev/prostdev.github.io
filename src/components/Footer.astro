@@ -1,0 +1,49 @@
+---
+import { NAV, SOCIAL, SITE } from '@/config';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+const year = new Date().getFullYear();
+const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent('Hello from prostdev.com')}`;
+---
+<footer class="mt-20 border-t border-default bg-surface-subtle">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
+    <div>
+      <div class="flex items-center gap-2 font-extrabold">
+        <Logo class="h-8 w-8 text-accent" />
+        <span><span class="text-accent">Prost</span>Dev</span>
+      </div>
+      <p class="mt-3 max-w-xs text-sm text-muted">
+        Where MuleSoft mastery meets fun. Tutorials, AI experiments, and deep dives on
+        MuleSoft, DataWeave & Anypoint Code Builder.
+      </p>
+    </div>
+
+    <nav aria-label="Footer">
+      <h2 class="text-sm font-semibold text-default">Explore</h2>
+      <ul class="mt-3 space-y-2 text-sm">
+        {NAV.map((item) => (
+          <li><a href={item.href} class="text-muted transition-colors hover:text-accent">{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="text-sm font-semibold text-default">Follow</h2>
+      <div class="mt-3 flex gap-2">
+        <a href={SOCIAL.youtube} target="_blank" rel="noopener" aria-label="YouTube" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-default text-muted transition-colors hover:text-[#ff0000]"><Icon name="youtube" /></a>
+        <a href={SOCIAL.github} target="_blank" rel="noopener" aria-label="GitHub" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-default text-muted transition-colors hover:text-default"><Icon name="github" /></a>
+        <a href={SOCIAL.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-default text-muted transition-colors hover:text-[#0a66c2]"><Icon name="linkedin" /></a>
+        <a href={mailto} aria-label="Email Alex" title="Email me" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-default text-muted transition-colors hover:text-accent"><Icon name="mail" /></a>
+      </div>
+      <p class="mt-4 text-sm text-muted">
+        <a href="/llms.txt" class="hover:text-accent">llms.txt</a> ·
+        <a href="/rss.xml" class="hover:text-accent">RSS</a>
+      </p>
+    </div>
+  </div>
+  <div class="border-t border-default">
+    <div class="mx-auto max-w-7xl px-4 py-5 text-xs text-muted sm:px-6">
+      © {year} {SITE.name}. Built with Astro.
+    </div>
+  </div>
+</footer>

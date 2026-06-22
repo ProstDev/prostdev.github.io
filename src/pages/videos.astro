@@ -1,0 +1,61 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistRow from '@/components/PlaylistRow.astro';
+import ExternalPlaylistCard from '@/components/ExternalPlaylistCard.astro';
+import { videosInPlaylist, primaryPlaylists, morePlaylists, sectionHref, FUN_PLAYLISTS, COMMUNITY_PLAYLISTS } from '@/data/videos';
+
+// Featured series first, then the rest — one uniform list, no visual separation.
+const playlists = [...primaryPlaylists(), ...morePlaylists()];
+---
+<BaseLayout
+  title="All Videos"
+  description="Browse every ProstDev video series — MuleSoft, DataWeave, Anypoint Code Builder, and AI experiments — including the full back-catalog."
+  contained={false}
+>
+  <div class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">All videos</h1>
+    <p class="mt-3 max-w-2xl text-muted">
+      Every series on the channel, grouped by playlist.
+    </p>
+
+    <div class="mt-6">
+      {playlists.map((p) => (
+        <PlaylistRow
+          playlist={p}
+          videos={videosInPlaylist(p.id)}
+          headingHref={sectionHref(p)}
+        />
+      ))}
+    </div>
+  </div>
+
+  <!-- Fun side-quests: external YouTube playlists (games / side-content), not in the catalog. -->
+  <section class="bg-surface-subtle">
+    <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+      <div class="mb-6 max-w-3xl">
+        <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">🎮 Fun side-quests</h2>
+        <p class="text-pretty text-muted">
+          Coding challenges, games, and #Codetober — the playful side of the channel. Each opens on YouTube.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {FUN_PLAYLISTS.map((p) => <ExternalPlaylistCard playlist={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Community: external YouTube playlists from meetups / community events, not in the catalog. -->
+  <section>
+    <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+      <div class="mb-6 max-w-3xl">
+        <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">🤝 Community</h2>
+        <p class="text-pretty text-muted">
+          Meetups, live streams, and community events Alex has hosted or joined over the years. Each opens on YouTube.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {COMMUNITY_PLAYLISTS.map((p) => <ExternalPlaylistCard playlist={p} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

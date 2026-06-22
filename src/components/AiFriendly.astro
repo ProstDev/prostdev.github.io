@@ -1,0 +1,72 @@
+---
+import Icon from './Icon.astro';
+---
+<section class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+  <div class="mb-6">
+    <h2 class="flex items-center gap-2 text-2xl font-bold">🤖 Built for humans <span class="text-muted">&amp;</span> AI</h2>
+    <p class="mt-2 max-w-2xl text-muted">
+      Every video and post here is machine-readable. Copy the Markdown straight into ChatGPT,
+      Claude, or your editor — no scraping, no copy-pasting from a transcript box.
+    </p>
+  </div>
+
+  <ul class="grid list-none gap-x-6 gap-y-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
+    <li class="flex h-full flex-col rounded-xl border border-default bg-surface-card p-5">
+      <span class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-default bg-surface text-accent" aria-hidden="true">
+        <Icon name="file-text" class="h-5 w-5" />
+      </span>
+      <h3 class="text-base font-bold text-default">Full transcripts on every video</h3>
+      <p class="mt-1.5 flex-1 text-sm text-muted">
+        Each tutorial page includes the complete, cleaned-up transcript — read it, search it,
+        or feed it to your AI of choice.
+      </p>
+      <a
+        href="/video/claude-code-vs-curietech-advent-of-code-dataweave#transcript"
+        target="_blank"
+        rel="noopener"
+        class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+      >
+        See a transcript <Icon name="external" class="h-4 w-4" aria-hidden="true" />
+      </a>
+    </li>
+
+    <li class="flex h-full flex-col rounded-xl border border-default bg-surface-card p-5">
+      <span class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-default bg-surface text-accent" aria-hidden="true">
+        <Icon name="copy" class="h-5 w-5" />
+      </span>
+      <h3 class="text-base font-bold text-default">One-click “Copy as Markdown”</h3>
+      <p class="mt-1.5 flex-1 text-sm text-muted">
+        On any video or post, hit <span class="font-semibold text-default">Copy as Markdown</span>
+        in the toolbar and paste the whole thing into your prompt.
+      </p>
+      <a
+        href="/video/claude-code-vs-curietech-advent-of-code-dataweave.md"
+        target="_blank"
+        rel="noopener"
+        class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+      >
+        See an example <Icon name="external" class="h-4 w-4" aria-hidden="true" />
+      </a>
+    </li>
+
+    <li class="flex h-full flex-col rounded-xl border border-default bg-surface-card p-5">
+      <span class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-default bg-surface text-accent" aria-hidden="true">
+        <Icon name="sparkles" class="h-5 w-5" />
+      </span>
+      <h3 class="text-base font-bold text-default">The whole site, AI-ready</h3>
+      <p class="mt-1.5 flex-1 text-sm text-muted">
+        Add <span class="rounded bg-surface px-1 font-mono text-[0.8em] text-default">.md</span>
+        to any page URL for raw Markdown, or point an AI at
+        <span class="font-semibold text-default">/llms.txt</span> to give it the entire site.
+      </p>
+      <a
+        href="/llms.txt"
+        target="_blank"
+        rel="noopener"
+        class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+      >
+        View llms.txt <Icon name="external" class="h-4 w-4" aria-hidden="true" />
+      </a>
+    </li>
+  </ul>
+</section>

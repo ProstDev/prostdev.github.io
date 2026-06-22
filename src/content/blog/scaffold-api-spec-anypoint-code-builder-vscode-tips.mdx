@@ -1,0 +1,199 @@
+---
+title: 'Scaffold an API Spec in ACB + VS Code Tips for Beginners'
+description: >-
+  Scaffold an API spec in Anypoint Code Builder and explore key ACB + VS Code
+  tips like running flows, customizing views, and using Git effectively.
+pubDate: 2025-07-21
+category: Tutorials
+tags: [MuleSoft, Anypoint Code Builder, Visual Studio Code]
+youtubeId: SIcxoyL5NtY
+draft: false
+heroImage: ../../assets/blog/scaffold-api-spec-anypoint-code-builder-vscode-tips.png
+---
+
+If you’ve ever used **Anypoint Studio** to implement an API from a spec, you already know how easy it is to generate flows from a RAML or OpenAPI file.
+
+But what about **Anypoint Code Builder (ACB)**?
+
+In this guide, I’ll walk you through what happens when you scaffold an API spec in ACB — from clicking **“Implement an API”** to running your Mule app locally. Along the way, you’ll learn essential **VS Code tips**, how to handle `.gitignore`, where your **flows** and **configs** live, and how to switch between **UI and XML views**.
+
+> [!TIP]
+> Whether you're a beginner with MuleSoft or just transitioning to ACB, this walkthrough gives you the confidence to explore and edit scaffolded projects like a pro.
+
+## 🛠️ Step 1: Scaffold the API Spec from Exchange
+
+Start with an API spec you’ve published to **Anypoint Exchange** (we used a simple To-Do API in OpenAPI 3.0 format).
+
+- Open Anypoint Code Builder inside **VS Code**
+- Click **Implement an API**
+- Select your API asset from Exchange
+- Name your project (e.g., todo-api-impl)
+- Choose a local folder and hit **Create Project**
+
+ACB will automatically generate:
+
+- Mule flows for each endpoint
+- HTTP Listener configuration
+- Error handling logic (400, 404, 405, 406, 415, etc.)
+- `mule-artifact.json`, `pom.xml`, .gitignore, and other setup files
+
+## 🧭 Step 2: Explore the Scaffolded Project
+
+Here’s what you get out of the box:
+
+### ✅ Auto-generated Flows
+
+Each method in your API (GET, POST, etc.) becomes its own flow, wired to the right path.
+
+### 🔀 Error Handling
+
+ACB scaffolds global error flows like:
+
+- 400 Bad Request
+- 404 Resource Not Found
+- 405 Method Not Allowed
+- and more…
+
+You don’t need to define these in the API spec — ACB just adds them.
+
+### 🧩 Configuration Files
+
+- `mule-artifact.json`: runtime + project metadata
+- `pom.xml`: dependencies (e.g., APIkit, HTTP connector)
+- `log4j2.xml`, embedded sample folders, etc.
+
+## 🔧 Step 3: Use Mule Project Properties UI
+
+Right-click your project > **Open Mule Project Properties**. This UI helps you:
+
+- View/set Mule runtime and Java version
+- See which **connectors** were added
+- Check compatibility for versions (runtime vs connector vs Java)
+- Apply missing runtimes automatically
+
+## 🗂️ Step 4: Clean Up with .gitignore
+
+To keep your repo clean:
+
+- Add `src/test/resources/embedded*/` to .gitignore
+- Ignore .vscode or other machine-specific files
+- VS Code makes this easy from the Source Control tab — right-click any file > Add to .gitignore
+
+## 🌀 Step 5: Initialize Git & Use Source Control
+
+- Open the **Source Control** tab in VS Code
+- Click “Initialize Repository”
+- You’ll see all tracked changes
+- You can commit everything after staging, or one file at a time
+
+## 🧑‍💻 Step 6: Canvas vs XML — Switch Views Easily
+
+Want XML to open by default?
+
+- Open a .xml file (e.g., a flow)
+- Click the three-dot icon at the top right > **Configure Editors**
+- Edit the file association so XML is default instead of Canvas
+- Switch it back anytime to mulesoft.projectFile.canvas if you prefer UI
+
+Bonus: You can even open **both views at once** with "Open in Canvas and Code Editor."
+
+## 🚀 Step 7: Run & Test Your App in VS Code
+
+Click the **Run** button or use the command palette to launch the Mule app locally.
+
+Test your endpoints with:
+
+- Postman
+- Postcode (VS Code extension for REST requests)
+- cURL or any HTTP client
+
+You should see 200 OK responses — even though the implementation is empty. That’s scaffolding done right.
+
+## 🎯 Recap: What You Learned
+
+✅ How to scaffold an API spec into a running Mule project
+
+✅ What files and flows ACB generates for you
+
+✅ How to explore and customize your project like a pro
+
+✅ Useful VS Code tips for Git, views, testing, and organization
+
+## 🔔 Want More Tutorials?
+
+Subscribe to [ProstDev on YouTube](https://www.youtube.com/@prostdev?sub_confirmation=1) for weekly videos on:
+
+- Anypoint Code Builder (ACB)
+- API design and implementation
+- MUnit testing
+- MuleSoft best practices
+
+## 🤖 FAQ – Anypoint Code Builder (ACB) API Scaffolding & VS Code
+
+### ❓ What does "scaffold an API" mean in Anypoint Code Builder?
+
+Scaffolding an API in ACB means automatically generating Mule flows, error handlers, and configuration files (like `mule-artifact.json` and `pom.xml`) based on an API spec, such as OpenAPI or RAML. This allows developers to instantly start implementing logic without manually creating flows from scratch.
+
+### ❓ How do I implement an API spec from Anypoint Exchange in ACB?
+
+You can implement an API by:
+
+Opening Anypoint Code Builder in VS Code
+
+Clicking **“Implement an API”**
+
+Selecting your API spec from Exchange
+
+Letting ACB generate flows and configs for you
+
+### ❓ What files are auto-generated when scaffolding an API in ACB?
+
+ACB generates:
+
+Mule flows for each method
+
+Error handlers
+
+`mule-artifact.json`
+
+`pom.xml`
+
+Logging configs (`log4j2.xml`)
+
+HTTP listener configurations
+
+Sample test files (under `src/main/test/embedded*`)
+
+### ❓ Can I edit the Mule flows in both XML and visual UI (Canvas) in ACB?
+
+Yes. ACB supports both views:
+
+**Canvas UI** for visual editing
+
+**XML editor** for precise config control
+
+You can open both views side-by-side or configure VS Code to always default to one view using the **Configure Editor** setting.
+
+### ❓ How do I configure .gitignore in a new ACB project?
+
+ACB automatically creates a .gitignore file for you when creating a new project, but you still need to add some files or folders like `src/test/resources/embedded*` or .vscode/
+
+### ❓ What is mule-artifact.json used for?
+
+The `mule-artifact.json` file defines project-level metadata like:
+
+The required Mule runtime version
+
+Minimum Mule version
+
+ACB generates this automatically during scaffolding.
+
+### ❓ How do I run my Mule app locally in ACB?
+
+Use the Run/Debug tab in VS Code or use the command palette:
+
+Select **Run/Debug Mule Application Locally**
+
+Check the terminal for server logs and endpoint availability
+
+Use Postman or Postcode (VS Code REST client) to test your API

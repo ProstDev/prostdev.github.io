@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistGrid from '@/components/PlaylistGrid.astro';
+import { getPlaylist, videosInPlaylist } from '@/data/videos';
+
+const playlist = getPlaylist('datacloud-mulesoft')!;
+const videos = videosInPlaylist('datacloud-mulesoft');
+---
+<BaseLayout title="Data Cloud + MuleSoft Integration" description={playlist.description}>
+  <PlaylistGrid
+    playlist={playlist}
+    videos={videos}
+    hook="Connect Salesforce Data Cloud to MuleSoft, end to end."
+  />
+</BaseLayout>
