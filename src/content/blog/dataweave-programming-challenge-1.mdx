@@ -6,6 +6,132 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: JviC_4lSQEk
 heroImage: ../../assets/blog/dataweave-programming-challenge-1.png
+readerNotes:
+  - author: learningdazzler
+    date: 2024-10-24
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      ---
+      (((((payload splitBy "\n\n") map ((item, index) -> item replace "\n" with ",")) map ((item, index) ->  item splitBy ",") ) map ((item, index) -> item map ((item, index) -> item as Number))) map ((item, index) -> sum(item) ) orderBy ((item, index) -> item))[-1]
+  - author: Kevin Medina
+    date: 2024-02-23
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Arrays
+      output application/json
+      fun getMaxNumber(nums) =
+      max(nums splitBy "\n\n" map ((values, index) ->
+          values splitBy "\n"
+          sumBy $))
+      ---
+      getMaxNumber(payload)
+  - author: sai teja nallamallli
+    date: 2023-07-13
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      fun returnmax(a : Number,b : Number) : Number=if(a>b)a else b
+      fun findMax(Data: String) : Number = findMax(Segregate(Data))
+      fun findMax(L : Array<Number>) :Number = L reduce ($$ returnmax  $) default 0
+      fun findMax(X:Any) : Number  = 0
+      fun Segregate(Data : String) : Array<Number>= Segregate(Data splitBy "\n\n")
+      fun Segregate(Data : Array) : Array<Number> = Data map sum($ splitBy "\n")
+      ---
+      findMax(payload)
+  - author: Victor Manuel Rodriguez
+    date: 2023-07-11
+    lang: dataweave
+    code: |
+      %dw 2.0
+      var pay = (read(payload, "text/plain") splitBy('\n\n')) map ($ splitBy('\n'))
+      output application/json
+      ---
+      max(pay map sum($))
+  - author: Disha Bhar
+    date: 2023-05-10
+    text: Hi, tried solving using random input.
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      ---
+      max((payload splitBy "\n\n") map(sum($ splitBy "\n") as Number))
+  - author: Kalyani Chodavarapu
+    date: 2023-05-09
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      ---
+      max(payload splitBy ("\n\n") map (($ splitBy "\n" reduce $ + $$) as Number))
+  - author: mysg147
+    date: 2023-04-20
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      var x= payload splitBy('\n\n')
+      var y = x map((val,in) -> sum(val splitBy('\n')) as Number )
+      ---
+      max(y)
+  - author: Felix Schnabel
+    date: 2023-02-22
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import lines from dw::core::Strings
+      ---
+      max(payload splitBy "\n\n" map sum(lines($)))
+  - author: Alex Martinez
+    date: 2023-02-22
+    replyTo: Felix Schnabel
+    text: "You and your fancy code :p\n\nThanks, Felix! I'll use one of your solutions for the next challenge, I hope you don't mind (giving you full credit, of course)."
+  - author: Felix Schnabel
+    date: 2023-02-22
+    replyTo: Alex Martinez
+    text: Sure, no problem!
+  - author: Saravanan Devadass
+    date: 2023-03-06
+    replyTo: Felix Schnabel
+    text: How do you handle if the line has a letter.
+  - author: Alex Martinez
+    date: 2023-03-07
+    replyTo: Saravanan Devadass
+    text: It's a simple challenge. In this case, there's never gonna be a letter in the input.
+  - author: Elvedin Babic
+    date: 2023-02-22
+    lang: dataweave
+    code: |
+      max(payload splitBy "\n\n" map sum($ splitBy "\n"))
+  - author: Faizan Arif
+    date: 2023-02-21
+    text: Here is my soln
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+
+      var Numbers = payload splitBy (/\r?\n\r?\n/)
+
+      var highestSum = Numbers map ((item)-> item splitBy("\n") reduce ((value, accumulator) -> accumulator + value as Number)) maxBy ((item) -> item )
+      ---
+      highestSum
+  - author: Shyam Raj Prasad
+    date: 2023-02-21
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import lines from dw::core::Strings
+      ---
+      max(lines(payload) joinBy "," splitBy ",,"  map(
+          sum($ splitBy ",") as Number
+      ))
 ---
 
 > [!NOTE]

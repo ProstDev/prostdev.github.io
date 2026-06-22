@@ -6,6 +6,310 @@ category: Challenges
 tags: [MuleSoft, DataWeave]
 youtubeId: cZVwl55yTWo
 heroImage: ../../assets/blog/dataweave-programming-challenge-2.png
+readerNotes:
+  - author: Rahul Dusaje
+    date: 2024-08-17
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      output application/json
+
+      fun checkPoints(myScore, opponentScore) =
+
+      if(opponentScore == "R" and myScore == "S")
+      total: 6
+
+      else if(opponentScore == "R" and myScore == "P")
+      total: 0
+
+      else if(opponentScore == "R" and myScore == "R")
+      total: 3
+
+      else if(opponentScore == "P" and myScore == "P")
+      total: 3
+
+      else if(opponentScore == "P" and myScore == "S")
+      total: 0
+
+      else if(opponentScore == "P" and myScore == "R")
+      total: 6
+
+      else if(opponentScore == "S" and myScore == "S")
+      total: 3
+
+      else if(opponentScore == "S" and myScore == "P")
+      total: 6
+
+      else if(opponentScore == "S" and myScore == "R")
+      total: 0
+
+      else
+      total: -1
+
+      ---
+      sum(((payload splitBy "\n") map ((item, index) -> (item splitBy " "))) map ((item, index) -> checkPoints((item)[0], item[1]).total ))
+  - author: Kevin Medina
+    date: 2024-02-23
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Arrays
+      output application/json
+      fun getPoints(games) =
+      games splitBy "\n" map ((hands, index) ->
+        do{
+          var points = 0
+        ---
+          hands match {
+            case "R R" -> points + 3
+            case "R P" -> points + 0
+            case "R S" -> points + 6
+            case "P P" -> points + 3
+            case "P S" -> points + 0
+            case "P R" -> points + 6
+            case "S S" -> points + 3
+            case "S R" -> points + 0
+            case "S P" -> points + 6
+            else -> 0
+          }
+
+        }
+      ) sumBy $
+      ---
+      getPoints(payload)
+  - author: zainab zaidi
+    date: 2023-11-07
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      fun calculate( item) =
+        if(item [0] == item [1])
+        3 else if((item[0]=='R' and item[1]== 'P') or (item[0]=='S' and item[1]=='R') or item[0]=='P' and item[1]=='S') 6 else 0
+
+      ---
+      /* Expected output:
+
+      30
+
+      */
+      sum(payload splitBy  ("\n") map (item,index) -> calculate(item splitBy(" ") ))
+  - author: Kelvin Fernandes
+    date: 2023-10-19
+    lang: dataweave
+    code: |
+      %dw 2.0
+
+      var ROCK = "R"
+      var PAPER = "P"
+      var SCISSOR = "S"
+
+      fun getScore(play: Array) = (
+        do {
+          var opponent = play[0]
+          var me = play[1]
+          ---
+          if((me == ROCK and opponent == SCISSOR) or
+          (me == PAPER and opponent == ROCK) or
+          (me == SCISSOR and opponent == PAPER)) 6
+          else if(opponent == me) 3
+          else 0
+        }
+      )
+
+      output application/json
+      ---
+      sum((payload splitBy "\n") map getScore($ splitBy " "))
+  - author: sai teja nallamallli
+    date: 2023-07-13
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      type Rank="S"|"R"|"P"|'s'|'p'|'r'
+      fun GetRank(Data : Array<Rank>):Array<Number> = do {
+          var Res = Data
+          var P1=upper(Res[0]) as Rank
+          var P2=upper(Res[1]) as Rank
+          ---
+          if((P1 == "P") and (P2 == "R")) [6,0] else
+          if((P1 == "S") and (P2 == "P")) [6,0] else
+          if((P1 == "R") and (P2 == "P")) [6,0] else
+          if((P1 == "R") and (P2 == "S")) [0,6] else
+          if((P1 == "P") and (P2 == "S")) [0,6] else
+          if((P1 == "S") and (P2 == "R")) [0,6] else
+          [3,3]
+      }
+      fun GetWinner(Data : Array<Number>) = if(Data[0] > Data[1]) "Player 1 is The winner Score is $(Data[0])"
+      else if(Data[0] > Data[1]) "The Game is Draw With The Score is $(Data[0])"
+      else "Player 2 is The winner Score is $(Data[1])"
+      ---
+      GetWinner(
+      (payload splitBy "\n") reduce (item,acc=[0,0]) ->
+      do {
+          var res = GetRank(item splitBy " ")
+          ---
+          [acc[0] + res[0] , acc[1] + res[1]]
+      }
+      )
+  - author: tafkamw
+    date: 2023-05-02
+    text: I took the old-fashioned way out 😎
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+
+      output application/json
+      ---
+      lines(payload remove " ") map (
+          if ($=="RR" or $=="PP" or $=="SS") 3
+          else if ($=="RP" or $=="PS" or $=="SR") 6
+          else if ($=="RS" or $=="SP" or $=="PR") 0
+          else "what?!"
+      )
+      reduce ($$ + $)
+  - author: Victor Manuel Rodriguez
+    date: 2023-07-11
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      var points = {
+          "R R": 3,
+          "S S": 3,
+          "P P": 3,
+          "R S": 6,
+          "P R": 6,
+          "S P": 6
+      }
+      fun RPSComparer(value) = points[value] default 0
+      output application/json
+      ---
+      lines(payload) reduce ((item, acc=0) -> acc + RPSComparer(item))
+  - author: shwetabh singh
+    date: 2023-04-30
+    text: "sharing my approach below:"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      fun getScore(result)= calcScore(((result splitBy " ")[0]),((result splitBy " ")[1]))
+      fun calcScore(bot,me)= if(bot == me) 3
+      else if (bot == "R" and me == "S")  0
+      else if (bot == "R" and me == "P") 6
+      else if (bot == "P" and me == "R") 0
+      else if (bot == "P" and me == "S") 6
+      else if (bot == "S" and me == "P") 0
+      else if (bot == "S" and me == "R") 6
+      else 0
+      output application/json
+      ---
+      sum(valuesOf(((payload splitBy "\n") map ((item, index) ->{
+          score: getScore(item)
+      } ))reduce ($$ ++ $ ))
+  - author: mysg147
+    date: 2023-04-22
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      var x = payload splitBy('\n')
+      var y =x map ((val,in) -> if(val == "R R" or val == "S S" or val == "P P") 3
+      else if(val == "R P" or val == "P S" or val == "S R") 6 else 0
+      )
+      ---
+      sum(y)
+  - author: prasadrnithin
+    date: 2023-03-02
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Strings
+      fun rps(inValue) =
+          if(['R P','P S','S R'] contains inValue)
+              6
+          else if(['P R','S P','R S'] contains inValue)
+              0
+          else
+              3
+      ---
+      sum(lines(payload) map (rps($)))
+  - author: BESIDE serious
+    date: 2023-03-02
+    lang: dataweave
+    code: |
+      %dw 2.0
+      import * from dw::core::Strings
+      output application/json
+      fun myScore(moves :Any)= do{
+          var steps =  moves splitBy " "
+          ---
+          log(if(steps[0]==steps[1]) 3 else if (["S R","R P","P S"] contains(moves) ) 6 else 0)
+      }
+      ---
+      sum(valuesOf(((lines(payload) map (() -> {
+          ($): myScore($)
+      } )))))
+  - author: sksalmanhaider
+    date: 2023-03-01
+    lang: dataweave
+    code: |
+      %dw 2.0
+      fun calculateMyScore(inData) =
+        (inData splitBy "\n") reduce (stringOfChoices, myTotalScore = 0) -> do {
+          var opponentChoice = stringOfChoices[0]
+          var myChoice = stringOfChoices[2]
+          var myWinningCombos = ["SR", "RP", "PS"]
+          ---
+          if (opponentChoice == myChoice)
+            myTotalScore + 3
+          else if (myWinningCombos contains (opponentChoice ++ myChoice))
+            myTotalScore + 6
+          else
+            myTotalScore
+        }
+      output json
+      ---
+      calculateMyScore(payload)
+  - author: Vikash
+    date: 2023-02-28
+    text: Just a kind of static & probability...!!
+    lang: dataweave
+    code: |
+      %dw 2.0
+      var opponent = payload splitBy  "\n" map ($ splitBy  " ")[0]
+      var you = payload splitBy  "\n" map ($ splitBy  " ")[1]
+      var result = payload splitBy  "\n"  map(v,i) ->
+      {
+          result: if(opponent[i] == you[i]) 3 else if((opponent[i] == "R") and (you[i] == "S")) 0 else if((opponent[i] == "R") and (you[i] == "P")) 6 else if((opponent[i] == "S") and (you[i] == "P")) 0 else if((opponent[i] == "S") and (you[i] == "R")) 6 else if((opponent[i] == "P") and (you[i] == "S")) 6 else if((opponent[i] == "P") and (you[i] == "R")) 0 else 0
+      }
+      output application/json
+      ---
+      sum(result.result)
+  - author: Shyam Raj Prasad
+    date: 2023-02-28
+    text: "Just sharing my approach:"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      var scoring ={
+          "R R" : 3,
+          "R P" : 6,
+          "R S" : 0,
+          "S R" : 6,
+          "S S" : 3,
+          "S P" : 0,
+          "P R" : 0,
+          "P P" : 3,
+          "P S" : 6
+      }
+      ---
+      sum(payload splitBy  "\n" map (
+          scoring[$] default 0
+      ))
 ---
 
 > [!NOTE]

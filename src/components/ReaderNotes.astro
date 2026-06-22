@@ -40,6 +40,18 @@ interface Props {
 const { notes } = Astro.props;
 
 /**
+ * <Code> does NOT inherit astro.config.mjs's `langAlias` (same gotcha as `themes` above), so
+ * `lang="dataweave"` makes Shiki warn "language doesn't exist, falling back to plaintext" and
+ * the snippet renders unhighlighted. Mirror the config's alias here: dataweave/dwl → scala
+ * (DataWeave has no Shiki grammar; scala is the closest). CodeBlockEnhancer then labels a
+ * `data-language="scala"` block "DataWeave", matching body code fences.
+ */
+function shikiLang(lang?: string): string {
+  const l = (lang ?? 'text').toLowerCase();
+  return l === 'dataweave' || l === 'dwl' ? 'scala' : l;
+}
+
+/**
  * Split a comment's prose into renderable inline segments. Two kinds of markup are recognized:
  *   • `inline-code` spans (backtick-delimited) → <code> chips, and
  *   • bare http(s) URLs → autolinked <a> (opens in a new tab + external icon, like the rest of
@@ -106,7 +118,7 @@ function inlineSegments(text: string) {
           <div class="mt-3">
             <Code
               code={note.code}
-              lang={(note.lang ?? 'text') as any}
+              lang={shikiLang(note.lang) as any}
               themes={{ light: 'github-light', dark: 'github-dark' }}
             />
           </div>
