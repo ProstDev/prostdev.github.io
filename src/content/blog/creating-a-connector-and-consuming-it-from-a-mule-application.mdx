@@ -7,6 +7,22 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Exchange, Maven, Java, Anypoint Platform]
 draft: false
 heroImage: ../../assets/blog/creating-a-connector-and-consuming-it-from-a-mule-application.png
+readerNotes:
+  - author: "KRISHNA SAKETH"
+    date: 2021-03-21
+    text: |
+      Hello ,
+
+      can you please , i am Getting following error
+
+      `[ERROR] Failed to execute goal org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy (default-deploy) on project testconnector: Failed to deploy artifacts: Could not transfer artifact :testconnector:pom:1.0.0-20210321.151740-1 from/to mule-snapshots (https://repository-master.mulesoft.org/nexus/content/repositories/snapshots): Unauthorized (401) -> [Help 1]`
+
+      Went throuh below link and validated .seems everything good to me
+      https://help.mulesoft.com/s/article/Getting-401-Unauthorized-error-when-deploying-assets-to-Exchange-using-Maven
+  - author: "Jyoti Choudhury"
+    date: 2021-03-21
+    replyTo: "KRISHNA SAKETH"
+    text: "Please make sure your exhange url in `settings.xml` has https in it and also make sure the username and password being used is correct."
 ---
 
 ## What is a Connector?
