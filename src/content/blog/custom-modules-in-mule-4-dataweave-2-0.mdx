@@ -5,6 +5,10 @@ pubDate: 2020-07-16
 category: Tutorials
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/custom-modules-in-mule-4-dataweave-2-0.png
+readerNotes:
+  - author: "Paul Smith"
+    date: 2021-10-18
+    text: "You should consider doing this instead of using the `p` function (which looks up the property every time the dw is run). `words joinBy \"${joinByChar}\"` as it's more performant as it is done at deployment time, instead of each run."
 ---
 
 *GitHub repository with the Mule Project can be found at the end of the post.*
