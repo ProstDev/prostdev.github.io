@@ -8,6 +8,86 @@ pubDate: 2020-05-28
 category: Guides
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/combining-objects-concatenation-in-dw-2-0.png
+readerNotes:
+  - author: "Erki Kriks"
+    date: 2022-11-03
+    parts:
+      - text: "Thank you for your post! How to avoid creating duplicated keys in json?"
+      - text: "Payload:"
+      - code: |
+          {"status":true}
+        lang: json
+      - text: "Schema:"
+      - code: |
+          output application/json encoding="UTF-8"
+          ---
+          ++(payload, payload)
+        lang: dataweave
+      - text: "And the result is invalid json:"
+      - code: |
+          {
+            "status": true,
+            "status": true
+          }
+        lang: json
+  - author: "Alex Martinez"
+    date: 2022-11-03
+    replyTo: "Erki Kriks"
+    parts:
+      - text: "Well, in this case since you're concatenating the same object, it's expected that you'll have duplicated keys and values. But you can use the `distinctBy` function to get rid of duplicated keys. Like so:"
+      - code: |
+          output application/json encoding="UTF-8"
+          ---
+          ++(payload, payload)
+          distinctBy $
+        lang: dataweave
+  - author: "Erki Kriks"
+    date: 2022-11-03
+    replyTo: "Alex Martinez"
+    parts:
+      - text: "But it does not work if values are different."
+      - text: "Payload:"
+      - code: |
+          {
+              "status": null,
+              "message": "Hello world!"
+          }
+        lang: json
+      - text: "Schema:"
+      - code: |
+          %dw 2.0
+          output application/json
+          ---
+          ++ (payload, {"status":true}) distinctBy $
+        lang: dataweave
+      - text: "Result is invalid json:"
+      - code: |
+          {
+            "status": null,
+            "message": "Hello world!",
+            "status": true
+          }
+        lang: json
+  - author: "Alex Martinez"
+    date: 2022-11-03
+    replyTo: "Erki Kriks"
+    parts:
+      - text: "Whoops! My mistake. Instead of using `$` (which refers to the value), you should be using `$$` (which refers to the key)"
+      - code: |
+          %dw 2.0
+          output application/json
+          ---
+          ++ (payload, {"status":true}) distinctBy $$
+        lang: dataweave
+  - author: "Erki Kriks"
+    date: 2022-11-04
+    replyTo: "Alex Martinez"
+    parts:
+      - text: "Ok, thanks! This works. In JavaScript there is a similar function: `Object.assign(json1, json2)`; So, if same key is used in first json, it becomes overwritten by second json."
+      - text: "In dataweave, fields in second json will be ignored if they already exists in first json. Of course, we can change the order to ignore fields in first json if they exists in second json:"
+      - code: |
+          ++ ({"status":true}, payload) distinctBy $$
+        lang: dataweave
 ---
 
 In this post, I will explain what object concatenation is and how to utilize it.
