@@ -7,6 +7,19 @@ category: Guides
 tags: [MuleSoft]
 draft: false
 heroImage: ../../assets/blog/scatter-gather-integration-pattern-mule-4-part-2.png
+readerNotes:
+  - author: "anjanavutupali66"
+    date: 2021-03-08
+    text: |-
+      Having doubt
+      one of scater gather route having flow ref and flow goes to flow ref and executes varaibles in it and it fails at one of connector and it went back to flow reference so the varaibles that are declared upto that point were there but the failure comes to scater gather component the variables are disappearing  is it because of scater gather functionality or any mistake?
+  - author: "Vishal Padhiyar"
+    date: 2021-03-08
+    replyTo: "anjanavutupali66"
+    text: |-
+      Hello anjanavutupali66,
+
+      Thanks for sharing your question with us. I partially understood your scenario. Can you please elaborate and provide more details on type of connector used. If you are referring to the example application, up on checking the first case, the variable value is available although the flow 3 failed. However, no connector is used in this case. For scatter-gather route variable propagation please check the mule documentation : https://docs.mulesoft.com/mule-runtime/4.3/scatter-gather-concept
 ---
 
 *GitHub repository with the Mule Project can be found at the end of the post.*
