@@ -78,3 +78,21 @@ GitHub Pages. The custom domain is set via [`public/CNAME`](public/CNAME) (`pros
 4. In Settings → Pages, set the custom domain to `prostdev.com` and enable **Enforce HTTPS**.
 
 Keep Wix live until the new site is verified, to avoid downtime.
+
+## License
+
+This project is **free for noncommercial use, but may not be used to generate revenue.**
+Two licenses apply:
+
+- **Source code** — [PolyForm Noncommercial License 1.0.0](LICENSE). You may read, fork,
+  study, and reuse the code for any *noncommercial* purpose. Commercial use is not permitted.
+- **Written & media content** — blog posts (`src/content/blog/`), transcripts
+  (`src/content/transcripts/`), and other editorial content are licensed under
+  [Creative Commons BY-NC 4.0](LICENSE-CONTENT): share and adapt with attribution, but
+  **no commercial use**.
+
+In short: learning from it, forking it, and non-commercial reuse (with credit) are welcome —
+using any of it to make money is not. For commercial licensing, contact alex@prostdev.com.
+
+Guest-authored posts remain © their respective authors (see each post's `author` field),
+published here under the same noncommercial terms.
