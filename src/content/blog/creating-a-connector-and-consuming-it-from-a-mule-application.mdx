@@ -23,6 +23,34 @@ readerNotes:
     date: 2021-03-21
     replyTo: "KRISHNA SAKETH"
     text: "Please make sure your exhange url in `settings.xml` has https in it and also make sure the username and password being used is correct."
+  - author: "kkrish.mathi"
+    date: 2022-10-13
+    parts:
+      - text: |
+          Hello,
+
+          I created a connector and published to exchange successfully. connector working as expected, however, I see below error while building my test application with the connector, and the same error is also returned when tried test connection in the connector configuration window. please advise
+      - code: |
+          org.mule.runtime.api.connection.ConnectionException: An exception was found trying to obtain a connection: org.mule.runtime.api.lifecycle.LifecycleException: Instance must not be null
+            org.mule.runtime.api.connection.ConnectionException: An exception was found trying to obtain a connection: org.mule.runtime.api.lifecycle.LifecycleException: Instance must not be null
+            Caused by: org.mule.runtime.api.exception.MuleRuntimeException: org.mule.runtime.api.lifecycle.LifecycleException: Instance must not be null
+            Caused by: org.mule.runtime.api.lifecycle.LifecycleException: Instance must not be null
+            Caused by: java.lang.IllegalArgumentException: Instance must not be null
+                  at org.springframework.util.Assert.notNull(Assert.java:198)
+                  at org.springframework.util.ClassUtils.getUserClass(ClassUtils.java:881)
+                  at org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory.autowireBean(ObjectProviderAwareBeanFactory.java:140)
+                  at org.mule.runtime.config.internal.SpringRegistry.initialiseObject(SpringRegistry.java:318)
+                  at org.mule.runtime.config.internal.SpringRegistry.inject(SpringRegistry.java:308)
+                  at org.mule.runtime.core.internal.connection.DefaultConnectionProviderWrapper.connect(DefaultConnectionProviderWrapper.java:54)
+                  at org.mule.runtime.core.internal.connection.PoolingConnectionManagementStrategy$ObjectFactoryAdapter.makeObject(PoolingConnectionManagementStrategy.java:173)
+                  at org.apache.commons.pool.impl.GenericObjectPool.borrowObject(GenericObjectPool.java:1188)
+                  at org.mule.runtime.core.internal.connection.PoolingConnectionManagementStrategy.borrowConnection(PoolingConnectionManagementStrategy.java:85)
+                  at org.mule.runtime.core.internal.connection.PoolingConnectionManagementStrategy.getConnectionHandler(PoolingConnection
+        lang: text
+  - author: "Alex Martinez"
+    date: 2022-10-13
+    replyTo: "kkrish.mathi"
+    text: "Hi! Hopefully the author is able to help you on this, but in case he doesn't reply on time, you can also try posting at https://help.mulesoft.com for others to see your question in the community!"
 ---
 
 ## What is a Connector?
