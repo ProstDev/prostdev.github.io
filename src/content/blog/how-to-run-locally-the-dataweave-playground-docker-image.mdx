@@ -6,13 +6,50 @@ category: Tutorials
 tags: [MuleSoft, DataWeave, Docker]
 draft: false
 heroImage: ../../assets/blog/how-to-run-locally-the-dataweave-playground-docker-image.png
+readerNotes:
+  - author: trekkan
+    date: 2020-09-09
+    text: |-
+      Thank you for posting this, it is very helpful! I've run into an issue however and hopefully you can help.
+
+      Normally, I want to run DWP while I'm connected to a network via VPN. When I'm on the VPN connection, it takes 60+ seconds for changes to reflect. Meaning, I change the dataweave script and the output window takes 60+ seconds to update.
+
+      If I am not on the VPN, this updates almost instantly. I've verified this same behavior with a few others and we are all experiencing the same issue.
+
+      It seems as though DWP is attempting to hit an external (from the VPN) endpoint for some reason? Since it actually works after the 60+ seconds, this endpoint doesn't seem to be necessary. Some kind of telemetry, etc?
+
+      Do you have any suggestions?
+  - author: Alex Martinez
+    date: 2020-09-11
+    replyTo: trekkan
+    text: |-
+      Hi Trekkan,
+
+      I wasn't aware of that issue until now that you mention it. I just tried it while being connected to a VPN and it works as normal; I don't see the issue you mention :(
+
+      Since this is not an official MuleSoft product, I don't think they provide support for specific issues like this one, but you could try asking in the Mule Forums: https://help.mulesoft.com/ - maybe someone else had the same issue and was able to troubleshoot a workaround.
+
+      Let me know if you're able to find a workaround. Unfortunately, I don't have any other suggestions since I can't really replicate the issue. It could also be something regarding the VPN, but I'm not familiar with all this configuration.
+  - author: trekkan
+    date: 2020-10-28
+    replyTo: trekkan
+    text: |-
+      So I finally figured out what the fix is, posting it here for anyone else running into the problem. It seems to be a docker and DNS issue. I found that by pointing the container DNS to the localhost IP, the issue goes away.
+
+      I'm not entirely sure what the problem is, but I do know that by adding `--dns 127.0.0.1` to the container startup, the issue goes away.
+
+      So then the run of the container is: `docker run --dns 127.0.0.1 -d --name dwp -p 9999:8080 machaval/dw-playground:2.3.1-SNAPSHOT`
+  - author: Alex Martinez
+    date: 2020-10-28
+    replyTo: trekkan
+    text: That's awesome!! Thank you for posting the fix for the issue with the DNS :D
 ---
 
 You may already know about the DataWeave (DW) Playground that can be used for both versions of DW: 1.0 and 2.0. DataWeave version 1.0 is used in Mule 3, and DataWeave version 2.0 is used in Mule 4.
 
 If this is your first time hearing about the DW Playground, check out this post to see why you need to start using it now to test your DataWeave scripts or transformations. I will explain how to get this Docker Image running on your laptop (even if you don’t know how to use Docker). I’ll also show you how to install Docker Desktop and what exact commands you need to run to have it up and ready to use.
 
-### What is the DW Playground, and why is it useful?
+## What is the DW Playground, and why is it useful?
 
 DataWeave is MuleSoft’s scripting language that is mainly used to transform the data in your integration apps. To be able to use this, you need to download, install and open [Anypoint Studio](https://www.mulesoft.com/platform/studio) (Mule’s [IDE](https://www.prostdev.com/post/5-reasons-why-you-need-an-ide)). Then you need to create a new Mule Project, create a new flow, and finally add the Transform Message component. There are times when you already have a project, and you just want to test out a function to make sure that it works correctly. You can either create a new flow, or create a new project, and then add a new Transform Message component in order to test it out. After you test your code, you normally just delete whatever you created, right? Well, what if there was a way to use a browser, like Google Chrome, and already have your Transform Message component right there to test out the script you want directly? There *is* a way! It’s the DW Playground!
 
@@ -24,7 +61,7 @@ As you can see, I’m accessing it through Google Chrome, and it’s running on 
 
 This Playground is just a Docker Image that can be downloaded to your computer. You can run it with various commands and have it ready to use whenever you want.
 
-### How to install Docker Desktop
+## How to install Docker Desktop
 
 I’m not going to explain the details of Docker, but I’ll leave some resources at the end of the post to learn more about it if you want to. Just know that previous knowledge in Docker isn’t needed in order to get the Playground running.
 
@@ -48,7 +85,7 @@ Once you double click on it, you will see the main screen of the application. No
 
 ![Docker Desktop main screen showing "No containers running" with a Sign in button](../../assets/blog/how-to-run-locally-the-dataweave-playground-docker-image-3.png)
 
-### How to run the DataWeave Playground Docker Image
+## How to run the DataWeave Playground Docker Image
 
 Now, let’s get started with the fun part: how to get the DW Playground up and running on our local computer.
 
@@ -120,7 +157,7 @@ docker run -d --name DWPlayground1 -p 9998:8080 machaval/dw-playground:1.1.8-SNA
 
 ![Docker Desktop with two containers: DWPlayground2 on port 9999 and DWPlayground1 on port 9998](../../assets/blog/how-to-run-locally-the-dataweave-playground-docker-image-9.png)
 
-### How to remove or stop the Docker Containers
+## How to remove or stop the Docker Containers
 
 Maybe you don’t want to use the Playground anymore, or you just want to clear the containers from your app. Luckily for us, the Docker Desktop application provides a button to stop and remove the containers. Take a look at the screenshots below to be able to manipulate your containers.
 
@@ -136,7 +173,7 @@ Maybe you don’t want to use the Playground anymore, or you just want to clear 
 
 ![Docker Desktop with the Delete button highlighted on the exited DWPlayground1 container](../../assets/blog/how-to-run-locally-the-dataweave-playground-docker-image-12.png)
 
-### Recap
+## Recap
 
 In summary, this is what you need to do to run the DataWeave Playground Docker Image:
 
