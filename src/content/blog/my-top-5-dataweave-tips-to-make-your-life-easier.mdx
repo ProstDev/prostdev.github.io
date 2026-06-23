@@ -5,6 +5,22 @@ pubDate: 2021-06-01
 category: Guides
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/my-top-5-dataweave-tips-to-make-your-life-easier.png
+readerNotes:
+  - author: Whitney Akinola
+    date: 2021-06-03
+    text: |
+      Hi Alexandra
+      This is a great post.  I was looking for material last month on how to use do statement in a map, so this definitely helps.   However, I have a follow up question, are you recommending use the do statement, but exercise caution so that you do not create sphaghetti code?
+  - author: Alex Martinez
+    date: 2021-06-04
+    replyTo: Whitney Akinola
+    text: |
+      Yes, you may think of doing `do{ do{ do{ ...` to keep having local contexts but this may be dangerous because it will be hard to understand. Just using one `do{..}` at a time is best (like in my example). I hope this answers your question!
+  - author: Whitney Akinola
+    date: 2021-06-04
+    replyTo: Alex Martinez
+    text: |
+      Yes.  It does.  Thank you so much!😃
 ---
 
 It took me some time to find and fully understand how to use these “hacks” *(they’re not really hacks, but they’ve made my life so much easier, so I’ll call them hacks)*. Trust me; they’re truly worth it, especially if you’re just starting to learn DataWeave.
