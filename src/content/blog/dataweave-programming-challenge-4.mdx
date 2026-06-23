@@ -49,13 +49,64 @@ readerNotes:
     replyTo: Felix Schnabel
     text: |
       Here is my solution😄
-      https://gist.github.com/Shadow-Devil/e083bb04c4d0467a239932fd1cc03511
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Arrays
+
+      type State = {|
+          moves: Number,
+          disks: Number,
+          targetTower: String,
+          towers: {|
+              _: Array<Number>
+          |}
+      |}
+
+      fun free(a: String, b: String, state: State): String = (namesOf(state.towers) -- [a, b])[0]
+
+      fun move(a: String, b: String, height: Number, state: State): State = height match {
+          case 0 -> state
+          else -> do {
+              var c = free(a, b, state)
+              ---
+              move(a, c, height - 1, state) then (state) ->
+              state update {
+                  case .moves -> $ + 1
+                  case .towers."$a" -> $ drop 1
+                  case .towers."$b" -> state.towers[a][0] >> $
+              } then (state) ->
+              move(c, b, height - 1, state)
+          }
+      }
+
+      fun findStartingTower(state): String = namesOf(state.towers filterObject !isEmpty($))[0]
+
+      fun simulate(state: State): State = move(
+          findStartingTower(state), //a
+          state.targetTower, //b
+          state.disks, //height
+          state
+      )
+      ---
+      simulate(payload)
+    lang: dataweave
   - author: Felix Schnabel
     date: 2023-03-21
     replyTo: Felix Schnabel
     text: |
       And my super super short solution (which is a bit like cheating):
-      https://gist.github.com/Shadow-Devil/fde7c8bf1994a07e26359cd411ed4a2a
+    code: |
+      %dw 2.0
+      output application/json
+      var startTower = namesOf(payload.towers filterObject !isEmpty($))[0]
+      ---
+      payload update {
+          case .moves -> pow(2, payload.disks) - 1
+          case .towers."$(startTower)" -> []
+          case .towers."$(payload.targetTower)" -> payload.towers[(startTower)]
+      }
+    lang: dataweave
   - author: Alex Martinez
     date: 2023-03-21
     replyTo: Felix Schnabel

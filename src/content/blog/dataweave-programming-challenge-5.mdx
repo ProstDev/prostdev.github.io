@@ -28,11 +28,30 @@ readerNotes:
       payload splitBy("\n") map (line,key)-> extract(line)
   - author: Felix Schnabel
     date: 2023-04-18
-    text: |
-      My solution: https://gist.github.com/Shadow-Devil/c579da4418b135bd67869437bf999653
-      My first approach was wrong, I just inserted the special chars at the exact index where they were before 😂
+    parts:
+      - text: |
+          My solution:
+      - code: |
+          %dw 2.0
+          output application/json
+          import * from dw::core::Strings
+          ---
+          lines(payload) map (
+            words($) map [$, $$] reduce ((cur, acc = words($)[-1 to 0]) ->
+            if(!isAlphanumeric(cur[0][-1]))
+              acc update {
+                case [cur[1]] -> $ ++ cur[0][-1] as String
+                case [sizeOf(acc) - cur[1] - 1] -> $[0 to -2]
+              }
+            else
+              acc
+            ) joinBy " "
+          )
+        lang: dataweave
+      - text: |
+          My first approach was wrong, I just inserted the special chars at the exact index where they were before 😂
 
-      So "a, bc" would be "b,c a" what's wrong of course
+          So "a, bc" would be "b,c a" what's wrong of course
   - author: Shyam Raj Prasad
     date: 2023-04-18
     text: "My approach for this."

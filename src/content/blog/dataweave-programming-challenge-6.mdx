@@ -54,7 +54,22 @@ readerNotes:
       (sum((payload splitBy "\n") filter($>0) map tailFactorial($ as Number) )as String)[20 to 25] as Number
   - author: Felix Schnabel
     date: 2023-05-09
-    text: "https://gist.github.com/Shadow-Devil/38922025e3ab95f18bc21633eae5f27f"
+    lang: dataweave
+    code: |
+      %dw 2.0
+      output application/json
+      import * from dw::core::Strings
+      @TailRec
+      fun solve(i: Number, acc: Number = 1): Number = i match {
+          case 0 -> acc
+          case i if(i < 0) -> 0
+          else -> solve(i - 1, acc * i)
+      }
+      ---
+      lines(payload)
+          map solve($ as Number)
+          then sum($)
+          then $[20 to 25] as Number
   - author: Sudiptaa
     date: 2023-05-09
     lang: dataweave
