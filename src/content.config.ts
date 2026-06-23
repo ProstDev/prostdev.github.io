@@ -120,6 +120,21 @@ const blog = defineCollection({
             text: z.string().optional(),
             code: z.string().optional(),
             lang: z.string().optional(),
+            /**
+             * Ordered prose/code segments — use INSTEAD of `text`/`code` when a single comment
+             * interleaves prose and code (e.g. a question, then a JSON response, then "In the
+             * console:", then a log). Each part is a prose chunk and/or a code block, rendered in
+             * order. When present, `parts` takes precedence over the flat `text`/`code` fields.
+             */
+            parts: z
+              .array(
+                z.object({
+                  text: z.string().optional(),
+                  code: z.string().optional(),
+                  lang: z.string().optional(),
+                })
+              )
+              .optional(),
             date: z.coerce.date().optional(),
             /** Author this note replies to — renders the note indented/nested as a reply. */
             replyTo: z.string().optional(),

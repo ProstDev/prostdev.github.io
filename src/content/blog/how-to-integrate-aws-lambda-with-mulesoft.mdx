@@ -7,6 +7,39 @@ category: Tutorials
 tags: [MuleSoft, AWS, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/how-to-integrate-aws-lambda-with-mulesoft-1.png
+readerNotes:
+  - author: Praveen Kumar
+    date: 2024-01-18
+    parts:
+      - text: "Hey guys😋, i have doubt while creating the user in AWS access key is not created so i create it separately, while creating i give use case as local code. by using those i configured the invoke connector and the test connection is successful. when i gave a hit in postman i am getting this response."
+      - lang: json
+        code: |
+          {
+            "traceId": null,
+            "errorType": "AMAZON-LAMBDA:NOT_FOUND",
+            "errorMessage": "ServerError Request returned status code 404"
+          }
+      - text: "In the console:"
+      - lang: text
+        code: |
+          ERROR 2024-01-18 10:37:14,844 [[MuleRuntime].uber.03: [aws-lambda].uber@org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChain.initialise:750 @5067e28b] [processor: globalErrorHandler/7/processors/0; event: 996bfa60-b630-11ee-9328-111112334] org.mule.runtime.core.internal.processor.LoggerMessageProcessor: {
+            "traceId": null,
+            "errorType": "AMAZON-LAMBDA:NOT_FOUND",
+            "errorMessage": "DetailedErrorDescription: Request returned status code 404"
+          }
+          INFO  2024-01-18 10:37:14,880 [[MuleRuntime].uber.06: [aws-lambda].globalErrorHandler.CPU_INTENSIVE @7e34fc17] [processor: globalErrorHandler/7/processors/2; event: 996bfa60-b630-11ee-9328-3417ebb83582] org.mule.runtime.core.internal.processor.LoggerMessageProcessor: ================>500 --- AMAZON-LAMBDA:NOT_FOUND --- AMAZON-LAMBDA:NOT_FOUND-- ServerError Request returned status code 404
+          ERROR 2024-01-18 10:37:14,905 [[MuleRuntime].uber.06: [aws-lambda].globalErrorHandler.CPU_INTENSIVE @7e34fc17] [processor: ; event: 996bfa60-b630-11ee-9328-3417ebb83582] org.mule.runtime.core.privileged.exception.DefaultExceptionListener:
+          ********************************************************************************
+          Message               : Request returned status code 404
+          Element               : (None)
+          Element DSL           : (None)
+          Error type            : AMAZON-LAMBDA:NOT_FOUND
+          FlowStack             : (None)
+      - text: "Thanks in advance!!!!!"
+  - author: Praveen Kumar
+    date: 2024-01-25
+    replyTo: Praveen Kumar
+    text: "Actually! I found the error. If we gave the wrong function name this error will born!"
 ---
 
 In this blog post, I will demonstrate how to Integrate AWS Lambda with MuleSoft. The GitHub repository with the Mule Project can be found at the end of the post.

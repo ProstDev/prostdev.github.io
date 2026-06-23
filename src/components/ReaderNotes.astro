@@ -24,11 +24,19 @@ import { Code } from 'astro:components';
 import { formatDate } from '@/lib/content';
 import Icon from './Icon.astro';
 
+interface NotePart {
+  text?: string;
+  code?: string;
+  lang?: string;
+}
+
 interface Note {
   author: string;
   text?: string;
   code?: string;
   lang?: string;
+  /** Ordered prose/code segments; takes precedence over flat text/code when present. */
+  parts?: NotePart[];
   date?: Date;
   replyTo?: string;
 }
@@ -66,6 +74,16 @@ function shikiLang(lang?: string): string {
 const URL_SPLIT = /(https?:\/\/[^\s)]+[^\s).,;:!?])/g;
 const URL_ONE = /^https?:\/\/[^\s)]+[^\s).,;:!?]$/;
 
+/**
+ * Normalize a note into an ordered list of {text?, code?, lang?} parts. A note authored with the
+ * flat `text`/`code` fields collapses to a single part; one authored with `parts` is returned
+ * as-is (the multi-segment case: prose → code → prose → code).
+ */
+function noteParts(note: Note): NotePart[] {
+  if (note.parts && note.parts.length > 0) return note.parts;
+  return [{ text: note.text, code: note.code, lang: note.lang }];
+}
+
 function inlineSegments(text: string) {
   return text
     .split(/(`[^`]+`)/g)
@@ -98,31 +116,35 @@ function inlineSegments(text: string) {
           <span class="font-semibold text-[var(--text)]">{note.author}</span>
           {note.date && <span class="text-muted">· {formatDate(note.date)}</span>}
         </div>
-        {note.text && (
-          <p class="mt-2 whitespace-pre-line text-[var(--text)]">
-            {inlineSegments(note.text).map((seg) =>
-              seg.type === 'code' ? (
-                <code>{seg.value}</code>
-              ) : seg.type === 'link' ? (
-                <a href={seg.value} target="_blank" rel="noopener" class="reader-note__link">
-                  {seg.value}
-                  <Icon name="external" class="external-icon" />
-                </a>
-              ) : (
-                seg.value
-              )
+        {noteParts(note).map((part) => (
+          <>
+            {part.text && (
+              <p class="mt-2 whitespace-pre-line text-[var(--text)]">
+                {inlineSegments(part.text).map((seg) =>
+                  seg.type === 'code' ? (
+                    <code>{seg.value}</code>
+                  ) : seg.type === 'link' ? (
+                    <a href={seg.value} target="_blank" rel="noopener" class="reader-note__link">
+                      {seg.value}
+                      <Icon name="external" class="external-icon" />
+                    </a>
+                  ) : (
+                    seg.value
+                  )
+                )}
+              </p>
             )}
-          </p>
-        )}
-        {note.code && (
-          <div class="mt-3">
-            <Code
-              code={note.code}
-              lang={shikiLang(note.lang) as any}
-              themes={{ light: 'github-light', dark: 'github-dark' }}
-            />
-          </div>
-        )}
+            {part.code && (
+              <div class="mt-3">
+                <Code
+                  code={part.code}
+                  lang={shikiLang(part.lang) as any}
+                  themes={{ light: 'github-light', dark: 'github-dark' }}
+                />
+              </div>
+            )}
+          </>
+        ))}
       </li>
     ))}
   </ul>

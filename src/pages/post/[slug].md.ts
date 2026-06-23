@@ -60,11 +60,18 @@ export const GET: APIRoute = async ({ props }) => {
         .map((n) => {
           const reply = n.replyTo ? `↳ Reply to ${n.replyTo} — ` : '';
           const head = `${reply}**${n.author}**${n.date ? ` (${formatDate(n.date)})` : ''}`;
-          const prose = n.text ? `${head}: ${n.text}` : head;
-          const code = n.code
-            ? `\n\n\`\`\`${n.lang ?? ''}\n${n.code.replace(/\n+$/, '')}\n\`\`\``
-            : '';
-          return prose + code;
+          const fence = (code?: string, lang?: string) =>
+            code ? `\n\n\`\`\`${lang ?? ''}\n${code.replace(/\n+$/, '')}\n\`\`\`` : '';
+          // Ordered prose/code segments take precedence over the flat text/code fields.
+          const parts =
+            n.parts && n.parts.length > 0
+              ? n.parts
+              : [{ text: n.text, code: n.code, lang: n.lang }];
+          const segments = parts
+            .map((p) => (p.text ? p.text : '') + fence(p.code, p.lang))
+            .filter((s) => s !== '')
+            .join('\n\n');
+          return segments ? `${head}: ${segments}` : head;
         })
         .join('\n\n');
   }
