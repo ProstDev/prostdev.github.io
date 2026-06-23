@@ -10,6 +10,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint MQ, Anypoint Studio, Spring]
 draft: false
 heroImage: ../../assets/blog/retry-and-reprocess-flow-design-with-anypoint-mq.png
+readerNotes:
+  - author: "Jefferson Sousa"
+    date: 2022-05-25
+    text: "Thank you for the content! I'd like to know why you use Remove Variables in this flow. I imagine to be because you want to help the Java Garbage Collection to clean objects in fliyng. But, it's a imagination. Could you help me with this doubt?"
+  - author: "Alex Martinez"
+    date: 2022-05-26
+    replyTo: "Jefferson Sousa"
+    text: |-
+      Hi Jefferson!
+
+      I'm not the author of this article, but yes indeed is to help the Garbage Collection and also to release memory. Maybe for small projects it's not a big deal to add them or not, but I've seen big projects where it is important to remove the variables manually
 ---
 
 *GitHub repository with the Mule project and the spring boot application can be found at the end of the post.*
