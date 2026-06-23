@@ -9,6 +9,16 @@ author: "Soumyajit Sinha"
 category: Tutorials
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/encryption-in-dataweave-hmacbinary-and-tobase64-functions.png
+readerNotes:
+  - author: "nimmala praveen"
+    date: 2021-06-29
+    text: >-
+      Hi @Soumyajit Sinha , Good one, but we can't decrypt them back to original. is there any module similar to crypto in dataweave to encrypt using a key and algorithm and decrypt using the same key and algorithm
+  - author: "Soumyajit Sinha"
+    date: 2021-06-29
+    replyTo: "nimmala praveen"
+    text: >-
+      Thank you for your comment! Currently there is no provision of decrypting a string in DataWeave that I am aware of. You can use the JCE Encrypter/Decrypter, PGP Encrypter/Decrypter or XML Encrypter/Decrypter, if you want to encrypt & decrypt your payload.
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*
