@@ -9,6 +9,23 @@ pubDate: 2021-02-02
 category: Tutorials
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/how-to-check-for-empty-values-in-an-array-in-dataweave-part-1-sizeof-groupby-isempty-default.png
+readerNotes:
+  - author: KM
+    date: 2021-02-02
+    text: |-
+      Good one @Alex. We can avoid if else right?
+      `if (sizeOf((arr groupBy isEmpty($))."true" default []) > 0) true else false`
+      instead `(sizeOf((arr groupBy isEmpty($))."true" default []) > 0)` works for us.
+      isBlank works with Strings and null, but fails with objects {}
+  - author: Alex Martinez
+    date: 2021-02-04
+    replyTo: KM
+    text: |-
+      Hi KM,
+
+      Yes, you can avoid if/else. That's a great catch!!
+      You will see the other (and better) solutions in the last post of this series :D
+      Stay tuned!
 ---
 
 I had this use-case where I had to make sure all the values inside an [array](https://en.wikipedia.org/wiki/Array_data_structure) were not empty. By “empty,” I’m referring to an empty string (“”), a null value (*null*), or even an empty array ([]). There were some cases when I would receive a null value instead of an array. The array could only contain strings or nulls, but not objects. However, I’ll be adding tests to check for empty objects as well.
