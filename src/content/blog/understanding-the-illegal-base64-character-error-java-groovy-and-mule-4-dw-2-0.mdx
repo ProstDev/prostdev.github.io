@@ -9,6 +9,90 @@ pubDate: 2020-07-21
 category: Tutorials
 tags: [MuleSoft, DataWeave, Java, Groovy]
 heroImage: ../../assets/blog/understanding-the-illegal-base64-character-error-java-groovy-and-mule-4-dw-2-0-1.png
+readerNotes:
+  - author: wella test
+    date: 2023-05-10
+    text: "Hi Alex, I am trying to encode pdf containing some text and images/logos to base 64. I need to send endoded base 64 content to external system. I tried to encode pdf with `tobase()` function in dataweave and using the java function which you have given in your blog. But base64 content generated using these two ways is not correct. When external system is generating pdf from base 64 content , the resulting pdf is showing error as `Message: Illegal character: 41` . Basically images/logos in PDF are not loading properly When I send base 64 content generated using online tool (https://base64.guru/converter/encode/pdf). then external system is able to generate PDF properly from it."
+  - author: Alex Martinez
+    date: 2023-05-10
+    replyTo: wella test
+    text: |
+      That is so interesting! I have never tried it with pdfs. If you think this is a bug, feel free to raise an issue here: https://github.com/mulesoft-labs/data-weave-rfc
+
+      You can also ask a question to the wider community using Stack Overflow with the DataWeave tag: https://stackoverflow.com/questions/tagged/dataweave?sort=newest
+  - author: tanushreemazumdar08
+    date: 2021-02-20
+    parts:
+      - text: |
+          Hi Alexendra
+
+          I have recieved your response via email so writing again. I am receiving below payload from an external system :
+      - lang: text
+        code: |
+          payload=%7B%22type%22%3A%22block_actions%22%2C%22user%22%3A%7B%22id%22%3A%22U01M26265NU%22%2C%22username%22%3A%22connect2tanushree%22%2C%22name%22%3A%22connect2tanushree%22%2C%22team_id%22%3A%22T01LCAPH1BL%22%7D%2C%22api_app_id%22%3A%22A01L5J2FV8W%22%2C%22token%22%3A%22u2AkH2O8aShNqskXd1S464z5%22%2C%22container%22%3A%7B%22type%22%3A%22message%22%2C%22message_ts%22%3A%221612281350.000100%22%2C%22channel_id%22%3A%22D01LT6C44F3%22%2C%22is_ephemeral%22%3Afalse%7D%2C%22trigger_id%22%3A%221781264358804.aa5a08357f8700923ea6e05f4164de4d%22%2C%22team%22%3A%7B%22id%22%3A%22T01LCAPH1BL%22%2C%22domain%22%3A%22workdaytestteamgroup%22%7D%2C%22enterprise%22%3Anull%2C%22is_enterprise_install%22%3Afalse%2C%22channel%22%3A%7B%22id%22%3A%22D01LT6C44F3%22%2C%22name%22%3A%22directmessage%22%7D%2C%22message%22%3A%7B%22bot_id%22%3A%22B01KZPXR02K%22%2C%22type%22%3A%22message%22%2C%22text%22%3A%22Important+Message+%22%2C%22user%22%3A%22U01LBEQRAAH%22%2C%22ts%22%3A%221612281350.000100%22%2C%22team%22%3A%22T01LCAPH1BL%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22block_id%22%3A%22bBeX%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Track+Your+Time%22%2C%22emoji%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22block_id%22%3A%22r271%22%2C%22fields%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%2AGeneral+%26amp%3B+Administrative%3A%2A%22%2C%22verbatim%22%3Afalse%7D%5D%7D%2C%7B%22type%22%3A%22section%22%2C%22block_id%22%3A%22rSrvb%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22+%22%2C%22verbatim%22%3Afalse%7D%2C%22accessory%22%3A%7B%22type%22%3A%22static_select%22%2C%22action_id%22%3A%22static_select-action%22%2C%22placeholder%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Select+Number+of+Hours%22%2C%22emoji%22%3Atrue%7D%2C%22options%22%3A%5B%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%220%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-0%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%221%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-1%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%222%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-2%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%223%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-3%22%7D%5D%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22block_id%22%3A%22694Ex%22%2C%22fields%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%2AProjects%3A%2A%22%2C%22verbatim%22%3Afalse%7D%5D%7D%2C%7B%22type%22%3A%22section%22%2C%22block_id%22%3A%22yOkLb%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Country+Expansion+ATP%22%2C%22verbatim%22%3Afalse%7D%2C%22accessory%22%3A%7B%22type%22%3A%22static_select%22%2C%22action_id%22%3A%22static_select-action%22%2C%22placeholder%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Select+Number+of+Hours%22%2C%22emoji%22%3Atrue%7D%2C%22options%22%3A%5B%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%220%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-0%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%221%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-1%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%222%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-2%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%223%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-3%22%7D%5D%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22block_id%22%3A%22Led%22%2C%22fields%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%2AWhen%3A%2A%5CnJan+31+-+Feb+06%22%2C%22verbatim%22%3Afalse%7D%5D%7D%2C%7B%22type%22%3A%22actions%22%2C%22block_id%22%3A%22eA%5C%2F%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22V2%2Bep%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit+Timesheet%22%2C%22emoji%22%3Atrue%7D%2C%22style%22%3A%22primary%22%2C%22value%22%3A%22click_me_123%22%7D%5D%7D%5D%7D%2C%22state%22%3A%7B%22values%22%3A%7B%22rSrvb%22%3A%7B%22static_select-action%22%3A%7B%22type%22%3A%22static_select%22%2C%22selected_option%22%3A%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%220%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-1%22%7D%7D%7D%2C%22yOkLb%22%3A%7B%22static_select-action%22%3A%7B%22type%22%3A%22static_select%22%2C%22selected_option%22%3A%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%220%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22value-0%22%7D%7D%7D%7D%7D%2C%22response_url%22%3A%22https%3A%5C%2F%5C%2Fhooks.slack.com%5C%2Factions%5C%2FT01LCAPH1BL%5C%2F1775098058146%5C%2FbJ3EryWaj4hHIt0grYdt102B%22%2C%22actions%22%3A%5B%7B%22action_id%22%3A%22V2%2Bep%22%2C%22block_id%22%3A%22eA%5C%2F%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit+Timesheet%22%2C%22emoji%22%3Atrue%7D%2C%22value%22%3A%22click_me_123%22%2C%22style%22%3A%22primary%22%2C%22type%22%3A%22button%22%2C%22action_ts%22%3A%221613828122.887562%22%7D%5D%7D
+      - text: |
+          My goal is to convert this to json. For this I did the same scripting tool->groovy script execution by feeding java input of this payload. I am receiving below error when posting from postman:
+          `java.lang.IllegalArgumentException: Illegal base64 character 25`
+
+          Please let me know how can I fix this.
+
+          Thank Yiu
+          Tanushree
+  - author: Alex Martinez
+    date: 2021-03-11
+    replyTo: tanushreemazumdar08
+    parts:
+      - text: |
+          Hi @Tanushree!
+
+          Your string is not a Base64 encoded payload, it's a URI component string.
+
+          To convert that string into a JSON format, you can use this code:
+      - lang: dataweave
+        code: |
+          %dw 2.0
+          output application/json
+          import * from dw::core::URL
+          ---
+          read(decodeURIComponent(payload))
+      - text: |
+          You can read more about the URL module here: https://docs.mulesoft.com/mule-runtime/4.3/dw-url
+          and the read function here: https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-read
+
+          Why is it not a base64 encoded string?
+
+          The error message mentions a character 25, which is a percentage (%) character (from Hex: https://ascii.cl/).
+
+          If you take a look at the Base64 alphabet in this blog post, for both regular and URL encoding, none of them include the percentage character. For this same reason, it wouldn't be able to decode a string that contains a percentage character (% - 25 in Hex).
+
+          This is why you get the `illegal base64 character 25` error - it doesn't exist in its alphabet!
+
+          Also, if you try to encode any string into a base64 encoding, you'll notice two things:
+          1) The base64 encoded string contains a final double equals sign (`==`), which your string doesn't contain.
+          2) The base64 encoded string is made of (what seems to be) random characters (like `cHJvc3RkZXY_YmxvZw==`), or not easily legible by a human. While your string can be read by a human, for example, right at the start of your string it contains `%7B%22type%22%3A%22block_actions%22` - which can be read by a human.
+
+          You can confirm these 2 points by testing with some Java code directly at https://www.tutorialspoint.com/compile_java_online.php
+      - lang: java
+        code: |
+          import java.util.Base64;
+          public class Base64UrlEncoding {
+              public static void main(String []args) {
+                  byte[] bytes = "{ \"json example\": \"123\" }".getBytes();
+                  String encodedString = new String(Base64.getEncoder().encode(bytes));
+                  String decodedString = new String(Base64.getDecoder().decode(encodedString));
+
+                  System.out.println(encodedString); 
+                  //eyAianNvbiBleGFtcGxlIjogIjEyMyIgfQ==
+                  System.out.println(decodedString); //{ "json example": "123" }
+              }
+          }
+  - author: Kishan Mohan
+    date: 2020-09-29
+    text: "Thanks for this post @Alex, for URL encoding do we need to use Java? Is there any option to generate byte array from a string payload? If yes, then it seems we can use `Base64.getUrlencoder().encode(payload)`"
+  - author: Alex Martinez
+    date: 2021-03-11
+    replyTo: Kishan Mohan
+    text: "Hi Kishan! No, you don't need to use Java. This was just an example that's using Java. And, yes! You can use that function to encode inside the Groovy script :) I didn't use it in this example because the problem was just to decode what was received from the server."
 ---
 
 Are you familiar with the fromBase64 or the toBase64 functions from DataWeave 2.0? What about the getUrlEncoder or the getEncoder functions from Java? Do you know the differences between the “basic” Base 64 encoding and the “URL and Filename safe” Base 64 encoding? Well, you may have guessed it by now, but you’re about to find out the answers to these questions!
