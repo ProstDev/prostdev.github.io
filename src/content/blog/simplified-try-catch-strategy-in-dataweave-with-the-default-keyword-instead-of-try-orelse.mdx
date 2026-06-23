@@ -7,6 +7,101 @@ tags: [MuleSoft, DataWeave]
 draft: false
 heroImage: ../../assets/blog/simplified-try-catch-strategy-in-dataweave-with-the-default-keyword-instead-of-try-orelse-1.png
 youtubeId: QUc1Ffs8GY0
+readerNotes:
+  - author: "Nicky van Steensel van der Aa"
+    date: 2023-02-01
+    parts:
+      - text: |
+          Since both default and try have the same limitations, does anyone know how or if graceful error handling can be implemented?
+          See the text below for details on why this is needed.
+
+          We are currently writing a sizable dw lib and have implemented a few hundred unit tests.
+          We have not yet successfully found any method to unit test unhappy flows, in fact it seems that certain errors, mostly weave exceptions and type mismatches simply crash the dw execution engine. In regular mule flows, this is sort of fine, if the payload is wrong, why should dw continue processing that payload? Well, the error could happen in an optional part of the message, and the rest might still be valid and should be processed.
+          You could extract processing of that particular sub-component into a separate transform, and on-error-continue the whole thing, and solve/workaround the problem like that.
+          Each example you can think of has particulars that would require a custom solution to solve, and while you can get really creative, this is not efficient and might still result in cases where no solution is viable. (Especially when there is a method that SHOULD do this for you; try-orElse )
+
+          The problem comes with dw libs (or module projects for that matter).
+
+          We like the testing framework, but dw tests run in one big batch.
+          That means that for now, we are limited to unit tests that test happy flows.
+          (e.g.: is myFunction(input) equalTo(expected-output))
+          This is fine and should be done, but the real power in unit tests comes from asserting that a possible 'wrong' input results in correct handling or errors.
+          (Because a correct input being correctly mapped is nice, a wrong input being 'correctly' mapped results in unhappy business/consumers/both, and you don't get warnings)
+
+          If someone changes a function in the lib in a years time, and the happy flow breaks, he gets a nice tip that unit test 84 out of 300 has failed because ….
+
+          If you look at the red underlined examples below, the code uses if, default or try statement to check for specific issues like if 'test' is not a string. (it's an object) the code correctly selects the string 'Manually throw an error' and does not execute the placeholder upper('h') function. The next line however will break execution if we uncomment it, even though the code should not be ran. This example uses the dataweave playground, and will just result in the error being displayed on the right. When you uncomment one of the lines, this will show you where the error is.
+
+          In a unit test, I would expect to be able to write a test that expects an error. Dataweave could update and implement functionality where upper() now capitalizes every string in the object, it would not even be too strange, as it already accepts numbers which it just ignores, we've seen dw methods change their in/outputs before, breaking old code. (like when now() got 'fixed' to return a slightly differently formatted datetime, one that APIkit and raml were convinced was not a datetime….)
+
+          The 'This should break' tests are arguably more important than the 'this should work' tests. As errors are often acted upon in later stages and other locations.
+
+          With the current limitation, instead of the unit test phase completing, and reporting that test 357 'this should break' is not breaking. it will not complete, it will crash and attempt to show you why. Fine in a simple example like below, where it's easily spotted. Less fine if the 'error is at line 700 in file somethingTest.dwl' where that is just the call to a function in the something.dwl file that calls eight underlying functions and good luck finding which one it is.
+
+          Last example: if I want to concat two strings, and gracefully break if one of those happens to be null I could implement that in a regular mule project in multiple ways. I could have defaults, typechecks, creative use of skipNull, a validator in the flow, a try scope for my mapping, or a dozen other methods.
+
+          In a dw lib, we have so far not managed to test for this case. I'd like to check if a specific function works (happy test), and if the errors are as expected (unhappy test), both to prevent breaking changes in the future. if my code expects 'A' ++ null to fail with an expected type error, and someone accidentally 'fixes' that, because of a skipnull he needed for something else it could easily break other components relying on that failure for it's functionality.
+
+          To summarise; both provided methods, default and try don't always work.
+          This was also stated above, but I think it's a bug, not a feature.
+          I think default does what it is supposed to do, but try-orElse should really be fixed.
+          I'm hoping that someone reads this, spots the error I'm making and has the solution ready,
+          At the moment, try-orElse seems objectively broken, why would you wrap something in a 'try' if it's gonna crash your entire execution anyway?
+
+          Please tell me where I'm going wrong with this!
+          -nicky
+      - code: |
+          %dw 2.0
+          import * from dw::Runtime
+          output application/json
+
+          var test = {num: 123, word: "Hi"}
+
+          ---
+          [
+          //This is a quick demo of a problem with try/catch mechanism.
+          //Example one: works, succesfully catches error
+          try(() -> ("ABC" as Number)) orElse "Invalid number",
+
+
+          //Example two: Does not work, if this occurs during runtime execution of dw simply stops.
+          //try(() -> ("ABC" ++ null)) orElse "Invalid String",
+
+          // Example three, Array Out of bounds works.
+          try(() -> ("ABC"[4] as String )) orElse "Example",
+
+          //Example four, again, when the input of a function is not of the expected type
+          //(object vs string/num), dw refuses to catch.
+          //try(() -> (upper(test))) orElse "input is not a string or number",
+
+          //Example five, even if we combine the prev example with a default, it still does not work.
+          //upper(test) default 'Input is not string or number',
+
+
+          // In this case, a default or skipNull directive is not wanted, as the use case is a unit test.
+          //the unit test is supposed to throw the error, as it is an unhappy test.
+
+          // How do we try/catch/else/orElse something that we need/want to error?
+          // Specifically, this problem seems to apply mostly when type mismatches occur
+          // As illustrated below, even if the code is never reached, it still breaks.
+
+          // You would expect below code to work then... after all, we only 'else' if the input is correct...
+          if (typeOf(test) != String) 'Manually throw an error' else upper('h'),
+          //if (typeOf(test) != String) 'Manually throw an error' else upper(test)
+          ]
+        lang: dataweave
+  - author: "Alex Martinez"
+    date: 2023-02-04
+    replyTo: "Nicky van Steensel van der Aa"
+    text: |
+      hey nicky! I'm sorry, I didn't get the notification about your comment.
+
+      this is very interesting and definitely worth discussing it more with the DW engineers! There are two options to continue this conversation with them:
+
+      1, Raise your concern in GitHub here: https://github.com/mulesoft-labs/data-weave-rfc/issues
+      2. Join the Slack workspace where you can have more dynamic discussions with the team. You can find the Slack link here: https://dataweave.mulesoft.com/
+
+      Please feel free to contact me through LinkedIn or email in case I can help you with anything else!
 ---
 
 The other day I was reading some StackOverflow DataWeave questions (as one does) and I got to this very interesting thread: [Why the “default” keyword acts like “try + catch / orElse” in some cases](https://stackoverflow.com/questions/73785223/why-the-default-keyword-acts-like-try-catch-orelse-in-some-cases). I wanted to take a moment to create an article about my own explanation of what I see in that thread. I already created a video about it, so, I might as well create a blog post too :)
