@@ -6,18 +6,20 @@ description: >-
 pubDate: 2024-09-16
 category: Tutorials
 tags: [MuleSoft, DataWeave]
+youtubeId: TqrmeLhGtQc
 heroImage: ../../assets/blog/upsert-object-from-array.png
 ---
 
 In this post, we'll learn how to use the update operator along with the upsert and conditional options. We'll also learn different ways of handling null values for our fields.
 
-You can follow along by clicking on the "Open in Playground" buttons to see how the code is being developed and to try it out yourself!
+> [!TIP]
+> You can follow along by clicking on the "Open in Playground" buttons to see how the code is being developed and to try it out yourself!
 
 ## Use case
 
-Let's say you have an array of objects *Array&lt;Object>* like so:
+Let's say you have an array of objects `Array<Object>` like so:
 
-```dataweave
+```json
 [
     {
         id: 1,
@@ -49,10 +51,10 @@ var updateUser = {
 
 The first observations we can make, based on this information, are:
 
-- The field "name" is not available from the *updateUser* variable. If we don't want to lose this field, we can't just replace the whole object. We'll need to check each field separately.
-- The field "newField" is not available from the original user. We will need to insert this field and not just update the current user.
+- The field `name` is not available from the `updateUser` variable. If we don't want to lose this field, we can't just replace the whole object. We'll need to check each field separately.
+- The field `newField` is not available from the original user. We will need to insert this field and not just update the current user.
 
-A quick solution to this problem is to use the [update](https://docs.mulesoft.com/dataweave/latest/dw-operators#update-operator)[operator](https://docs.mulesoft.com/dataweave/latest/dw-operators#update-operator) because it has an upsert option to it. Let's see how to do this.
+A quick solution to this problem is to use the <a href="https://docs.mulesoft.com/dataweave/latest/dw-operators#update-operator" target="_blank" rel="noopener">update operator</a> because it has an upsert option to it. Let's see how to do this.
 
 ## Solution
 
@@ -65,7 +67,10 @@ users map ((user) ->
 )
 ```
 
-Once we meet the condition, we can get started with the *update* operator. Since we want to have the possibility of updating all the fields (except the ID), we'll have to create *cases* for all of these. Like so:
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Fupsert-object-from-array%2Fscript1)
+
+Once we meet the condition, we can get started with the `update` operator. Since we want to have the possibility of updating all the fields (except the ID), we'll have to create `case`s for all of these. Like so:
 
 ```dataweave
 users map ((user) -> 
@@ -77,7 +82,10 @@ users map ((user) ->
 )
 ```
 
-Click on the previous button to see the code better. In summary, the object we want to update has two issues that we need to solve:
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Fupsert-object-from-array%2Fscript2)
+
+In summary, the object we want to update has two issues that we need to solve:
 
 ```json
   {
@@ -87,38 +95,41 @@ Click on the previous button to see the code better. In summary, the object we w
   }
 ```
 
-- The field "name" now has a *null* value
-- The field "newField" is not being inserted yet
+- The field `name` now has a `null` value
+- The field `newField` is not being inserted yet
 
-Issue [#1](https://www.prostdev.com/blog/hashtags/1) is happening because we are updating the field *name* with this: *updateUser.name* - and since this field does not exist, it's returning a *null* value.
+Issue 1 is happening because we are updating the field `name` with this: `updateUser.name` - and since this field does not exist, it's returning a `null` value.
 
-The solution is quite simple: we need to add a *default* keyword with the original value, like so:
+The solution is quite simple: we need to add a `default` keyword with the original value, like so:
 
 ```dataweave
 case na at .name -> updateUser.name default na
 ```
 
-Now it will take the value from the original object and use that if the *updateUser* variable does not contain this value. We can add this to the other fields just in case.
+Now it will take the value from the original object and use that if the `updateUser` variable does not contain this value. We can add this to the other fields just in case.
 
-Issue [#2](https://www.prostdev.com/blog/hashtags/2) is where we will be using our upsert operator because we do not have this field in our original value, so, we have to tell the operator that we want it to insert it if it doesn't exist. We do that by adding an exclamation point (!) right next to the field. Like so:
+Issue 2 is where we will be using our `upsert` operator because we do not have this field in our original value, so, we have to tell the operator that we want it to insert it if it doesn't exist. We do that by adding an exclamation point (`!`) right next to the field. Like so:
 
 ```dataweave
 case nf at .newField! -> updateUser.newField
 ```
 
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Fupsert-object-from-array%2Fscript3)
+
 Ta-da! 🎉 Now we are correctly inserting this new value and updating the other fields from the original object.
 
 ## Handling null values
 
-What would happen though, if the *newField* is not available in either of the two objects? Not in the original and not in the *updateUser* variable.
+What would happen though, if the `newField` is not available in either of the two objects? Not in the original and not in the `updateUser` variable.
 
-In that case, the *update* operator will still add the field because you are using the *upsert* operator. It will just be added with a *null* value.
+In that case, the `update` operator will still add the field because you are using the `upsert` operator. It will just be added with a `null` value.
 
 ```dataweave
 "newField": null
 ```
 
-Depending on your business requirements, maybe this is the way it should work. But in case it's not, you can fix it two ways: adding a conditional to each field or adding a *skipNullOn* configuration to the output directive.
+Depending on your business requirements, maybe this is the way it should work. But in case it's not, you can fix it two ways: adding a conditional to each field or adding a `skipNullOn` configuration to the output directive.
 
 ### With a conditional
 
@@ -128,8 +139,11 @@ This is the less fancy approach, but you may need to choose this if you only nee
 case nf at .newField! if(!isEmpty(updateUser.newField default nf)) -> updateUser.newField default nf
 ```
 
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Fupsert-object-from-array%2Fscript4)
+
 > [!TIP]
-> You can create a local scope with [do](https://docs.mulesoft.com/dataweave/latest/dataweave-flow-control#control_flow_do) if you don't want to re-type "updateUser.newField default nf" twice.
+> You can create a local scope with [do](https://docs.mulesoft.com/dataweave/latest/dataweave-flow-control#control_flow_do) if you don't want to re-type `updateUser.newField default nf` twice.
 
 ### With skipNullOn
 
@@ -140,6 +154,9 @@ To add this, you have to change the output directive on the top of your DataWeav
 ```dataweave
 output application/json skipNullOn="everywhere"
 ```
+
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Fupsert-object-from-array%2Fscript5)
 
 > [!DOCS]
 > To learn more about the JSON writer properties, see [JSON Format](https://docs.mulesoft.com/dataweave/latest/dataweave-formats-json#writer_properties).
