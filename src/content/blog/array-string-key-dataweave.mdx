@@ -21,14 +21,66 @@ I didn't think much about it at first, since I would -incorrectly- see all the a
 > [!NOTE]
 > The item in line 4 was coerced into a Key for demonstration purposes.
 
-![DataWeave script with arr1 keyed and arr2 strings, both outputting the same JSON arrays](../../assets/blog/array-string-key-dataweave-1.png)
+```dataweave title="transform.dwl"
+%dw 2.0
+output application/json
+var arr1 = [
+  "key" as Key,
+  "string"
+]
+var arr2 = [
+  "key",
+  "string"
+]
+---
+[arr1, arr2]
+```
+
+```json title="output.json"
+[
+  [
+    "key",
+    "string"
+  ],
+  [
+    "key",
+    "string"
+  ]
+]
+```
 
 > [!PLAYGROUND]
 > [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript1)
 
 So imagine my surprise when I tried to use a [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) function with the above arrays and I'd still get the same two arrays in the output.
 
-![distinctBy applied to the two arrays still returns both, since their item types differ](../../assets/blog/array-string-key-dataweave-2.png)
+```dataweave title="transform.dwl"
+%dw 2.0
+output application/json
+var arr1 = [
+  "key" as Key,
+  "string"
+]
+var arr2 = [
+  "key",
+  "string"
+]
+---
+[arr1, arr2] distinctBy $
+```
+
+```json title="output.json"
+[
+  [
+    "key",
+    "string"
+  ],
+  [
+    "key",
+    "string"
+  ]
+]
+```
 
 > [!PLAYGROUND]
 > [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript2)
@@ -43,7 +95,31 @@ It was until one of those million times finally led me to see the array types we
 
 There are different solutions for this problem. One would be to make sure any new items are of type String and not Key. This completely removes the issue since now you'd be comparing two arrays of type Array&lt;String>, which correctly returns only one array in the output.
 
-![Casting items to String before distinctBy now collapses the output to one array](../../assets/blog/array-string-key-dataweave-3.png)
+```dataweave title="transform.dwl"
+%dw 2.0
+output application/json
+var arr1 = [
+  "key" as Key,
+  "string"
+]
+var arr2 = [
+  "key",
+  "string"
+]
+---
+[arr1, arr2] map ((item) ->
+  item map ($ as String)
+) distinctBy $
+```
+
+```json title="output.json"
+[
+  [
+    "key",
+    "string"
+  ]
+]
+```
 
 > [!PLAYGROUND]
 > [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript3)
@@ -52,7 +128,29 @@ There are different solutions for this problem. One would be to make sure any ne
 
 If you can't change the type of the items or it would take too many iterations to do, another thing you can do is to transform the items inside the [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) function itself. Like this:
 
-![distinctBy with a joinBy criteria collapses the two arrays into one in the output](../../assets/blog/array-string-key-dataweave-4.png)
+```dataweave title="transform.dwl"
+%dw 2.0
+output application/json
+var arr1 = [
+  "key" as Key,
+  "string"
+]
+var arr2 = [
+  "key",
+  "string"
+]
+---
+[arr1, arr2] distinctBy ($ joinBy ",")
+```
+
+```json title="output.json"
+[
+  [
+    "key",
+    "string"
+  ]
+]
+```
 
 > [!PLAYGROUND]
 > [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript4)
