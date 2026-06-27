@@ -54,7 +54,7 @@ The first observations we can make, based on this information, are:
 - The field `name` is not available from the `updateUser` variable. If we don't want to lose this field, we can't just replace the whole object. We'll need to check each field separately.
 - The field `newField` is not available from the original user. We will need to insert this field and not just update the current user.
 
-A quick solution to this problem is to use the <a href="https://docs.mulesoft.com/dataweave/latest/dw-operators#update-operator" target="_blank" rel="noopener">update operator</a> because it has an upsert option to it. Let's see how to do this.
+A quick solution to this problem is to use the [update operator](https://docs.mulesoft.com/dataweave/latest/dw-operators#update-operator) because it has an upsert option to it. Let's see how to do this.
 
 ## Solution
 
