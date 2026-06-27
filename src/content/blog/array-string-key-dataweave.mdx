@@ -23,9 +23,15 @@ I didn't think much about it at first, since I would -incorrectly- see all the a
 
 ![DataWeave script with arr1 keyed and arr2 strings, both outputting the same JSON arrays](../../assets/blog/array-string-key-dataweave-1.png)
 
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript1)
+
 So imagine my surprise when I tried to use a [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) function with the above arrays and I'd still get the same two arrays in the output.
 
 ![distinctBy applied to the two arrays still returns both, since their item types differ](../../assets/blog/array-string-key-dataweave-2.png)
+
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript2)
 
 I started losing my mind trying to troubleshoot the problem a million different ways because I didn't notice the items in the arrays were of different types!
 
@@ -39,11 +45,17 @@ There are different solutions for this problem. One would be to make sure any ne
 
 ![Casting items to String before distinctBy now collapses the output to one array](../../assets/blog/array-string-key-dataweave-3.png)
 
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript3)
+
 ### Solution 2
 
 If you can't change the type of the items or it would take too many iterations to do, another thing you can do is to transform the items inside the [distinctBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-distinctby) function itself. Like this:
 
 ![distinctBy with a joinBy criteria collapses the two arrays into one in the output](../../assets/blog/array-string-key-dataweave-4.png)
+
+> [!PLAYGROUND]
+> [Open in Playground](https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=ProstDev%2Fdataweave-playground-previews&path=scripts%2Farray-string-key%2Fscript4)
 
 Since we're using the [joinBy](https://docs.mulesoft.com/dataweave/latest/dw-core-functions-joinby) function, we're transforming the values of arr1 and arr2 into concatenated strings and THEN comparing them. Both arr1 and arr2 would be "key,string", which makes these values the same.
 
