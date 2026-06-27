@@ -571,3 +571,16 @@ summary,
   outline-offset: 2px;
   border-radius: 2px;
 }
+/* External-link arrow appended by src/lib/rehype-link-external.mjs — the site's "opens in a
+   new tab" convention (same icon as Icon.astro `external` / .reader-note__link / the pills).
+   The anchor is inline, so NO flex:none here (unlike .playground-btn__ext, whose pill is a
+   flex container). The icon inherits the anchor's currentColor (--accent-strong, AA in both
+   themes). text-decoration:none keeps the link underline off the SVG box. */
+.prose :where(a) .external-icon {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-left: 0.15em;
+  vertical-align: -0.08em;
+  text-decoration: none;
+}

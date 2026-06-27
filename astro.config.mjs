@@ -5,6 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import remarkCallouts from './src/lib/remark-callouts.mjs';
 import rehypeTables from './src/lib/rehype-tables.mjs';
+import rehypeLinkExternal from './src/lib/rehype-link-external.mjs';
 import shikiCodeTitle from './src/lib/shiki-code-title.mjs';
 
 // https://astro.build/config
@@ -28,7 +29,9 @@ export default defineConfig({
     remarkPlugins: [remarkCallouts],
     // Wrap GFM tables in a responsive scroll container + add scope="col" to headers.
     // See src/lib/rehype-tables.mjs + the `.table-wrap` / `.prose table` styles in global.css.
-    rehypePlugins: [rehypeTables],
+    // Then decorate EXTERNAL links with target="_blank" rel="noopener" + the external-arrow
+    // icon — see src/lib/rehype-link-external.mjs + `.prose :where(a) .external-icon` in global.css.
+    rehypePlugins: [rehypeTables, rehypeLinkExternal],
     shikiConfig: {
       themes: {
         light: 'github-light',
