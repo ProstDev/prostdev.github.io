@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistGrid from '@/components/PlaylistGrid.astro';
+import { getPlaylist, videosInPlaylist } from '@/data/videos';
+
+const playlist = getPlaylist('other-videos')!;
+const videos = videosInPlaylist('other-videos');
+---
+<BaseLayout title="Other MuleSoft & DataWeave Videos" description={playlist.description}>
+  <PlaylistGrid
+    playlist={playlist}
+    videos={videos}
+    hook="One-off tutorials and tips that don't fit a series — but are worth a watch."
+  />
+</BaseLayout>

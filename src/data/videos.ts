@@ -170,6 +170,18 @@ export const PLAYLISTS: Playlist[] = [
       'https://www.youtube.com/playlist?list=PLb61lESgk6hg9lR-FYLup2zyyOLuirmLP',
     tier: 'more',
   },
+  {
+    // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
+    // A catch-all home for genuine one-off videos that don't belong to any multi-part
+    // series — its /other-videos section page (in SECTION_PAGE_SLUGS) exists so the
+    // videos' breadcrumbs resolve. Reachable but NOT in the nav.
+    id: 'other-videos',
+    slug: 'other-videos',
+    title: 'Other MuleSoft videos',
+    description:
+      'Standalone MuleSoft and DataWeave videos that don\'t belong to a multi-part series — one-off tutorials, tips, and walkthroughs worth a watch on their own.',
+    tier: 'more',
+  },
 ];
 
 export const VIDEOS: Video[] = [
@@ -1173,6 +1185,7 @@ const SECTION_PAGE_SLUGS = new Set([
   'datacloud-mulesoft',
   'dataweave-challenges',
   'getting-to-the-point',
+  'other-videos',
 ]);
 
 /** Section-page href for a playlist's heading link, or undefined if it has no section page. */
