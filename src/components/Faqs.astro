@@ -1,0 +1,101 @@
+---
+/**
+ * FAQs — an optional question/answer section appended to the end of a blog post for AEO.
+ *
+ * Driven by the optional `faqs` frontmatter array (see src/content.config.ts). Each Q&A is a
+ * native <details> disclosure (no-JS / crawler-safe / keyboard-native, like SeriesNav's jump menu
+ * and the tables wrapper). The answer text is in the DOM regardless of open state — good for
+ * answer engines + accessibility. The page also emits FAQPage JSON-LD (built in [slug].astro) and
+ * the .md endpoint mirrors a `## FAQs` block, so all three surfaces agree.
+ *
+ * HARD RULE (enforced by the add-faqs skill, not the type): every answer is grounded in the post's
+ * own body — never fabricated.
+ *
+ * Inline markup in an `answer` is parsed by inlineSegments() (copied from ReaderNotes.astro): `code`
+ * spans → <code> chips and bare http(s) URLs → autolinked <a>. Styled by `.reader-note code` /
+ * `.reader-note__link` in global.css (the `.faq` blocks reuse `.reader-note` for chips/links since
+ * both render OUTSIDE .prose, where the .prose code/link rules don't reach). Renders OUTSIDE the
+ * .prose <Content />, so its <h2> is intentionally absent from the right-rail ToC. Mounted after the
+ * body / reader notes, before the tags, in src/pages/post/[slug].astro.
+ */
+import Icon from './Icon.astro';
+
+interface Faq {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  faqs: Faq[];
+}
+
+const { faqs } = Astro.props;
+
+// Bare http(s) URLs in an answer become autolinked <a>; `code` spans become <code> chips.
+// (Identical recipe to ReaderNotes.astro — these render outside .prose, so .prose rules miss them.)
+const URL_SPLIT = /(https?:\/\/[^\s)]+[^\s).,;:!?])/g;
+const URL_ONE = /^https?:\/\/[^\s)]+[^\s).,;:!?]$/;
+
+function inlineSegments(text: string) {
+  return text
+    .split(/(`[^`]+`)/g)
+    .flatMap((seg) => {
+      if (seg.length > 1 && seg.startsWith('`') && seg.endsWith('`')) {
+        return [{ type: 'code' as const, value: seg.slice(1, -1) }];
+      }
+      return seg.split(URL_SPLIT).map((part) =>
+        URL_ONE.test(part)
+          ? { type: 'link' as const, value: part }
+          : { type: 'text' as const, value: part }
+      );
+    })
+    .filter((seg) => seg.value !== '');
+}
+---
+<section aria-labelledby="faqs" class="mt-12 border-t border-default pt-8">
+  <h2 id="faqs" class="text-lg font-bold">FAQs</h2>
+  <p class="mt-1 text-sm text-muted">Frequently asked questions about this post.</p>
+
+  <ul class="mt-5 space-y-3">
+    {faqs.map((faq) => (
+      <li class="reader-note rounded-lg border border-default bg-surface-card">
+        <details>
+          <summary class="faq-summary flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-left font-semibold text-[var(--text)] hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]">
+            <span>{faq.question}</span>
+            <Icon name="chevron-down" class="faq-chevron ml-auto h-4 w-4 shrink-0 text-muted transition-transform" aria-hidden="true" />
+          </summary>
+          <p class="whitespace-pre-line border-t border-default px-4 py-3 text-[var(--text)]">
+            {inlineSegments(faq.answer).map((seg) =>
+              seg.type === 'code' ? (
+                <code>{seg.value}</code>
+              ) : seg.type === 'link' ? (
+                <a href={seg.value} target="_blank" rel="noopener" class="reader-note__link">
+                  {seg.value}
+                  <Icon name="external" class="external-icon" />
+                </a>
+              ) : (
+                seg.value
+              )
+            )}
+          </p>
+        </details>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  /* Hide the default disclosure triangle (we render our own chevron). */
+  .faq-summary::-webkit-details-marker {
+    display: none;
+  }
+  /* Rotate the chevron when the disclosure is open. */
+  details[open] > .faq-summary .faq-chevron {
+    transform: rotate(180deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faq-chevron {
+      transition: none;
+    }
+  }
+</style>

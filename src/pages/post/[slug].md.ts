@@ -10,7 +10,7 @@ export async function getStaticPaths() {
 
 export const GET: APIRoute = async ({ props }) => {
   const { post } = props as { post: Awaited<ReturnType<typeof getPosts>>[number] };
-  const { title, description, author, pubDate, category, tags, readerNotes } = post.data;
+  const { title, description, author, pubDate, category, tags, readerNotes, faqs } = post.data;
 
   const frontmatter = [
     `# ${title}`,
@@ -76,7 +76,15 @@ export const GET: APIRoute = async ({ props }) => {
         .join('\n\n');
   }
 
-  return new Response(frontmatter + seriesBlock + body + notesBlock, {
+  // FAQ section (AEO) — mirrors Faqs.astro + the FAQPage JSON-LD. Verbatim Q&A so all surfaces agree.
+  let faqBlock = '';
+  if (faqs && faqs.length > 0) {
+    faqBlock =
+      '\n\n---\n\n## FAQs\n\n' +
+      faqs.map((f) => `### ${f.question}\n\n${f.answer}`).join('\n\n');
+  }
+
+  return new Response(frontmatter + seriesBlock + body + notesBlock + faqBlock, {
     headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
   });
 };

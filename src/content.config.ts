@@ -141,6 +141,17 @@ const blog = defineCollection({
           })
         )
         .optional(),
+      /**
+       * Optional FAQ section appended to the end of the post for AEO (answer-engine optimization).
+       * Renders a `## FAQs` <details> disclosure section (Faqs.astro) AND emits FAQPage JSON-LD on
+       * `/post/<slug>` + a `## FAQs` block on `/post/<slug>.md`. A post with none renders no section.
+       * HARD RULE: every answer must be grounded in the post's OWN body — never fabricate facts.
+       * `answer` is inline prose only (may contain `code` chips + bare URLs; NO block elements —
+       * no lists/code fences — so the JSON-LD acceptedAnswer.text stays clean). See the add-faqs skill.
+       */
+      faqs: z
+        .array(z.object({ question: z.string(), answer: z.string() }))
+        .optional(),
       draft: z.boolean().default(false),
     }),
 });
