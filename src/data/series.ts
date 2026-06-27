@@ -152,6 +152,22 @@ export const SERIES: Series[] = [
       're-scaffold-mule-flows-exchange-api-spec-studio',
     ],
   },
+  {
+    id: 'solace-pubsub-mulesoft',
+    title: 'Integrate Solace PubSub+ Cloud with MuleSoft',
+    posts: [
+      'how-to-integrate-solace-pubsub-cloud-with-mulesoft',
+      'how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling',
+    ],
+  },
+  {
+    id: 'power-of-curl',
+    title: 'The Power of cURL',
+    posts: [
+      'the-power-of-curl',
+      'the-power-of-curl-part-ii',
+    ],
+  },
 ];
 
 /** The series a post belongs to, or undefined if it isn't part of one. */
