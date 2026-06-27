@@ -8,6 +8,17 @@ category: Tutorials
 tags: [MuleSoft, DataWeave]
 youtubeId: TqrmeLhGtQc
 heroImage: ../../assets/blog/upsert-object-from-array.png
+faqs:
+  - question: "How do I update only one object in an array based on its ID in DataWeave?"
+    answer: "First use a `map` function over the array, then add a conditional that checks `if (user.id ~= updateUser.id)` to act only on the matching object and return `else user` for the rest. When the condition is met, use the `update` operator with a `case` for each field you want to change."
+  - question: "Why does the updated object end up with a `null` value for the `name` field?"
+    answer: "This happens because the field is updated with `updateUser.name`, and since that field does not exist on the `updateUser` variable, it returns a `null` value. The fix is to add a `default` keyword with the original value, like `case na at .name -> updateUser.name default na`, so it falls back to the original object's value when `updateUser` doesn't contain it."
+  - question: "How do I insert a new field that doesn't exist in the original object?"
+    answer: "This is where the upsert option comes in, because the field is not in the original value, so you have to tell the operator to insert it if it doesn't exist. You do that by adding an exclamation point (`!`) right next to the field, like `case nf at .newField! -> updateUser.newField`."
+  - question: "What happens if a field is missing from both the original object and the `updateUser` variable?"
+    answer: "The `update` operator will still add the field because you are using the upsert option, but it will be added with a `null` value. Depending on your business requirements that may be fine, but if not you can remove it either by adding a conditional to the field or by adding a `skipNullOn` configuration to the output directive."
+  - question: "What's the difference between using a conditional and using `skipNullOn` to handle null values?"
+    answer: "A conditional, such as `case nf at .newField! if(!isEmpty(updateUser.newField default nf))`, is the less fancy approach but lets you remove only specific fields rather than all of them. Adding `output application/json skipNullOn=\"everywhere\"` to the output directive gets rid of every field with a null value, which is effective but can be confusing if you later expect to see actual null values from other fields."
 ---
 
 In this post, we'll learn how to use the update operator along with the upsert and conditional options. We'll also learn different ways of handling null values for our fields.

@@ -7,6 +7,19 @@ tags: [MuleSoft, DataWeave, GitHub]
 youtubeId: WzfFkgw0xhw
 draft: false
 heroImage: ../../assets/blog/how-to-generate-shareable-link-examples-from-github-to-open-in-the-dataweave-playground.png
+faqs:
+  - question: "What are the parts of a shareable DataWeave Playground link?"
+    answer: "The link always starts with `https://dataweave.mulesoft.com/learn/playground`, then a `?` marks the start of the query parameters and `&` concatenates more. There are three query parameters: `projectMethod`=GHRepo, which always stays the same; `repo`, which points to the public GitHub repository; and `path`, which points to the folder inside that repo where the inputs and scripts live."
+  - question: "Why does the repo value contain %2F instead of a slash?"
+    answer: "The `%2F` is just the URL-safe representation of a slash (/), so the value can be passed safely inside the URL. To make sure your `repo` and `path` values are URL-safe, you can use https://www.urlencoder.org/ — input your value at the top and click Encode, and the encoded value is returned under the button."
+  - question: "How should I structure the folder inside my repo?"
+    answer: "Since only the main folder is passed to the Playground, everything has to be in place: an `inputs` folder (which must always be named 'inputs') holds your payloads, and the main script file must be named `transform.dwl` at the top level. Any custom DataWeave modules go at the same level as `transform.dwl` and must have the .dwl extension."
+  - question: "How do I add multiple input payloads?"
+    answer: "Add the files inside the `inputs` folder, making sure each has the appropriate extension (.xml, .json, .txt) so the Playground knows the data format. If you add several payloads, name them differently, and reference each one from your scripts using the file name without the extension."
+  - question: "Does my GitHub repository need to be public?"
+    answer: "Yes. The `repo` query parameter has to point to a public repo, and once everything is set up and committed/pushed to your public GitHub repository you will be able to use the link to share your examples."
+  - question: "Why aren't my changes showing up in the Playground right away?"
+    answer: "It may take up to 30 minutes for the Playground to be updated after you make changes to the repository, so if you do not see your changes reflected immediately, just wait a bit."
 ---
 
 Some months ago, the DataWeave engineering team created this beautiful functionality to be able to open DataWeave examples (including inputs and scripts) directly in the Playground with a single link.

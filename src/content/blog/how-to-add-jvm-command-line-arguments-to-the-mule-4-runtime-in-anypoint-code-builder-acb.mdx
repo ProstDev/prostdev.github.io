@@ -10,6 +10,17 @@ tags: [MuleSoft, Anypoint Code Builder, Visual Studio Code]
 youtubeId: -u9jZ45Ut1A
 draft: false
 heroImage: ../../assets/blog/how-to-add-jvm-command-line-arguments-to-the-mule-4-runtime-in-anypoint-code-builder-acb-1.png
+faqs:
+  - question: "Why would I add JVM or command-line arguments to the Mule 4 Runtime?"
+    answer: "Adding arguments is especially useful when you're using properties files that are separated by environment, and it's also useful to pass a secure/encryption key to your Mule application when you have secured properties."
+  - question: "How do I add an argument to the Mule Runtime in Anypoint Code Builder?"
+    answer: "Open the ACB Settings by clicking the gear icon on the home screen, go to Mule > Runtime: Default Arguments, and append your argument at the end of the value, for example `-M-Denv=dev`, so the property is provisioned to the runtime every time you run the app."
+  - question: "What do I need installed before following this tutorial?"
+    answer: "You need Visual Studio Code, the Anypoint Extension Pack to enable Anypoint Code Builder (Desktop), and a REST Client such as Postman, curl, or Thunder Client for VS Code, which is the client used in this post; you can also clone the example GitHub repo at https://github.com/ProstDev/args-in-acb to follow along."
+  - question: "Can I use a YAML file instead of a .properties file for my configuration?"
+    answer: "Yes, you can use either `.properties` or `.yaml` extensions for your properties files."
+  - question: "How do I run and test the Mule app locally after adding the argument?"
+    answer: "Start your Mule app from the Run and Debug tab by clicking the green run button, then call your application from your REST Client at `localhost:8081/hello`, where you should receive a \"Hello World\" response."
 ---
 
 I've received this question a lot lately, so I figured I'd create a quick post about it.

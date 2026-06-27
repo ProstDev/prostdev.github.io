@@ -11,6 +11,19 @@ category: Guides
 tags: [MuleSoft, Anypoint Studio, JMS]
 draft: false
 heroImage: ../../assets/blog/how-to-handle-single-and-xa-extended-architecture-transactions-in-mulesoft-1.png
+faqs:
+  - question: "What is a transaction in MuleSoft?"
+    answer: "A transaction is a group of operations where all the steps need to be successful to commit a result. If any one of the intermediate steps fails, the whole chain of steps fails collectively, and the transaction action rolls everything back to the initial state from which the event was kicked off so that none of the steps are committed."
+  - question: "What types of transactions does MuleSoft support?"
+    answer: "MuleSoft supports two types of transactions: Single Resource (a single mode of data transaction, such as only JDBC affairs, only JMS activities, or only VM Queues) and XA (Extended Architecture) transactions, which you use when you need to deal with multiple data exchange sources atomically, such as a JMS broker along with a JDBC operation and VM queues."
+  - question: "Why do you use a Try block for transactions in MuleSoft?"
+    answer: "The Try block enforces the transaction on the JDBC operations by acting as the initiator of a transaction thread, and the JDBC components simply connect themselves to the transaction initiated by the Try component. In the Try block you set both the transactional action and the transaction type for the transaction."
+  - question: "What's the difference between the ALWAYS_BEGIN, BEGIN_OR_JOIN, and INDIFFERENT transactional actions?"
+    answer: "`ALWAYS_BEGIN` always initiates a new transaction; `BEGIN_OR_JOIN` initiates a new transaction if there are no preceding transactions but joins an already set up transaction if one exists; and `INDIFFERENT` stays neutral, neither creating a transaction nor joining an existing one."
+  - question: "How do I configure an XA transaction in MuleSoft?"
+    answer: "You select XA as the transaction type in the Try scope settings and use the Bitronix Transaction Manager, added from the Global Elements section in Anypoint Studio. For the database connection config you tick the Use XA Transactions checkbox in its transactions section, and for the JMS connection config you scroll to the Connection Factory section, choose Edit inline for the factory configuration, and tick the Enable xa checkbox; note that XA will not work for a JMS connection when caching is activated, so you select No caching as the Caching Strategy. The components join the Try block's transaction by setting their transactional action to `ALWAYS_JOIN`."
+  - question: "Why does the XA transaction follow a 2-Phase-Commit protocol?"
+    answer: "The XA transaction uses a 2-Phase-Commit protocol because the first phase checks whether all the steps (the JDBC/JMS components) in a transaction completed successfully; if they all pass, the transaction manager commits and writes completion logs to a file ending with \"tx-logs\" in the .mule folder of your workspace directory, and if any component fails execution, the transaction manager rolls back the entire transaction."
 ---
 
 "Transaction" is a word that is used way too frequently in our daily lives. We use it whenever we are engaged in purchasing or selling any commodity. In our daily lives, a transaction signifies an instance of buying or selling something. Also, a transaction can be deemed as completed only upon the overall completion of the buying/selling activity along with the monetary affair associated with it.

@@ -90,6 +90,17 @@ readerNotes:
     text: |
       Damn, that solution is so nice.
       I was kinda thinking in that direction but couldn't write it down
+faqs:
+  - question: "What does this DataWeave challenge ask you to do?"
+    answer: "You write a DataWeave script that reverses the order of the words in each phrase to form a new phrase, where phrases are separated by a new line and words are separated by a space, but the punctuation signs (`!` and `,`) stay in the same place; for example \"Hello world!\" becomes \"world Hello!\" and \"With you, be May the Fourth!\" becomes \"Fourth the, May be you With!\". Lower and upper cases can be kept as-is."
+  - question: "How should the punctuation be handled when reversing the words?"
+    answer: "The punctuation signs stay in the same place rather than moving with the words, so as Clue #1 suggests you keep the index of each punctuation sign so you can insert it back there later after the words have been reversed."
+  - question: "What clues does the post give if I get stuck?"
+    answer: "The post offers four clues: first, keep the index of each punctuation sign so you can insert it there later; second, you can use the `isAlphanumeric` function from the Strings module; third, you can use the `scan` function to separate each phrase into an Array of Strings; and finally you can use the `joinBy` function to transform from Array to String."
+  - question: "Can I output the result as text instead of JSON?"
+    answer: "Yes, the post notes you can keep the output as a JSON or as a text, whatever your preference is."
+  - question: "Where can I try solving this challenge?"
+    answer: "You can solve it on the DataWeave Playground using the linked project at https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F5, and the post recommends referring only to the DataWeave documentation at https://docs.mulesoft.com/dataweave/latest/ rather than Google or others so you can learn on your own."
 ---
 
 > [!NOTE]

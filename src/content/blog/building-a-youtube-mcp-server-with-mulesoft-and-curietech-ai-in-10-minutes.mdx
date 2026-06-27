@@ -10,6 +10,19 @@ tags: [MuleSoft, CurieTech AI, AI, Anypoint Code Builder, GitHub]
 youtubeId: EE1QLCuzGVk
 draft: false
 heroImage: ../../assets/blog/building-a-youtube-mcp-server-with-mulesoft-and-curietech-ai-in-10-minutes.png
+faqs:
+  - question: "What is MCP?"
+    answer: "MCP stands for Model Context Protocol, a new protocol designed for agents, AI tools, and other automated systems to interact with structured tools in a flexible and self-describing way. MCP tools define schemas, input parameters, and responses, and are ideal for agent-based use cases. As the post puts it, it's an API for your agents."
+  - question: "How do I get a YouTube API key for this project?"
+    answer: "You get one from the Google Cloud Console at https://console.cloud.google.com/: create a project, enable the YouTube Data API v3, then under APIs & Services > Credentials create a new API Key, restrict it to the YouTube Data API v3 under API Restrictions, save, and copy the key to use in your requests."
+  - question: "How do I generate the integration with CurieTech AI?"
+    answer: "Inside CurieTech AI you open the Integration Generator, set the language to Java 17, the build tool to Maven 3.9, and Mule 4.9, then use a prompt asking it to make an API that uses YouTube Data API v3 including all query parameters (especially `key`) and as simple as possible; paste the list of parameters from the official docs or paste the URL, and CurieTech generates the full integration for you to copy."
+  - question: "How do I convert the Mule app into an MCP server?"
+    answer: "Push your Mule project to GitHub (or use VS Code's repo initializer), then in CurieTech open the Coding Agent, select your repo, and prompt it to turn the project into an MCP server using the beta MCP connector; CurieTech updates the code, modifies the `pom.xml`, adds a global MCP config, and replaces the HTTP listener with an MCP listener, after which you approve the PR in GitHub and merge."
+  - question: "How do I run the MCP server with SuperGateway?"
+    answer: "Open a terminal and run `npx -y supergateway --sse http://localhost:8081/sse --ssePath /sse --messagePath /message`, ensuring the port matches your Mule app's HTTP Listener."
+  - question: "How do I add the server to Claude?"
+    answer: "Add an `mcpServers` entry named `youtube` to your Claude or other AI agent config that runs the SuperGateway command via `npx` with the same `--sse`, `--ssePath`, and `--messagePath` arguments, then restart your app and you can use it with natural language prompts."
 ---
 
 Curious how to integrate the YouTube Data API v3 into a fully functioning MCP (Model Context Protocol) server in record time? With the help of CurieTech AI and MuleSoft, I did it in just 10 minutes, without ever having created an MCP server before.

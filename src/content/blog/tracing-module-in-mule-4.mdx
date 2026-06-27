@@ -10,6 +10,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Studio, Logging]
 draft: false
 heroImage: ../../assets/blog/tracing-module-in-mule-4-1.png
+faqs:
+  - question: "What can the Tracing module do in Mule 4?"
+    answer: "The tracing module lets you enhance your logs by setting logging variables to the logging context, removing a logging variable from the context, and clearing all logging variables from the event logging context, and it also lets you modify the correlation ID during flow execution."
+  - question: "How do I show the tracing logging variables in my logs?"
+    answer: "Use Mapped Diagnostic Context (MDC), which enriches logging with more context for the current Mule event. Open the `log4j.xml` file and replace `[processor: %X{processorPath}; event: %X{correlationId}]` with `[%MDC]` so the logging variables you set, such as `customerId` and `requestPath`, are printed in the logs."
+  - question: "What's the difference between Remove logging variable and Clear logging variables?"
+    answer: "Remove logging variable removes a single named variable, for example removing `requestPath` so it no longer appears in the context, while Clear logging variables removes all of the logging variables that were created during the flow, so afterward there is no `customerId` logging variable either."
+  - question: "Why does the changed correlation ID only appear in some loggers?"
+    answer: "When you add With Correlation ID after the payload logger to change the correlation ID, the updated correlation id is visible only for the logger available under the correlation ID, so a payload logger added afterward at the end will not have the updated correlation id."
+  - question: "Where can I find the sample project and the official reference?"
+    answer: "The sample Mule application is on GitHub at https://github.com/shyamrajprasad/mulesoft-tracing-module-integration and the official tracing module reference is at https://docs.mulesoft.com/tracing-module/1.0/."
 ---
 
 The tracing module enables you to enhance your logs by adding, removing, and clearing all variables from the logging context for a given Mule event. It also enables you to modify the correlation ID during flow execution.

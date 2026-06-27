@@ -20,6 +20,19 @@ readerNotes:
       Hello anjanavutupali66,
 
       Thanks for sharing your question with us. I partially understood your scenario. Can you please elaborate and provide more details on type of connector used. If you are referring to the example application, up on checking the first case, the variable value is available although the flow 3 failed. However, no connector is used in this case. For scatter-gather route variable propagation please check the mule documentation : https://docs.mulesoft.com/mule-runtime/4.3/scatter-gather-concept
+faqs:
+  - question: "How does the input message get processed in a Mule 4 Scatter-Gather?"
+    answer: "The input payload is distributed or copied across all the routes of the Scatter-Gather, but each route's own payload value overwrites it, so a Set Payload value placed before the component is overwritten by the flow's payload value. That said, the pre-Scatter-Gather Set Payload information can still be used to add business logic to the individual routes."
+  - question: "What happens if a Scatter-Gather route fails and there is no error handling in place?"
+    answer: "Without any error-handling mechanism the whole Scatter-Gather fails: the post shows flow-three failing on a division-by-zero error, which halts the process and returns a long semi-cryptic error message instead of a result."
+  - question: "How do I handle errors in a Scatter-Gather so it still returns a result?"
+    answer: "Wrap each of the Scatter-Gather routes in a MuleSoft `Try` scope with an `On-Error Continue` handler, which makes the failing route successful by handling its error logic so the Scatter-Gather still produces an aggregated result instead of a long error description."
+  - question: "How do I show only the successful responses and bypass error information?"
+    answer: "Inside the `On-Error Continue` scope, set the Transform Message payload to `[]` (an empty array) so the failed route returns nothing and the output is an aggregate response of only the successful flows."
+  - question: "Can I run a Scatter-Gather across different types of services?"
+    answer: "Yes. The post demonstrates a flight-search example where United Airlines flight data is retrieved through REST API calls while Delta Airlines information is retrieved through a SOAP WSDL, with a Set Variable storing the airport `code` value (`#[message.attributes.queryParams.code]`) used to look up the flights, and the results aggregated by the Scatter-Gather."
+  - question: "What can I do on a route failure beyond just returning an error message?"
+    answer: "If business logic needs to run when a route fails, it can be placed inside the `On-Error Continue` handler scope; the post notes this can be anything specific such as invoking another process upon failure or notifying stakeholders through email."
 ---
 
 *GitHub repository with the Mule Project can be found at the end of the post.*

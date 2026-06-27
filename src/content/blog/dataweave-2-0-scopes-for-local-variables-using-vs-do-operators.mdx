@@ -5,6 +5,17 @@ pubDate: 2023-02-14
 category: Guides
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/dataweave-2-0-scopes-for-local-variables-using-vs-do-operators-1.png
+faqs:
+  - question: "What is a scope in DataWeave?"
+    answer: "A scope is like an imaginary box where you can keep variables, functions, and so on; those variables or functions are not available to anyone outside the box, only inside it. In DataWeave you can have global variables (the ones declared above the three dashes that separate your script, accessible from anywhere) and local variables created inside a scope with the `do` or `using` operators."
+  - question: "What's the difference between the `do` and `using` operators for local variables?"
+    answer: "Both create local variables with the same functionality, but the syntax differs: with `do` you open a new local scope and add three dashes to separate the variable declarations from the localized script, just like a regular script, while `using` declares the variables in parentheses (such as `using (user = \"Robin\", age = \"5\")`) before the body. The post's author finds `do` more intuitive because of the familiar three-dashes syntax, and notes `using` is deprecated since DataWeave 2.0."
+  - question: "Why does the `do` example output an age of 5 instead of 21?"
+    answer: "Because DataWeave takes the closest variable: the more local the variable, the more precedence it takes. Even though a global `var age = 21` exists, the local `var age = 5` declared inside the `do` scope is the one used in the output."
+  - question: "Can I use lambda expressions as functions inside the `using` operator?"
+    answer: "Yes, you can create variables with lambda expressions to use them as functions inside `using`, for example declaring `echo = (t) -> t` alongside the other variables and then calling `echo(123)` in the body."
+  - question: "Should I still use the `using` operator?"
+    answer: "The post advises against it: `using` is deprecated since DataWeave 2.0 and you might get a large warning in your scripts (such as in Anypoint Studio) telling you to stop using it. The author recommends `do` instead because it is more intuitive, and warns that since the team kept `using` in DataWeave 2.0 there's no guarantee they won't remove it later, which makes relying on it risky."
 ---
 
 I had previously written a post with [my top 5 DataWeave tips to make your life easier](https://www.prostdev.com/post/my-top-5-dataweave-tips-to-make-your-life-easier) where I talked about the *do* operator. However, I’ve seen a lot of people asking about the *using* operator since it was inherited from DataWeave 1.0.

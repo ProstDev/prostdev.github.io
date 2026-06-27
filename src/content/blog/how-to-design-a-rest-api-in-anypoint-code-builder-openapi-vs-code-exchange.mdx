@@ -8,6 +8,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Code Builder, Visual Studio Code]
 youtubeId: cki1MOLC1CE
 heroImage: ../../assets/blog/how-to-design-a-rest-api-in-anypoint-code-builder-openapi-vs-code-exchange.png
+faqs:
+  - question: "How do I create a new OpenAPI spec in Anypoint Code Builder?"
+    answer: "From the ACB Welcome screen, choose \"Design an API\", then select API Specification as the type, OpenAPI 3.0 (YAML) as the language, and `todo-task-api` as the project name. You don't need to log into Anypoint Platform just yet."
+  - question: "What endpoints does the To-Do Task Management API define?"
+    answer: "It supports full CRUD on `/tasks`: a `GET /tasks` to list tasks with optional filters, a `POST /tasks` to create a task, and `GET /tasks/{taskId}`, `PUT`, and `DELETE` for managing an individual task by its ID."
+  - question: "What's the difference between the `Task` and `TaskInput` schemas?"
+    answer: "Both are reusable schemas defined in the components section, but `Task` includes an `id` property and lists `id`, `title`, and `completed` as required, while `TaskInput` (used for request bodies) omits `id` and requires only `title` and `completed`."
+  - question: "How do I test the API without building any flows?"
+    answer: "Click API Console to try out each endpoint—no flows required. You'll see query parameter validation, 404 handling, schema errors if you send the wrong type, and simulated responses using your example data, which is perfect for quick iteration or mocking out APIs."
+  - question: "How do I publish the API spec to Anypoint Exchange?"
+    answer: "Log into Anypoint Platform via ACB, press Cmd/Ctrl + Shift + P and choose \"Publish API Project to Exchange\", then pick a business group and version and publish. After that you can discover and reuse the API inside your org or scaffold flows from it."
 ---
 
 Whether you’re new to MuleSoft or finally starting to explore Anypoint Code Builder (ACB), this post will walk you through designing a full REST API specification using OpenAPI 3.0 — directly inside VS Code, with no XML or flows yet.

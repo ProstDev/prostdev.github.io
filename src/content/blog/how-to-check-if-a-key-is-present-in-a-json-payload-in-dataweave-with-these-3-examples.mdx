@@ -6,6 +6,15 @@ author: "Mohammed Shakir"
 category: Tutorials
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/how-to-check-if-a-key-is-present-in-a-json-payload-in-dataweave-with-these-3-examples-1.png
+faqs:
+  - question: "How do I check if a key exists in a JSON payload in DataWeave?"
+    answer: "Append a question mark to the end of the field, like `payload.id?`. When the field has a value it returns `true`, and when the field doesn't exist it returns `false`."
+  - question: "How do I check for a key across multiple objects in an array?"
+    answer: "You have two options shown in the post. The first, `payload.id?`, returns a single boolean that just tells you whether at least one object has the key, but not which one. The second, `payload map ((item, index) -> item.id?)`, iterates through each item so you can find out which specific object has the key present in it."
+  - question: "How do I check if a key is present inside a nested object?"
+    answer: "First go to the parent object and then to the key, for example `payload.Address.zip?`, which returns `true` when the nested `zip` field is present."
+  - question: "What does the question mark operator return when checking a key?"
+    answer: "It returns a boolean value: `true` when the field has a value, and `false` when the field doesn't exist."
 ---
 
 “In DataWeave, when a field in the input payload has a value and you append a **question mark (?)** at the end of the field, it will return **true**. On the other hand, if the field doesn’t exist, then it would return **false**.” Refer to the link below for more information:

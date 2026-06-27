@@ -103,6 +103,19 @@ readerNotes:
       ((lines(payload) filter ($>0) reduce ((item, accumulator) ->
           factorial(item) + accumulator
        )) as String)[20 to 25] as Number
+faqs:
+  - question: "What is this DataWeave challenge asking me to do?"
+    answer: "The challenge asks you to create a tail-recursive function that gets the factorial of each positive number in the payload, sum the results, then retrieve the digits located at positions 20 to 25, returning a number and not a string. Numbers that are 0 or less aren't calculated, so for the sample input the factorial of 3 is 6, the factorial of 5 is 120, the factorial of -6 isn't calculated (treated as 0), and the expected output is `537046`."
+  - question: "How do I process every line of the input payload?"
+    answer: "As the clues suggest, you can use `lines()` from the Strings module or `splitBy()` to process every line of the payload, which can be in txt format."
+  - question: "Why does the post insist on tail-recursion instead of regular recursion?"
+    answer: "The clues warn that you must use tail-recursiveness and not regular recursiveness, otherwise your script might not work."
+  - question: "How do I avoid an infinite loop in the recursive factorial function?"
+    answer: "Make sure to create an if statement before calling the function in recursion; otherwise you might get stuck in an infinite loop, as noted in the clues."
+  - question: "How do I return a number instead of a string for the final result?"
+    answer: "You can use the keyword `as` to transform to and from strings and numbers, and you extract the characters at positions 20 to 25 from a string using the range selector `[ x to y ]` before converting the result back to a number."
+  - question: "Where should I look for help while solving this challenge?"
+    answer: "The post recommends referring only to the DataWeave documentation at https://docs.mulesoft.com/dataweave/latest/ and avoiding Google or asking others, so you can learn on your own; you can also solve it directly on the linked DataWeave Playground."
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

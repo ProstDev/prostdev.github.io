@@ -10,6 +10,15 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/re-scaffold-mule-flows-exchange-api-spec-studio-1.png
+faqs:
+  - question: "How do I re-scaffold a Mule project after the API specification changes in Exchange?"
+    answer: "Once the updated specification is published to Exchange, find your API specification dependency in the Package Explorer, right-click it and select the spec name, then choose Update Version; in the window that opens click Refresh or Update to refresh the APIs, click Update version for the API, then Apply and Close, and when prompted whether you want to scaffold the specification select Yes to re-scaffold it."
+  - question: "What should I do before re-scaffolding a Mule project?"
+    answer: "You should already have an Anypoint Platform account, an API specification published in Anypoint Exchange, Anypoint Studio installed, and a first version of the Mule project already scaffolded from a previous version of the specification, since the post re-scaffolds that same project with the new change; if you haven't done the initial scaffolding yet, refer to part 1 of the series at https://www.prostdev.com/post/scaffold-mule-flows-from-published-api-specification."
+  - question: "Why does nothing happen when I click the Refresh button to update the APIs?"
+    answer: "It might mean your credentials have expired; refresh them from Anypoint Studio > Settings > Anypoint Studio > Authentication by removing your current Anypoint Platform credentials and re-adding them, then try refreshing the APIs one more time."
+  - question: "How do I know there is a newer version of my API specification available?"
+    answer: "After refreshing the APIs you'll see a newer version of the specification you're using, indicated by a tooltip on your current version reading that there is a newer version available, and the API dependency detail will show New version available with an Update version button."
 ---
 
 What happens when there is a change to a published API in Anypoint Exchange? How can we get these changes re-scaffolded to our API implementation once we have already done the scaffolding?

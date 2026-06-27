@@ -11,6 +11,17 @@ category: Tutorials
 tags: [MuleSoft, Salesforce, DataWeave]
 draft: false
 heroImage: ../../assets/blog/using-salesforce-search-in-mule-4.png
+faqs:
+  - question: "What is the difference between SOQL and SOSL in Salesforce?"
+    answer: "A SOQL query is the equivalent of a SELECT SQL statement and searches the org database, while SOSL is a programmatic way of performing a text-based search against the search index. Use SOQL when you know which objects the data resides in (to retrieve from one or related objects, count records, sort results, or read number/date/checkbox fields), and use SOSL when you don't know which object or field the data lives in and want to search a term across fields, retrieve multiple objects efficiently whether or not they are related, query a division, or handle Chinese, Japanese, Korean, or Thai text."
+  - question: "How do I build the SOSL search expression in this Mule 4 app?"
+    answer: "First, in the Preparing Search Request DataWeave component, convert all the external Id values from the original response into a single plain string concatenated by `OR` using `joinBy \" OR \"`, which produces a value the Salesforce search understands. Then pass that string into the Salesforce Search as the `:ids` parameter inside the expression `FIND { :ids } IN ALL FIELDS RETURNING Contact(Id,external_id__c,Email), Lead(Id,external_id__c,email)`, which asks Salesforce to search all fields and return the listed fields from Contacts and Leads."
+  - question: "How does the app decide whether to update a Contact or Lead versus create a new Lead?"
+    answer: "After the search returns, the app groups results by type and builds a `salesforceResponseMap` plus a Collect by type variable separating found Contacts and Leads keyed by external Id. The filter-and-collecting-records flow then filters `vars.originalPayload` against `vars.groupedObjects.fromContacts.id`: records NOT found are kept to be created as Leads, while records that ARE found are collected and mapped for update as Contacts (the Leads group works the same way). The enqueue-batch-jobs step then sets the payloads for the update and create operations."
+  - question: "Why use SOSL over SOQL for this kind of process?"
+    answer: "One advantage is that you can retrieve multiple objects in a single call, which saves a couple of API calls, making it a good fit for processes that need just a few records. The post notes that massive amounts of data might add complexity to how you build the SOSL expression, but in the end you can adjust the limits documented at https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_sosl_limits.htm if needed."
+  - question: "How does the batch processing reuse the same flow for both updates and upserts?"
+    answer: "In the enqueue-batch-jobs component the app specifies the `sObject` and externalId as variables, so instead of adding a separate batch component for each type it dynamically passes the `sObject` for updates and the `sObject` plus externalId for upsert calls, which lets the batch processes be reused. One batch focuses on updating objects and controls the Salesforce response with a DataWeave component that collects each item's id, success flag, and the field, message, and statusCode when the operation was not successful."
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*

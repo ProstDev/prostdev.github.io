@@ -7,6 +7,15 @@ tags: [MuleSoft, Salesforce, Data Cloud, API, Postman]
 youtubeId: r_AM3P8Y-_Q
 draft: false
 heroImage: ../../assets/blog/part-4-data-cloud-mulesoft-integration.png
+faqs:
+  - question: "How do I secure my Data Cloud Mule app so people can't use it just by getting the URL?"
+    answer: "Connect your Mule app deployed in CloudHub to API Manager and add basic authentication, so that even if you share your URL by mistake people would still need your username and password to access it. You do it with clicks, not code: create an API in API Manager, upgrade the deployed app, add the Autodiscovery properties and credentials, then apply the Basic Authentication - Simple policy."
+  - question: "What Autodiscovery properties do I need to add in Runtime Manager?"
+    answer: "In the Properties tab (Text view) you add `anypoint.platform.gatekeeper=flexible`, `api.id=your_api_instance_id`, `anypoint.platform.client_id=your_client_id`, and `anypoint.platform.client_secret=your_client_secret`, replacing the placeholders with your values. Then go back to Table view and click Protect for the two new Anypoint Platform credentials before clicking Apply Changes."
+  - question: "Why am I getting a 401-Unauthorized error from Postman?"
+    answer: "A 401-Unauthorized after applying the Basic Authentication policy actually means the security policy was successfully applied and your request is missing credentials. To fix it, add your username and password to Postman by referencing them as environment variables with the `{{variableName}}` syntax in the collection's Authorization tab set to Basic Auth, after which the Query request returns 200-OK again."
+  - question: "What should I do if I get a 503 error after setting up Autodiscovery?"
+    answer: "A 503 error right after setting up Autodiscovery usually just means you need to wait a few seconds for the security policies to be applied to your API. If a long time has passed and you still get 503 instead of 200, make sure the `api.id` property is correct and your API in API Manager appears as Active (refresh the page), and if it still fails try changing `anypoint.platform.gatekeeper` to disabled, then back to flexible once it works."
 ---
 
 We already finished our Data Cloud integration with MuleSoft. We have everything deployed and running in CloudHub, and we know how to call this integration to query, insert, or delete records from/to Data Cloud. However, our integration has a fatal flaw: we have no security.

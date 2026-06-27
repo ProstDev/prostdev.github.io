@@ -6,6 +6,19 @@ category: Tutorials
 tags: [API, Postman]
 draft: false
 heroImage: ../../assets/blog/intro-to-regression-testing-with-postman.png
+faqs:
+  - question: "What is regression testing?"
+    answer: "Regression testing is a type of software testing in which tests are created to ensure that a new change to the code did not break existing functionality. The post illustrates this with a car metaphor: after installing neon lights, you re-run the same set of checks (lights, starting, A/C, windows, radio, tires) to confirm the new addition didn't break anything that was working before."
+  - question: "How do I create basic API tests in Postman?"
+    answer: "First download Postman for free from https://www.postman.com/downloads/, then create a collection (the folder that holds your requests), add a request to your API, and write your checks in the request's `Tests` tab. The post tests `slack.com/api/team.info` with seven checks, then re-runs the request and views pass/fail results in the `Test Results` tab."
+  - question: "What does a successful-response test check for the Slack API?"
+    answer: "The post's seven tests check that the `Content-Type` header is present, that it is `application/json`, that there is a response body, that the body is valid JSON, that the body contains `ok: true`, that `team.name` is `ProstDev`, and that the status is 200 OK."
+  - question: "How is a negative-scenario test different from a successful-response test?"
+    answer: "A negative-scenario test expects an error back, verifying that an incorrect request does return the error you anticipated. The post copies the same successful tests and makes minor tweaks: test #5 checks for `ok: false` instead of `ok: true`, and test #6 checks for `error: unknown_method`. Test #7 stays unchanged because Slack returns status 200 even when the request errors."
+  - question: "How do I run all my Postman tests at once?"
+    answer: "Click the `Runner` button on the top-left of Postman, select your collection in the window that opens, and click the blue `Run` button at the bottom. Postman's Runner runs all your requests and tests and gives you a visual report; in the post's example it reported 14 passed and 0 failed."
+  - question: "How does regression testing help when I add new functionality?"
+    answer: "Before pushing your code to the remote repository, you run the set of regression tests with Postman's Runner; if even one test fails, you know you broke functionality you weren't aware of, so you go back and fix the error and re-run all the tests until everything passes and your new functionality works as expected."
 ---
 
 *Gist file with the tests script and GitHub repository with the Postman collection can be found at the end of the post.*

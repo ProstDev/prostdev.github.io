@@ -40,6 +40,19 @@ readerNotes:
     date: 2024-01-25
     replyTo: Praveen Kumar
     text: "Actually! I found the error. If we gave the wrong function name this error will born!"
+faqs:
+  - question: "What does the Anypoint Connector for Amazon Lambda let me do?"
+    answer: "It enables you to execute AWS Lambda operations within your Mule flows, and you can then use the response of the Lambda operation to process another Mule flow as needed."
+  - question: "How do I get the access key and secret key needed for the Lambda connector?"
+    answer: "You create an IAM user in AWS with the programmatic AWS credential type, attach the `AWSLambda_FullAccess` policy directly, and create the user; on the success screen you make a note of the Access Key ID and Secret access key because you cannot retrieve them again."
+  - question: "Which Lambda operations are available in the Mule Palette after adding the connector?"
+    answer: "After adding the Amazon Lambda Connector dependency you can see Get Function, Invoke, Invoke Async, and List Functions in the Mule Palette."
+  - question: "What's the difference between invoking a Lambda function synchronously and asynchronously?"
+    answer: "To invoke a function asynchronously you set InvocationType to Event, while for synchronous invocation details about the function response, including errors, are included in the response body and headers, and for either type you can find more information in the execution log and trace."
+  - question: "Why might I get an AMAZON-LAMBDA:NOT_FOUND error returning status code 404?"
+    answer: "As noted in the reader comments on this post, that error appears when the wrong function name is given to the Invoke connector."
+  - question: "Should I hardcode the connector configuration details in a real project?"
+    answer: "No; the configuration details were entered directly only for simplification, and it is always recommended to externalize these details and encrypt the sensitive data."
 ---
 
 In this blog post, I will demonstrate how to Integrate AWS Lambda with MuleSoft. The GitHub repository with the Mule Project can be found at the end of the post.

@@ -11,6 +11,19 @@ author: "Soumyajit Sinha"
 category: Tutorials
 tags: [MuleSoft, DataWeave, Anypoint Studio]
 heroImage: ../../assets/blog/dynamic-variable-in-mulesoft.png
+faqs:
+  - question: "What problem does the dynamic variable approach solve?"
+    answer: "The assignment was to write the records belonging to a unique identifier into a variable when you do not know how many such unique identifiers will arrive in a particular batch. Since you cannot allocate a separate variable ahead of time for an unknown number of identifiers, the solution creates variables during runtime, building as many variables as there are unique identifiers in the batch and placing each record in its specific variable."
+  - question: "How do I read an Excel file from my local system in the flow?"
+    answer: "Use a `Read` component from the File palette and give it the location of the file, then add the MIME Type, which for an Excel file is `application/xlsx`. To get the path on Windows, right-click the file, open the Security tab, and copy the Object Name shown at the top. Because Mule does not understand the backslash, replace every `\\` with `/` so a path like `C:\\Users\\Documents\\Test Files\\<<File Name>>` becomes `C:/Users/Documents/Test Files/<<File Name>>`."
+  - question: "How does the flow split the query string to drive the dynamic variable?"
+    answer: "On the onset of the flow the queryString is captured from the URL, then inside the payload it is split by the separator `=` using a Set Variable named `segBy` with the value `vars.queryString splitBy \"=\"`. With a query string of Company=ImaginaryA, `segBy[0]` becomes Company (the feature to segregate by) and `segBy[1]` becomes ImaginaryA (the value to retrieve)."
+  - question: "How is the variable name created at runtime?"
+    answer: "A local variable `dynamicVar` is built from the feature in the query string, written as `dynamicVar = payload[vars.segBy[0] as String] as String`, which creates a placeholder per company in the payload. The script then checks whether the company-named variable already exists; if it does, it pushes the records into that existing variable, and if it does not, it creates the company-named variable and then inserts the records."
+  - question: "How do I retrieve the records for a specific company at the end?"
+    answer: "The email body summons the variable with `vars[vars.segBy[1]]`. Since the example payload has four companies, four variables are created, and because `segBy[1]` returns ImaginaryA from the query string, that command accesses the variable created for ImaginaryA, so the received email lists only the ImaginaryA records."
+  - question: "Where can I find the Mule project for this post?"
+    answer: "The GitHub repository with the Mule project is linked at the end of the post at https://github.com/ProstDev/dynamic-variable-mule."
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*

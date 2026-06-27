@@ -7,6 +7,17 @@ category: Tutorials
 tags: [MuleSoft, Kafka, Oracle, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/mulesoft-connected-with-oracle-streaming-service-using-the-kafka-connector.png
+faqs:
+  - question: "How do I connect MuleSoft to Oracle Streaming Service?"
+    answer: "Because MuleSoft has no connector for OCI Streams but does have a Kafka connector, you use the Kafka compatibility mode that Oracle Streaming Service offers. First create a stream in Oracle Cloud, then build a Mule app with the Kafka Message listener processor pointing at that stream, configuring the connection with the bootstrap server, group ID, topic, and SASL/PLAIN credentials from OCI."
+  - question: "Which Kafka connection type should I select for OCI Streaming?"
+    answer: "Of the five options the connector offers (Consumer Plaintext, Consumer Kerberos, Consumer SASL/PLAIN, Consumer SASL/SCRAM, and Consumer SASL/TOKEN), you need to use the Consumer SASL/PLAIN Connection, which is option c."
+  - question: "Where do I get the bootstrap server, username, and password for the Kafka connector?"
+    answer: "Go back to the OCI Console and click the Default Pool of your newly created stream, then click Kafka Connection Settings on the left. The bootstrap server shown there is what you input in the MuleSoft connection window, the username is the element labeled username inside the SASL Connection String box (copy the whole string), and for the password you create an `AUTH_TOKEN` from the user's Auth Tokens page."
+  - question: "Why do I need to enable TLS Configuration in the Kafka connector?"
+    answer: "A tricky but required step is telling the connector you want to use SSL, so you go to the Security tab and enable the TLS Configuration. Even though there will be no actual configuration entered on that tab, you still need to enable it for the connection to work."
+  - question: "What do I need to provide when creating the stream in Oracle Cloud?"
+    answer: "Creating a stream is straightforward: click the blue Create Stream button and fill in the name for your stream, select the compartment where you want to create it, create a new Stream Pool, and define the number of partitions. You don't need to worry about anything extra."
 ---
 
 Apache Kafka is a very popular streaming service, and I could say that it is the leader in the market. Is part of the Apache Initiative, but vendors like Confluent offer a managed service that can be very powerful for organizations who are looking to start using the platform, without the need to control/manage the underlined infrastructure.

@@ -8,6 +8,17 @@ category: Guides
 tags: [API, REST, HTTP]
 draft: false
 heroImage: ../../assets/blog/understanding-apis-part-4-what-is-a-uri.png
+faqs:
+  - question: "What's the difference between a URL and a URI?"
+    answer: "A URL (Uniform Resource Locator) is the web address you use in your browser to retrieve a website, while a URI (Uniform Resource Identifier) is the broader term. A URL is actually just a form of URI, and many people use both terms interchangeably in the API world. For this series, a URL is mostly used for visual websites and a URI is what we use to call our APIs."
+  - question: "How can I make a JSON response easier to read?"
+    answer: "When a response comes back as raw JSON like `{\"id\":131,\"type\":\"general\",\"setup\":\"How do you organize a space party?\",\"punchline\":\"You planet.\"}`, you can paste it into a JSON formatter website such as https://jsonformatter.curiousconcept.com/ and click Process to get an indented, human-readable version."
+  - question: "Why can I open the Joke API links directly in my browser?"
+    answer: "Because the Joke API endpoints all use GET as the HTTP method, you can open the links directly in your browser (or just click them) and see the returned joke in JSON format, such as the random joke at https://official-joke-api.appspot.com/random_joke."
+  - question: "What is the host part of a URI?"
+    answer: "The host is the part of the URI that remains the same even when you change the path you're using to retrieve different information, just like how \"google.com\" doesn't change even after you search for something."
+  - question: "What is the difference between HTTP and HTTPS in a RESTful API URI?"
+    answer: "Both the HTTP and HTTPS protocols are used when calling RESTful APIs, and HTTPS is just a secure way to call HTTP."
 ---
 
 We are slowly starting to get a sense of what an API is. So far, we’ve been learning, piece by piece, some of the components that define an API. Let’s take a look back at what we’ve learned:

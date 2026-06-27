@@ -11,6 +11,15 @@ tags: [MuleSoft, DataWeave]
 youtubeId: MAZC_pLl-2c
 draft: false
 heroImage: ../../assets/blog/how-to-retrieve-the-number-of-years-months-or-days-between-two-dates-in-dataweave-2-0.png
+faqs:
+  - question: "How do I get the number of years, months, or days between two dates in DataWeave 2.0?"
+    answer: "Use the `between` function from the Periods module, which returns a Period like `\"P31Y2M19D\"`, and then pull out each part with a field selector: `period.years` gives the years, `period.months` the months, and `period.days` the days."
+  - question: "How do I import the `between` function?"
+    answer: "Because `between` lives in a different module, you import it first. In this post it is brought in explicitly with `import between from dw::core::Periods`."
+  - question: "Why not use `daysBetween` to calculate someone's age?"
+    answer: "The author started with `daysBetween` and then manually counted the days to convert them to years, but that led to a wrong answer, which is why the post switches to the `between` function from the Periods module instead."
+  - question: "How can I get the same outputs as the post instead of today's date?"
+    answer: "The post uses a specific date, `\"2021-03-20\" as Date`, rather than the `now` function so you receive the same outputs as the author; you can use `now()` instead of the fixed date to refer to today's date."
 ---
 
 I was working on a pretty fun API for some demo purposes, and I needed to get a person’s age. Of course, my first instinct was to jump right into it and start using different core functions. *(By the way, if you haven’t seen my DataWeave 2.0 core functions cheat sheet, check it out* [here](https://www.prostdev.com/post/dataweave-2-0-core-functions-cheatsheet)*!)*

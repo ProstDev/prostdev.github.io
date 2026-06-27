@@ -9,6 +9,17 @@ tags: [MuleSoft, DataWeave, Anypoint Code Builder, Docker, MySQL]
 youtubeId: uV_ncdIoJQI
 draft: false
 heroImage: ../../assets/blog/connect-mysql-docker-to-mulesoft-acb-vs-code.png
+faqs:
+  - question: "Which VS Code extensions does this tutorial use?"
+    answer: "Three extensions: Container Tools to run MySQL with a single click, Database Client to create tables and test queries, and Postcode to test your API endpoints. The Anypoint Extension Pack and a running Docker Desktop are also listed as prerequisites."
+  - question: "How do I connect to the MySQL container with the Database Client extension?"
+    answer: "Open the Database panel in VS Code, click + New Connection and select MySQL, then enter Host `127.0.0.1`, Port `3306`, User `user`, Password `password`, and Database `mysqldb`, and save and test the connection — it should succeed."
+  - question: "How does the get-all-tasks sub-flow work?"
+    answer: "It starts with a Logger marking the beginning, then builds the SQL query with the `dw/get-all-tasks-request.dwl` DataWeave script, runs a `db:select` against MySQL using `Mysql_Database_Config` where `#[payload]` is the SQL string from the previous step, transforms the DB results into JSON with the `dw/get-all-tasks-response.dwl` script, and ends with a Logger marking completion."
+  - question: "Why are the request and response transformations split into two separate DataWeave files?"
+    answer: "Using a separate DataWeave script to build the SQL query keeps the SQL logic separate from the flow, and a second script shapes the raw DB results into a clean JSON response — keeping the query building and the response formatting as distinct steps."
+  - question: "Why does the API return an empty JSON array when I first test it?"
+    answer: "Because the table is created but no data has been inserted yet, so sending a `GET http://localhost:8081/api/tasks` request from Postcode returns an empty JSON array `[]` until you insert rows later, even though the flow is working and ready for data."
 ---
 
 In this tutorial, you’ll learn how to connect a **MySQL database running in Docker** to a MuleSoft project in **Anypoint Code Builder (ACB)** — all inside **VS Code**, without ever leaving your IDE.

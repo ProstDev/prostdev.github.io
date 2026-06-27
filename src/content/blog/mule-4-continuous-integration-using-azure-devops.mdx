@@ -7,6 +7,19 @@ category: Tutorials
 tags: [MuleSoft, Azure DevOps, CloudHub, CI/CD, RAML]
 draft: false
 heroImage: ../../assets/blog/mule-4-continuous-integration-using-azure-devops.png
+faqs:
+  - question: "What is the role of the test and emoran branches in this pipeline?"
+    answer: "In this sample the `emoran` developer branch is where the pipeline reviews the build (running a `clean install`), while the `test` branch is where the application is deployed to CloudHub; you promote changes from `emoran` to `test` via a Pull Request to trigger that deployment."
+  - question: "Why do I need a personal access token in Azure DevOps?"
+    answer: "Once created, the personal access token becomes your project password, so you keep it safe and use it when the terminal asks for a password while pushing your code to the Azure repository."
+  - question: "How do I verify my settings.xml and pom.xml are set up correctly before building the pipeline?"
+    answer: "You can verify everything works locally by running `mvn clean install -s settings.xml -e` before creating the pipeline."
+  - question: "Where in the pom.xml do I configure where the application gets deployed?"
+    answer: "You specify where to deploy your application with the `cloudHubDeployment` configuration inside the `mule-maven-plugin` tag, and you specify where your source-control repository lives in the `scm` and `distributionManagement` sections of the `pom.xml`."
+  - question: "How does the pipeline know whether to just build or to actually deploy?"
+    answer: "The modified pipeline YAML has two `Maven@3` tasks: the deploy task carries a condition `eq(variables['Build.SourceBranch'], 'refs/heads/test')` so a `clean deploy` only runs on the `test` branch, while the other task runs a `clean install` build, and you set the credentials it needs (Anypoint, the Azure token, and Nexus) as pipeline Variables."
+  - question: "Where can I find the complete project code?"
+    answer: "The complete code is available in the GitHub repository at https://github.com/emoran/mule4-yucelmoran-azure-pipeline."
 ---
 
 *GitHub repository with the project can be found at the end of the post.*

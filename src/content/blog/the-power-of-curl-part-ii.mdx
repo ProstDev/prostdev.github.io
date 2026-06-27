@@ -7,6 +7,17 @@ category: Tutorials
 tags: [MuleSoft, cURL, API]
 draft: false
 heroImage: ../../assets/blog/the-power-of-curl-part-ii.png
+faqs:
+  - question: "How do I specify the HTTP request method in a cURL command?"
+    answer: "Use the `--request` option (or its short form `-X`) followed by the method and the URL, for example `curl --request <method> '<url>'` or `curl -X <method> '<url>'`. The article also recommends wrapping the URL in single quotes, especially when passing query parameters."
+  - question: "Why does cURL return \"SSL certificate problem: self signed certificate\"?"
+    answer: "That error appears when the certificate presented by the API host is not from a trusted source and is not in your machine's trust store. In the article it happens when invoking a local Mule API configured for HTTPS with a self-signed certificate, since a self-signed certificate is not trusted."
+  - question: "How do I get past the self-signed certificate error in cURL?"
+    answer: "The article covers two of the four options cURL offers: first, you can disable SSL certificate validation by adding the `--insecure` or `-k` option, which the author recommends only for invoking or testing internal APIs from a host you trust; second, you can provide the certificate during the invocation with `--cacert <cert_path>`, which keeps SSL certificate validation in place and is therefore the safer option."
+  - question: "What is the difference between the `--insecure` option and the `--cacert` option?"
+    answer: "The `--insecure` (or `-k`) option disables peer SSL certificate validation entirely, while the `--cacert` option lets you reference a saved copy of the host's certificate so validation stays in place. Both let you successfully get a response from the Mule API, but `--cacert` is the safer choice because validation is not disabled."
+  - question: "Why did the request to the JSON Placeholder API work without any certificate options?"
+    answer: "It works because the server hosting https://jsonplaceholder.typicode.com has a digital certificate issued by a trusted Certificate Authority. When the HTTPS request is made the server presents that certificate, and because it is in the API client's trust store the client recognizes the server as trusted and accepts the response."
 ---
 
 Welcome to part II of the The Power of cURL. If you are new to cURL, I recommend checking out my previous post [here](https://www.prostdev.com/post/the-power-of-curl). There I provide an overview of cURL and how to invoke HTTP methods from the command line. I go into detail on how to invoke APIs using HTTP GET and POST requests, as well as how to pass query parameters, URI parameters and headers. This post will explain how to invoke APIs using HTTPS via **cURL**.

@@ -16,6 +16,19 @@ readerNotes:
     replyTo: "Chintan Vashi"
     text: "Hi Chintan, thanks so much for the kind words! 😄 Honestly? I'd just go with the Desktop IDE. The Cloud IDE is a lot to process and it leans on your browser's memory, so it can get heavy fast — for both on-prem and CloudHub 2.0 deployments I find the desktop version smoother to work in. Prost! 🍻"
     date: 2026-06-22
+faqs:
+  - question: "What do I need to install before using Anypoint Code Builder?"
+    answer: "Install Git from https://git-scm.com/downloads and Visual Studio Code from https://code.visualstudio.com/ first, and only then install the Anypoint Extension Pack — install the full pack rather than individual extensions, and restart VS Code completely afterward."
+  - question: "Do I need to install Java manually for Anypoint Code Builder?"
+    answer: "No — you don't need to install Java manually because ACB does it for you, and in future versions ACB may also install Git automatically."
+  - question: "How is Anypoint Code Builder different from Anypoint Studio?"
+    answer: "ACB runs inside VS Code rather than as its own app, so you start a project from the MuleSoft tab instead of the \"File > New Project\" menu, you can't import JAR files or projects directly, and you should always open the root folder (with your src, `pom.xml`, etc.) to work on projects."
+  - question: "How do I build a Hello World Mule app in ACB?"
+    answer: "Go to the MuleSoft tab and choose \"Develop an Integration,\" name it helloworld, pick a folder and the latest runtime and Java version, then use the UI builder to add an HTTP Listener with the path /hello, add a Transform Message component that outputs \"Hello World,\" and add a Logger to print the payload — it then returns Hello World at http://localhost:8081/hello."
+  - question: "How do I run and debug my Mule app in VS Code?"
+    answer: "Use the Run and Debug panel in VS Code and click \"Start Debugging,\" then test with a tool like Postcode or Postman by hitting localhost:8081/hello; you can add breakpoints directly in the XML or via the UI, watch variables like payload or check flow attributes, and use the Command Palette's Format Document to format XML files."
+  - question: "Do I have to log in to the Anypoint Platform to get started?"
+    answer: "Not right away — you can sign in with the \"Sign in with Anypoint Platform\" option in the ACB panel, but you can skip this for now if you're just testing locally."
 ---
 
 If you're new to MuleSoft—or making the switch from Anypoint Studio—you might be wondering: **how do I even begin with Anypoint Code Builder (ACB)?** This post will walk you through the **entire setup process of ACB locally in Visual Studio Code**, from installation to building and testing your very first “Hello World” Mule application.

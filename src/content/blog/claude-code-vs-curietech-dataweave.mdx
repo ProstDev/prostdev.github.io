@@ -9,6 +9,17 @@ category: Opinion
 tags: [MuleSoft, DataWeave, Visual Studio Code, AI, CurieTech AI, Claude Code]
 youtubeId: C0QB4Z1LwxM
 heroImage: ../../assets/blog/claude-code-vs-curietech-dataweave.png
+faqs:
+  - question: "Which AI wrote better DataWeave, Claude Code or CurieTech AI?"
+    answer: "There was no clear winner. Both got the correct answer on all 4 puzzles and their Playground execution times were within milliseconds of each other, so the real differences showed up in code readability, type usage, error handling, and whether the AI runs the code before handing it back. Pick Claude Code if you value workflow integration and live in VS Code; pick CurieTech AI if you value verified-running code, typed function signatures, and inline performance notes."
+  - question: "What's the difference between how Claude Code and CurieTech AI handle the generated code?"
+    answer: "CurieTech executes the DataWeave it generates before returning the answer, while Claude doesn't and just produces code and hopes for the best. That difference surfaced a runtime error in Claude's Day 2 solution that only appeared when run locally, requiring a second pass; CurieTech never had that problem."
+  - question: "Why does CurieTech AI write typed function signatures and does it matter?"
+    answer: "CurieTech writes typed signatures like `fun curietech(input: Array<Number>): Number = ...` whereas Claude produced an untyped `fun claude(input) = ...`. When you're reading code cold or coming back to it months later, those types make a huge difference."
+  - question: "How was the benchmark set up?"
+    answer: "Claude Code ran as a VS Code extension in MAX effort mode on Sonnet 4.5, and CurieTech AI was tested two ways: Day 1 via the CurieTech MCP server inside Claude Code, and Day 2 directly through the chat at https://platform.curietech.ai. The challenges were Advent of Code 2025 Days 1 and 2, both parts, benchmarked with `dw::util::Timer::time()` in the DataWeave Playground."
+  - question: "Which tool is the better entry point for someone newer to DataWeave?"
+    answer: "CurieTech is probably the gentler entry point for someone newer to DataWeave or AI coding tools, because the chat UI is approachable and the verified-solution guarantee is reassuring. Experienced devs already deep in the Claude Code ecosystem may prefer Claude Code with the CurieTech MCP server as a hybrid that adds verification to the workflow."
 ---
 
 Two AIs. Four DataWeave puzzles. One question:

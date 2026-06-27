@@ -10,6 +10,17 @@ author: "Leonardo Gonzalez"
 category: Guides
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/dataweave-parsing-date-modes-smart-strict-and-lenient.png
+faqs:
+  - question: "What are the three DataWeave date parsing modes?"
+    answer: "When parsing date and time values, the `mode` parameter has three valid values: `SMART`, `STRICT`, and `LENIENT`. You set it alongside the `format` when coercing a value with the `as` operator, for example `badDate as Date {mode: \"STRICT\", format: dateFormat}`."
+  - question: "What is the default DataWeave date parsing mode?"
+    answer: "The default mode when parsing dates is `SMART`, so you get the same result whether you explicitly set `mode: \"SMART\"` or leave the `mode` parameter out entirely."
+  - question: "How does SMART mode handle an invalid date like 02-31-2020?"
+    answer: "SMART mode autocorrects the invalid date to the nearest valid one. Parsing `02-31-2020` in `MM-dd-yyyy` format returns `02-29-2020`, the valid date two days before the input, since February 2020 ended on the 29th."
+  - question: "What's the difference between SMART and LENIENT mode?"
+    answer: "Both return a valid date, but in opposite directions: SMART shifts back to the last valid date while LENIENT shifts forward. For `02-31-2020`, SMART gives `02-29-2020` while LENIENT gives `03-02-2020`, moving forward the same number of invalid days that fall between the last valid date and the input."
+  - question: "Why should I use STRICT mode when parsing dates?"
+    answer: "STRICT mode validates the input date and returns an error instead of silently transforming an invalid value, for example raising \"Cannot coerce String (02-31-2020) to Date\" for an impossible date. Use it when your goal is to validate input, so you avoid transforming bad dates and sending inconsistent information to downstream APIs or backends."
 ---
 
 We know that in DataWeave the types can be coerced from one type to another. For that we use the **as** operator.

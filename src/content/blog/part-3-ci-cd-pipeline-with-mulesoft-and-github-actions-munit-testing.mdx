@@ -7,6 +7,19 @@ tags: [MuleSoft, GitHub Actions, MUnit, CI/CD]
 youtubeId: ksAOahtpd6g
 draft: false
 heroImage: ../../assets/blog/part-3-ci-cd-pipeline-with-mulesoft-and-github-actions-munit-testing.png
+faqs:
+  - question: "Why do I need Nexus credentials to run MUnits in the CI/CD pipeline?"
+    answer: "You need enterprise Nexus credentials to run the MUnits in the pipeline because of some dependencies. The post notes you didn't need these credentials before, and that you do not need Nexus credentials to run the MUnits from Studio, only to run them with Maven."
+  - question: "Which secrets do I add to the GitHub repository for MUnit testing?"
+    answer: "On top of the secrets added in the previous articles (`ANYPOINT_PLATFORM_PASSWORD`, `ANYPOINT_PLATFORM_USERNAME`, and `DECRYPTION_KEY`), you add two more for the Nexus credentials: `NEXUS_USERNAME` and `NEXUS_PASSWORD`. You set these under Settings, then Secrets and variables, then Actions, using New repository secret."
+  - question: "How does the pipeline make the build and deploy jobs wait for the tests?"
+    answer: "A new `test` job runs the MUnits first, and the line `needs: test` is added under the build job so the jobs run synchronously, meaning the build (and then deploy) only continues after the test job."
+  - question: "Why is `-DskipMunitTests` added to the build and deploy Maven commands?"
+    answer: "Because the tests are already run in the first `test` step, there's no need to re-run them, so `-DskipMunitTests` is added to the two Maven commands from build and deploy."
+  - question: "Where do I put the settings.xml and what does it configure?"
+    answer: "You create a new `.maven` folder at the root of your project and create a `settings.xml` file inside it. It sets up the specific credentials, profiles, and repositories for the enterprise Nexus repository, and its Nexus username and password match the environment variables sent through the `build.yml` file (without hardcoding the credentials)."
+  - question: "Do I need to change my pom.xml to run the MUnits?"
+    answer: "No, there's nothing to add to your `pom.xml` this time. The MUnit dependencies and needed configuration should be added automatically by MuleSoft once you add the tests to your code, though the post includes the author's full pom in case you want to compare it with yours."
 ---
 
 In the [previous article](https://www.prostdev.com/post/part-2-ci-cd-pipeline-with-mulesoft-and-github-actions-secured-encrypted-properties), we learned how to add a decryption key to your CI/CD pipeline to be able to decrypt your encrypted properties at runtime. If you haven’t been following the series or you’re not familiar with GitHub Actions, we recommend you start from the [first article](https://www.prostdev.com/post/how-to-set-up-a-ci-cd-pipeline-to-deploy-your-mulesoft-apps-to-cloudhub-using-github-actions) to understand how we are setting up all the configurations we need.

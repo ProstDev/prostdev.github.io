@@ -8,6 +8,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Studio, DataWeave]
 draft: false
 heroImage: ../../assets/blog/scaffold-mule-flows-from-published-api-specification-1.png
+faqs:
+  - question: "Why would I scaffold Mule flows from an API specification instead of starting from scratch?"
+    answer: "Scaffolding lets you get started on your Mule application with a base project that is created upon your specification, instead of starting the Mule project and Mule flows from scratch. Once you scaffold the project you get Mule flows for each HTTP method in your specification, basic error handling for different HTTP status codes, and an initial Mule project with some Transform Message components where applicable."
+  - question: "What do I need before I can scaffold flows from a published API spec in Anypoint Studio?"
+    answer: "You need an Anypoint Platform account (a free trial works), an API specification already published in Anypoint Exchange, and Anypoint Studio, which is MuleSoft's Eclipse-based IDE. If this is your first time creating an API specification, the post links to a separate guide on using the visual API Designer to create one."
+  - question: "How do I import the published API into a new Mule project?"
+    answer: "First open Anypoint Studio and click `Create a Mule project`, then give it a name. Next click the green plus button under `Import a published API` and select `from Exchange`. Follow the prompts to authenticate by clicking `Add Account` and entering your Username and Password, then search for your API Specification, select it, click `Add >`, and finally click `Finish` to generate the project."
+  - question: "What error handling gets generated automatically in the scaffolded project?"
+    answer: "Error Handling is added automatically to the main flow, containing the HTTP status codes for some basic errors like 400 Bad Request or 404 Not Found, implemented with On Error Propagate scopes for cases such as BAD_REQUEST and NOT_FOUND."
+  - question: "Why do some of the generated flows already include a Transform Message component?"
+    answer: "Some flows already have a Transform Message component so you can see which DataWeave code is needed to retrieve data like the URI Parameter(s), which only happens if your API Specification contains a URI Parameter. Transform Message components are also added for cases where you have set up an example in the API Specification."
 ---
 
 In this post, I am going to show you how to scaffold your flows in Anypoint Studio from a published API specification.

@@ -10,6 +10,17 @@ tags: [MuleSoft, Salesforce, Data Cloud]
 youtubeId: hbrxfIfP4fI
 draft: false
 heroImage: ../../assets/blog/part-5-data-cloud-mulesoft-integration.png
+faqs:
+  - question: "What does the upsert operation do behind the scenes?"
+    answer: "When you call the POST `/api/bulk/upsert` request, the Mule application creates a new Job, uploads the data, and closes it with the *UploadComplete* status, transforming your input body into a CSV that Data Cloud can read. If anything goes wrong while uploading, the Job is aborted instead, and either way you receive a response with the details of the Job."
+  - question: "What are the stages a bulk Job goes through?"
+    answer: "In the happy path you first create the Job, then upload the data to it, then close it with the *UploadComplete* status; after that Data Cloud queues the data and changes the Job's state to *InProgress*, and once processing finishes the state becomes *JobComplete*. The blue circles in the diagram are operations you perform with the Data Cloud connector, while the purple squares are state changes Data Cloud makes on its own."
+  - question: "When can I delete a Job?"
+    answer: "You can only delete a Job that is already closed and not being processed, meaning its state is UploadComplete (before it becomes InProgress), JobComplete, Aborted, or Failed. If the Job is in a different state, the delete request will try to Abort it first, which only succeeds if the Job is in an Open state."
+  - question: "Why do I get a 409-Conflict error when creating a Job?"
+    answer: "If a specific object already contains an open or in-progress Job, you can't create more Jobs for the same object and you receive a 409-Conflict error. You need to wait until that Job is Failed or JobComplete, or abort the other Open Job first if it hasn't been closed."
+  - question: "Which query parameters do the bulk requests need?"
+    answer: "The upsert request and the get job info request both need two query parameters, same as the streaming insertion: `sourceApiName` and `objectName`. The get all jobs request needs no query params or body, and the delete job request only needs the Job ID in the URI."
 ---
 
 Hello, hello! By this point, you should already have a full Mule application running in CloudHub and you have been able to call the Query/Streaming operations.

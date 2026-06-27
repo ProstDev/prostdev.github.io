@@ -7,6 +7,19 @@ tags: [MuleSoft, DataWeave, Visual Studio Code]
 youtubeId: _8kCFBdgX5A
 draft: false
 heroImage: ../../assets/blog/how-to-move-your-code-from-the-dataweave-playground-to-visual-studio-code.png
+faqs:
+  - question: "Why should I move from the DataWeave Playground to Visual Studio Code?"
+    answer: "The Playground runs in your browser, so it's limited to the amount of memory allocated in your browser and is mainly recommended for training purposes. Visual Studio Code is recommended when you want to develop more complex code and need more performance for bigger payloads."
+  - question: "What are the advantages of the DataWeave extension for VSCode over the Playground?"
+    answer: "The post lists handling bigger payloads, getting code suggestions, creating unit tests for your code, creating documentation for your code, and debugging your scripts, noting there are more advantages that weren't listed."
+  - question: "What do I need to install before using the DataWeave extension?"
+    answer: "Install Visual Studio Code, then install Java 8 and Maven version 3.6.3 or higher, and finally install the DataWeave extension for Visual Studio Code from the marketplace."
+  - question: "How do I export my code from the DataWeave Playground?"
+    answer: "From the DataWeave Playground, click the Export button at the top, which downloads a `.zip` file to your computer; extract its contents, and that root folder (containing a `pom.xml` file and a `src` folder) is the one you'll open from VSCode via File > Open Folder."
+  - question: "How do I enable AutoPreview so the output updates automatically?"
+    answer: "Without changing the AutoPreview settings you have to click the Run Preview button every time you change the script or payload. To have it update automatically like the Playground does, open the `main.dwl` file, right-click on the window, and select DataWeave: Enable AutoPreview; you can disable it again later with the Disable button."
+  - question: "What should I check if I don't get the correct output?"
+    answer: "Make sure you installed Java 8 and the appropriate version of Maven, as well as the latest version of VSCode."
 ---
 
 ![Photo by Safar Safarov on Unsplash.](../../assets/blog/how-to-move-your-code-from-the-dataweave-playground-to-visual-studio-code-1.png)

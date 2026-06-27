@@ -7,6 +7,19 @@ category: Guides
 tags: [MuleSoft, Anypoint Platform, CloudHub]
 draft: false
 heroImage: ../../assets/blog/implementing-mapping-rules-with-mulesoft-dedicated-load-balancer.png
+faqs:
+  - question: "What is a Dedicated Load Balancer in Anypoint Platform?"
+    answer: "It is an optional component within the Anypoint Platform used to route HTTP and HTTPS traffic to multiple applications deployed to CloudHub workers in the VPC."
+  - question: "Do I need a VPC before creating a Dedicated Load Balancer?"
+    answer: "Yes, to create a Dedicated Load Balancer you must first create the Anypoint VPC, which can be mapped to multiple environments, and the same Dedicated Load Balancer can be used for different environments. You can also use multiple DNSs for the same DLB, such as `api-dev.example.com` and `api-test.example.com`."
+  - question: "How do mapping rules and variables work on a DLB?"
+    answer: "Mapping rules translate an input URI to call applications deployed on CloudHub, where a pattern is a string defining a template for matching an input text. Whatever value is placed within curly brackets is treated as a variable, and variable names can contain only lowercase letters (a-z) and no other characters, including slashes."
+  - question: "How do I route requests to the correct environment when one DLB has both a Dev and a Test DNS?"
+    answer: "Use a subdomain variable in the mapping rule and name your applications in the format org-app-subdomain (for example org-ecommerce-api-dev for dev and org-ecommerce-api-test for test) when deploying to CloudHub, so a request on `api-dev.example.com` routes to the dev app and a request on `api-test.example.com` routes to the test app."
+  - question: "Why do version numbers use a dash instead of a dot in CloudHub application names?"
+    answer: "Because CloudHub doesn't allow you to use \".\" in the application name, so when routing by version you use \"-\" in the application name (for example org-ecommerce-api-dev-v1-0) even though the version in the request URL is written as v1.0."
+  - question: "If multiple mapping rules match a request, which one does the DLB apply?"
+    answer: "The DLB applies the first matching rule regardless of more exact matching rules available; a rule defined first at index 0 has higher priority, and the higher the index assigned, the less priority the mapping rule has."
 ---
 
 ## Introduction

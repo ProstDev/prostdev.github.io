@@ -10,6 +10,19 @@ category: Tutorials
 tags: [MuleSoft, API, cURL]
 draft: false
 heroImage: ../../assets/blog/the-power-of-curl.png
+faqs:
+  - question: "How do I check whether cURL is already installed?"
+    answer: "Open your command prompt on Windows or terminal on Mac/Linux and run `curl`. If you see the output `curl: try 'curl --help' for more information`, that is a good indicator cURL is installed on your machine. If not, you can do a fresh install from https://curl.se/download.html."
+  - question: "What's the difference between the short-hand and long-hand way to send a GET request?"
+    answer: "Both produce a GET request. The short-hand form is just `curl '<url>'`, while the long-hand form spells out the method explicitly as `curl --request GET '<url>'`."
+  - question: "How do I send query parameters with cURL?"
+    answer: "Append them to the URL after a `?`, separating multiple pairs with `&`, as in `curl --request GET 'http://localhost:8081/curl/helloget?firstname=Daffy&lastname=Duck'`. The author notes you should wrap requests with query parameters in quotes, because without the quotes cURL dropped the query parameters."
+  - question: "How do I add headers to a cURL request?"
+    answer: "Use the `--header` option with a `'<key>:<value>'` pair, and repeat `--header` once per header for multiple headers, for example a single `--header 'Authorization: Bearer xybaneoovganfZbe'` or two lines `--header 'client_id: bond'` and `--header 'client_secret: 0007'`."
+  - question: "How do I save the output of a cURL request to a file?"
+    answer: "Use the `--output` option followed by a filename, as in `curl --request GET 'http://localhost:8081/curl/helloget' --output output.txt`, which saves the response into that file."
+  - question: "How do I write a multi-line cURL command?"
+    answer: "It differs by shell: add `\\` at the end of the line to continue onto a new line from the command line terminal, and add `^` at the end of the line to do the same from the Windows command prompt."
 ---
 
 [Advanced Rest Client](https://install.advancedrestclient.com/install), [Postman](https://www.postman.com/downloads/) and [SoapUI](https://www.soapui.org/downloads/soapui/) are top API clients you may have used while building or testing API integrations. These applications are useful. However there are cases where invoking the API from the command line is advantageous and is made possible through **cURL.**

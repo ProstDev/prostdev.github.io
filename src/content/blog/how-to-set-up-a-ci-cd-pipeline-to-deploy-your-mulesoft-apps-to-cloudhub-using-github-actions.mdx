@@ -138,6 +138,19 @@ readerNotes:
     replyTo: "Wuilver Patricio"
     date: 2023-03-10
     text: "Muchas gracias!!"
+faqs:
+  - question: "Where do I put the build.yml file in my repo?"
+    answer: "Once your Mule application is in a GitHub repo, create a folder called `.github`, and inside it create another folder called `workflows`, then create the `build.yml` file there and paste in the pipeline contents. You can name this YAML file however you want; it doesn't have to be `build`."
+  - question: "Which GitHub Actions secrets does this pipeline need and how do I create them?"
+    answer: "It uses two repository secrets: `ANYPOINT_PLATFORM_PASSWORD` and `ANYPOINT_PLATFORM_USERNAME`. In your repository go to the Settings tab, then Secrets and variables > Actions, click New repository secret, enter the name `ANYPOINT_PLATFORM_PASSWORD` with the actual password you use to sign in to Anypoint Platform, click Add secret, then repeat for `ANYPOINT_PLATFORM_USERNAME` with the username you use to sign in to Anypoint Platform."
+  - question: "Why does the deploy job use the `needs` field?"
+    answer: "Jobs run asynchronously to each other, but the `build` job must run before the `deploy` job; otherwise there is no jar file to deploy to CloudHub. Adding `needs: build` inside the `deploy` job forces the `build` job to run first."
+  - question: "When does the pipeline run?"
+    answer: "The `on` field sets it to run anytime there's a push to the main branch, or when a Pull Request has been merged into the main branch. You can also set it up to run on a schedule, though the post doesn't go through that example."
+  - question: "How do I deploy a Mule app that uses a decryption key for secured properties?"
+    answer: "The Deploy to Sandbox step includes two commented-out lines for a decryption key. If your Mule application uses a key to decrypt secured properties, that's where you add it, and you should also create a `DECRYPTION_KEY` secret."
+  - question: "Why does the build rename the jar file with the commit hash?"
+    answer: "For troubleshooting purposes, the Stamp artifact step changes the generated jar file name to include the last commit's hash. This file name is visible in CloudHub so you can confirm the deployed application is the correct version."
 ---
 
 Creating CI/CD (Continuous Integration, Continuous Delivery) pipelines for your code has become a standard practice. Instead of worrying about deployments and keeping your environments up to date, you can set up this automated pipeline to do the deployments for you. You can focus on developing your code and let the pipeline take care of the rest.

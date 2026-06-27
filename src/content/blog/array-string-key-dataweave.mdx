@@ -9,6 +9,15 @@ category: Tutorials
 tags: [MuleSoft, DataWeave]
 youtubeId: 0VgIRB3JfZM
 heroImage: ../../assets/blog/array-string-key-dataweave.png
+faqs:
+  - question: "Why does distinctBy fail to remove a duplicate array even though the JSON output looks identical?"
+    answer: "Because the items inside the arrays are different types: one array is an `Array<String>` while the other is an `Array<String | Key>`. The JSON output renders both the same way, so you incorrectly see them as identical, but the type difference means `distinctBy` treats them as distinct and keeps both."
+  - question: "What's the difference between an `Array<String>` and an `Array<String | Key>` in DataWeave?"
+    answer: "In this post, an `Array<String>` is produced when no key was added to the array, while an `Array<String | Key>` results when you add keys and/or values and one of the items ends up coerced into a Key. Both can look the same in the JSON output, but the differing item types break equality checks between the arrays."
+  - question: "How do I fix the type mismatch so distinctBy works correctly?"
+    answer: "The first solution is to make sure any new items are of type String and not Key, so you are comparing two arrays of type `Array<String>`; the post does this by mapping each item with `item map ($ as String)` before `distinctBy $`, which correctly returns only one array."
+  - question: "What if I can't change the type of the items before comparing them?"
+    answer: "If you can't change the item types or it would take too many iterations, you can transform the items inside the `distinctBy` function itself using `distinctBy ($ joinBy \",\")`. The `joinBy` function turns each array's values into a concatenated string (both become \"key,string\") and then compares those, so the arrays are seen as the same and only one is returned."
 ---
 
 ## The Problem

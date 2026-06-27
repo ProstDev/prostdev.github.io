@@ -43,6 +43,17 @@ readerNotes:
     date: 2020-10-28
     replyTo: trekkan
     text: That's awesome!! Thank you for posting the fix for the issue with the DNS :D
+faqs:
+  - question: "Do I need to know Docker to run the DataWeave Playground?"
+    answer: "No, previous knowledge of Docker isn't needed to get the Playground running. The post walks you through installing Docker Desktop and the exact commands to run, so you can have it up and ready even if you don't know how to use Docker."
+  - question: "What command do I use to run the DataWeave Playground Docker image?"
+    answer: "After installing Docker Desktop, you run `docker run -d --name DWPlayground2 -p 9999:8080 machaval/dw-playground:2.3.1-SNAPSHOT`, replacing the name, the port, and the version with your own settings. You first grab the image from DockerHub at https://hub.docker.com/r/machaval/dw-playground/tags, then run that container command."
+  - question: "How do I open the DataWeave Playground after the container is running?"
+    answer: "Once the container is running you can click the \"Open in browser\" button from the Docker Desktop app, which opens the Playground automatically, or manually open your browser and go to `http://localhost:9999/`, replacing the port if you changed the 9999 port from the original command."
+  - question: "Can I run both DataWeave 1.0 and 2.0 Playgrounds at the same time?"
+    answer: "Yes, but if you intend to run both containers at the same time you should change the ports so they don't collide on your local computer. The author personally runs DW Playground version 1 on port 9998 and version 2 on port 9999."
+  - question: "How do I stop or remove the DataWeave Playground container?"
+    answer: "The Docker Desktop application provides buttons to stop and remove the containers. You can stop a running container with the \"Stop\" button and start it again with the \"Start\" button, with no need to re-run the command, and you can remove a container with the \"Delete\" button."
 ---
 
 You may already know about the DataWeave (DW) Playground that can be used for both versions of DW: 1.0 and 2.0. DataWeave version 1.0 is used in Mule 3, and DataWeave version 2.0 is used in Mule 4.

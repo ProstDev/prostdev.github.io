@@ -21,6 +21,15 @@ readerNotes:
       Hi Jefferson!
 
       I'm not the author of this article, but yes indeed is to help the Garbage Collection and also to release memory. Maybe for small projects it's not a big deal to add them or not, but I've seen big projects where it is important to remove the variables manually
+faqs:
+  - question: "How do I retry an HTTP request to a backend in MuleSoft?"
+    answer: "Put the HTTP request inside an `until-successful` scope, which is a default scope MuleSoft provides for retrying any event. You configure it with `maxRetries` (the number of retries the request will make to connect to the backend) and `millisBetweenRetries` (how long the application waits before the next retry)."
+  - question: "What's the difference between the retry mechanism and the reprocess mechanism?"
+    answer: "The retry mechanism uses the `until-successful` scope to re-attempt the HTTP call to the backend a set number of times; if it still can't connect after those retries, the reprocess mechanism takes over by calling a subflow from the main flow's On Error Continue handler, which moves the message through queues so it can be processed again later."
+  - question: "Why do I need to acknowledge the subscribed queue in both the happy and error scenarios?"
+    answer: "You have to acknowledge the subscribed queue in both the HAPPY and ERROR scenarios because if you don't, the queue will hold the message and it may lead to a duplicate process."
+  - question: "What are the dead letter queue and the parking queue used for?"
+    answer: "The dead letter queue works as an intermediate queue where a message is stored for re-processing after the retry process fails, passing two MQ properties: `reprocessCount` (a counter for the reprocess call) and `qname` (the main queue name the application subscribes to), while a properties-file value like `maxUserRegistrationReprocessAttempts` limits how many times the reprocess happens. The parking queue is the final destination if both the retry and reprocess mechanisms fail, ensuring 100% delivery of each message; from there an additional flow can push the landed messages back to the main queue."
 ---
 
 *GitHub repository with the Mule project and the spring boot application can be found at the end of the post.*

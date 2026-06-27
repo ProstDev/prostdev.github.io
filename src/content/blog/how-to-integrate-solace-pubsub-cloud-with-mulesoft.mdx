@@ -9,6 +9,17 @@ category: Tutorials
 tags: [MuleSoft, Solace, JMS, Salesforce, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft.png
+faqs:
+  - question: "How do I create a Solace Cloud account to follow this tutorial?"
+    answer: "You can create a free Solace trial account at https://console.solace.cloud/login, then click Sign Up and fill in your details; you will receive a welcome email, after which you can sign in with your credentials."
+  - question: "What's the difference between the Enterprise and Developer service types in Solace?"
+    answer: "Enterprise is a highly available Service on dedicated infrastructure with customizable connections, while Developer is a Service on dedicated infrastructure with 100 connections. In this tutorial the Developer type was selected."
+  - question: "Why do I need to convert the Solace PEM certificate to JKS for MuleSoft?"
+    answer: "After selecting the Solace Messaging protocol you can download the TrustStore certificate via the Download PEM link, and this PEM file must be converted to a JKS format using the KeyStore Explorer tool from https://keystore-explorer.org/downloads.html before importing it into your Mule project under `src/main/resources`."
+  - question: "What's the difference between Queues and Topics in Solace PubSub+?"
+    answer: "Queues allow one-to-one (Point-to-Point) communication and are typically used to send a single event to exactly one consumer, while Topics allow one-to-many (Publish-Subscribe) communication and are typically used to send a single event to multiple consumers."
+  - question: "Why is the JMS Acknowledgement Mode set to Manual when subscribing from the queue?"
+    answer: "In the On New Message component the Acknowledgement Mode is set to Manual because we want to delete the message in the queue only after further processing it and sending the positive Acknowledgement, which is done with the Positive Ack JMS connector after the Salesforce Account is created."
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*

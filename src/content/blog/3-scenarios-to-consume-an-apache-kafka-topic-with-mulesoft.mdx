@@ -7,6 +7,19 @@ category: Guides
 tags: [MuleSoft, Kafka, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/3-scenarios-to-consume-an-apache-kafka-topic-with-mulesoft-1.png
+faqs:
+  - question: "Does MuleSoft behave as anything special when reading from Kafka?"
+    answer: "No, in all of these scenarios MuleSoft behaves like a normal Kafka consumer. The connector is built on top of the official Kafka SDKs and is nothing more than that, which is why you need to understand Kafka itself to configure it properly and read messages as you expect."
+  - question: "What are the three scenarios for consuming a Kafka topic with MuleSoft?"
+    answer: "First, connecting to a specific Topic and Partition by explicitly configuring the adapter with Assignments; second, pointing just to the Topic name without specifying a partition so Kafka balances the consumers using Topic Subscription Patterns; and finally, running the configuration within a MuleSoft cluster on-premise in hybrid mode."
+  - question: "Why do I get duplicated messages when two flows read the same Topic and Partition?"
+    answer: "When you configure the connector with Assignments to point two consumers at the same partition of the same topic, you are telling Kafka you have two consumers wanting to read those messages, so both flows get triggered and process all the messages, duplicating them. It can be another flow or another application, but that configuration produces the duplication effect."
+  - question: "How do I connect to a specific Topic and Partition in the Kafka connector?"
+    answer: "In the Topics section of the connector configuration you select `Assignments`, and the next section then lets you specify which Topic and Partition to read from; you must supply both the Topic name and the partition number, as there is no way to continue the configuration without them."
+  - question: "How do I let Kafka balance the partitions across multiple MuleSoft consumers?"
+    answer: "Use `Topic Subscription Patterns` and provide only the Topic Name without specifying a partition; Kafka then balances the partitions across the different MuleSoft applications acting as consumers, and if one application goes down Kafka rebalances the partitions across the remaining consumers. In CloudHub you can simply increase the number of replicas to add consumers."
+  - question: "When should I enable the Primary node only checkbox on a MuleSoft cluster?"
+    answer: "Enable Primary node only when you point to a specific partition (Scenario 1) on a cluster and do not want duplicated messages, so only the master node reads from the partition and a newly elected master takes over on failure. For Scenario 2, where the point is to have multiple consumers reading, do not use it and keep it disabled, otherwise only the master node reads and you lose the other nodes' capacity."
 ---
 
 Apache Kafka is one of the best options in the market for data streaming. Developed by LinkedIn engineers and then opened up for the open-source community, it has been very well received (and used) by many organizations.

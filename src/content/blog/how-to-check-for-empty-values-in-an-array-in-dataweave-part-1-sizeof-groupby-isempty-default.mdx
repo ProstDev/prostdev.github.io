@@ -26,6 +26,17 @@ readerNotes:
       Yes, you can avoid if/else. That's a great catch!!
       You will see the other (and better) solutions in the last post of this series :D
       Stay tuned!
+faqs:
+  - question: "What does \"empty\" mean for the array values in this post?"
+    answer: "In this post an empty value means an empty string (`\"\"`), a null value (`null`), or an empty array (`[]`). The use-case assumes the array only contains strings or nulls, not objects, though the function is also tested against empty and non-empty objects."
+  - question: "How does the sizeOf, groupBy, isEmpty, and default approach work step by step?"
+    answer: "First you use `groupBy isEmpty($)` to split the array into a \"false\" field holding the non-empty values and a \"true\" field holding the empty ones, then you select the `\"true\"` field to get just the empty values, then you wrap it in `sizeOf` to count them, and finally you check `if ( sizeOf(...) > 0 ) true else false` to return a Boolean indicating whether the array contains empty values."
+  - question: "Why does coercing with `as Array` fail and how does the `default` operator fix it?"
+    answer: "Coercing the selected field with `as Array` fails when a `null` value is passed in instead of an array, because you cannot coerce Null to Array. Replacing `as Array` with `default []` solves this, since the `default` operator supplies an empty array when the value is null, letting `sizeOf` return 0 instead of failing."
+  - question: "Why does this function also work with objects even though that wasn't the original use-case?"
+    answer: "It works with objects because it relies on the `isEmpty` function, which accepts the Array, String, Null, and Object data types, so the `containsEmptyValues` function handles the Object data type as well even though the initial use-case only involved strings and nulls."
+  - question: "What are the drawbacks of this Part 1 solution?"
+    answer: "The post lists three cons: it is not very easy to read because of the many parentheses that can confuse maintainers, DataWeave still shows a warning even though the code runs without errors, and a `null` value and an empty array (`[]`) incorrectly return false when they should return true, which is a bug that needs to be fixed in later solutions."
 ---
 
 I had this use-case where I had to make sure all the values inside an [array](https://en.wikipedia.org/wiki/Array_data_structure) were not empty. By “empty,” I’m referring to an empty string (“”), a null value (*null*), or even an empty array ([]). There were some cases when I would receive a null value instead of an array. The array could only contain strings or nulls, but not objects. However, I’ll be adding tests to check for empty objects as well.

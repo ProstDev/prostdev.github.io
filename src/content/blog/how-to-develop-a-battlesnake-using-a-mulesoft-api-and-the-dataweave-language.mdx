@@ -6,6 +6,17 @@ category: Tutorials
 tags: [MuleSoft, DataWeave, GitHub, CloudHub]
 draft: false
 heroImage: ../../assets/blog/how-to-develop-a-battlesnake-using-a-mulesoft-api-and-the-dataweave-language-1.png
+faqs:
+  - question: "How do I get my own MuleSoft Battlesnake starter project?"
+    answer: "Go to the official list of Starter Projects in the Battlesnake documentation, scroll down to the Mule and DataWeave Battlesnake Quickstart project created by Manik Magar and open it, then on the GitHub repo click Use this template and select Create a new repository, give it a name, and click Create repository from template to generate your own copy."
+  - question: "Where do I write the logic that decides where my snake moves?"
+    answer: "All the move logic lives in the DataWeave file at `src/main/resources/dw/move-snake.dwl`. When your API receives a POST /move request with the current turn, that DataWeave code runs and returns a JSON object such as `{ \"move\": \"up\", \"shout\": \"Moving up!\" }` telling the game where to go next."
+  - question: "How do I personalize my snake's color, head, and tail?"
+    answer: "Edit the `battlesnake.config` values in `src/main/resources/application.yaml` — for example the `color`, `head`, and `tail` fields. You can browse the available head and tail options at https://play.battlesnake.com/customizations, and leaving the defaults still works fine if you don't want to customize anything."
+  - question: "Do I have to deploy to CloudHub, or is there a faster way to test?"
+    answer: "You can deploy the Mule app directly to CloudHub and take its URL, but deploying there can take a long time, so the author personally uses ngrok for local deployments: install ngrok, run your Mule application locally, run `ngrok http 8081`, and retrieve the public URL to expose your local app over the internet."
+  - question: "How do I add my deployed snake to a game on Battlesnake?"
+    answer: "Create an account at https://play.battlesnake.com, go to the Battlesnakes tab and click New Battlesnake, fill out the details and make sure you add `/api` to the end of your URL (CloudHub or ngrok). After saving, go to the Create Game tab, click Add to Game next to your snake, optionally add Official Bots or Public Battlesnakes, then click Start Game and press the play button."
 ---
 
 If you’re not familiar with the modern Battlesnake game, you must at least remember the snake game from those old cell phones. It’s basically the same, but developing APIs and deploying them to the cloud...And fighting other snakes 😂

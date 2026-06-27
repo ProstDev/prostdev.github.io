@@ -93,6 +93,17 @@ readerNotes:
     date: 2021-03-11
     replyTo: Kishan Mohan
     text: "Hi Kishan! No, you don't need to use Java. This was just an example that's using Java. And, yes! You can use that function to encode inside the Groovy script :) I didn't use it in this example because the problem was just to decode what was received from the server."
+faqs:
+  - question: "Why do I get the \"Illegal base64 character\" error in DataWeave?"
+    answer: "This error happens when the string you are trying to transform contains a character that is not recognized by the basic Base 64 alphabet. In the post's case, the server returned a Base 64 URL encoded string (like `cHJvc3RkZXY_YmxvZw==`) containing an underscore, which the basic alphabet doesn't include, so the `fromBase64` function throws `Illegal base64 character 5f`."
+  - question: "What's the difference between the basic Base 64 alphabet and the Base 64 URL alphabet?"
+    answer: "They differ in characters 62 and 63: the basic Base 64 alphabet uses plus (+) and slash (/), while the Base 64 URL (and Filename safe) alphabet uses minus (-) and underline (_). A string encoded with one alphabet may not be decodable with the other's decoding system."
+  - question: "How do I decode a Base 64 URL encoded string in Mule 4?"
+    answer: "You can't use the `fromBase64` DataWeave 2.0 function for a URL-encoded string, but you can use the Mule 4 Scripting Module: drop in an Execute component, select the Groovy engine, and run `Base64.getUrlDecoder().decode(payload)`. Make sure to add a Transform Message before it that casts the payload to a Java String (`output application/java` with `payload as String`)."
+  - question: "Why won't the fromBase64 DataWeave function decode my URL-encoded string?"
+    answer: "The `fromBase64` function transforms a basic Base 64 string, whose alphabet does not include the minus or underline characters used by the Base 64 URL encoding. When it hits an unrecognized character it throws an error, such as `Illegal base64 character 5f` for an underscore or `Illegal base64 character 2d` for a minus."
+  - question: "Why does my URI component string throw an Illegal base64 character error?"
+    answer: "Because a URI component string is not a Base64 encoded payload. As Alex notes in the comments, a string like `%7B%22type%22%3A%22block_actions%22` contains a percentage character (% - 25 in Hex) that doesn't exist in either Base 64 alphabet, and it's human-readable and lacks the trailing `==` of an encoded string. To convert it to JSON, use `read(decodeURIComponent(payload))` with the `dw::core::URL` module instead."
 ---
 
 Are you familiar with the fromBase64 or the toBase64 functions from DataWeave 2.0? What about the getUrlEncoder or the getEncoder functions from Java? Do you know the differences between the “basic” Base 64 encoding and the “URL and Filename safe” Base 64 encoding? Well, you may have guessed it by now, but you’re about to find out the answers to these questions!

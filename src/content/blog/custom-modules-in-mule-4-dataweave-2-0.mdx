@@ -9,6 +9,17 @@ readerNotes:
   - author: "Paul Smith"
     date: 2021-10-18
     text: "You should consider doing this instead of using the `p` function (which looks up the property every time the dw is run). `words joinBy \"${joinByChar}\"` as it's more performant as it is done at deployment time, instead of each run."
+faqs:
+  - question: "What is a custom module in DataWeave 2.0?"
+    answer: "A custom module is a piece of code stored in an external file so it can be reused in other parts of the Mule application. Unlike the regular modules such as `Arrays`, `Strings`, or `Objects`, custom modules are not created by MuleSoft, but by you or your company."
+  - question: "How do I create a custom module in a Mule 4 project?"
+    answer: "First create a `modules` folder inside your `src/main/resources` folder, then create a new `.dwl` file inside it (the post names it `Custom.dwl`), then add your function inside that file without the output data type or the three dashes before the code, and finally import it in your Transform Message by writing `import getSentenceFromWords from modules::Custom` under the output statement so you can call the function in your script."
+  - question: "Why would I use a custom module instead of copy-pasting the code?"
+    answer: "If the same piece of code is used in several parts of your application and you later need to change the functionality, copy-and-pasting means editing every DW script manually, whereas with a custom module you only change the function in the `Custom.dwl` file and every script referencing it automatically gets the new functionality."
+  - question: "How do I load a property into a custom module in DataWeave?"
+    answer: "Use the `p` function from the Mule module by calling `Mule::p('joinByChar')` to read the property defined in your `default-properties.yaml` file, rather than hardcoding the value in the script. The author notes that trying the plain `${ }` or `p(' ')` syntax from inside a custom module returns a DataSense error (at least for Mule Runtime 4.3.0 and Anypoint Studio 7.5.0)."
+  - question: "What is the benefit of reading the separator character from a properties file?"
+    answer: "Once the `joinByChar` value lives in the `default-properties.yaml` file, you can change the character that separates the words in the output sentence right from that file without touching any code, for example switching from a space to a dash to turn the output into \"Hello-ProstDev-:)\"."
 ---
 
 *GitHub repository with the Mule Project can be found at the end of the post.*

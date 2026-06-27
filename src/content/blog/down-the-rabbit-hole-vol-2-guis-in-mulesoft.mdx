@@ -7,6 +7,15 @@ category: Opinion
 tags: [MuleSoft, APIKit]
 draft: false
 heroImage: ../../assets/blog/down-the-rabbit-hole-vol-2-guis-in-mulesoft-1.png
+faqs:
+  - question: "How can Mule serve a web page or GUI?"
+    answer: "Mule can use the HTTP Load Static Resource handler to serve a webpage on a chosen URL and port, cross-referencing each requested URL with a file in a web directory that holds an index.html plus any needed .js, .css, or other resources. The post also notes you can write your own DataWeave-based 'webserver' engine, as the net-tools API does, to parse the requested URI and return the matching file."
+  - question: "Why would I add a GUI to a MuleSoft integration instead of just using logs?"
+    answer: "The post argues that technical logs serve technical operations but not functional operations: non-technical business or functional maintainers often won't understand or regularly check logs, and answering their recurring questions becomes a time sink. A well-designed interface lets functional operations see the data they want, such as live test insight or partially processed payloads, without interrupting the developers."
+  - question: "How do you make a Mule GUI display dynamic data instead of a static page?"
+    answer: "Using Ajax in the HTML page turns a static display into a page that dynamically shows whatever info you supply from the endpoint. In the author's example they stored partially processed payloads in dedicated Object Stores keyed by correlation ID, exposed them through a few API endpoints, and had Ajax populate a correlation-ID dropdown and GET the payload values to display them."
+  - question: "How can a Mule GUI be secured?"
+    answer: "The post says these flows can use security filters, like net-tools does, or be secured by API Manager policies so the page is only available to the users you choose. It also warns to remove such a tool once you're done and not expose it to the internet for long, to mind access controls and who you grant access to, and above all to sanitize and verify any input."
 ---
 
 *GUIs, you love em or you hate em.*

@@ -12,6 +12,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Platform, SSO, SAML, Oracle]
 draft: false
 heroImage: ../../assets/blog/anypoint-platform-single-sign-on-sso-saml-configuration-with-oracle-idcs-part-2.png
+faqs:
+  - question: "Which attributes can Oracle IDCS send to MuleSoft in the SAML assertion?"
+    answer: "In this article the attributes added in the IDCS Attribute Configuration are email, firstname, lastname, and Groups. These are the attributes that IDCS sends inside the SAML assertion and that MuleSoft maps into its own attributes; if your table is empty you need to add the needed attributes yourself."
+  - question: "How do I map an Oracle IDCS group to a MuleSoft role?"
+    answer: "First create a group in the IDCS console and assign your user to it, taking note of the group name. Then in MuleSoft Anypoint Platform go to the Roles section, click the role (here Cloudhub Admin Sandbox), click \"Set external group mapping\", type the group name you created at IDCS, choose the Identity Provider, click the add button, and finally click Save."
+  - question: "Why would I map groups to roles instead of assigning MuleSoft roles directly?"
+    answer: "Because your users are created and assigned to groups in your Identity Provider, which is the natural place to manage them. By mapping those groups to MuleSoft roles, once a user logs in through the Identity Provider and is authenticated and authorized, they already have their roles assigned and can start working on their duties without you assigning roles directly in MuleSoft."
+  - question: "How do I control which IDCS groups are returned to MuleSoft?"
+    answer: "For the Groups attribute the article sets it to Group Membership with the All Groups option selected, which returns all groups the user is a member of. The group filter dropdown also offers Equals and Starts with options, so users can belong to multiple IDCS groups while you filter to return just the ones the application needs; the article returns all of them to keep things practical."
+  - question: "What changes for the user after the attribute and group mapping is configured?"
+    answer: "Before the configuration the Oracle IDCS user showed as \"unknown unknown\" with only the email mapped and only the Cloudhub Admin Design role. After the next login the SAML response from IDCS returns firstname, lastname, email, and the list of groups, so the user's name information is populated and the additional Cloudhub Admin Sandbox role is assigned alongside the Design role."
 ---
 
 Our[last article](https://www.prostdev.com/post/anypoint-platform-single-sign-on-sso-saml-configuration-with-oracle-idcs-part-1) was about how to integrate MuleSoft Anypoint Platform with Oracle Identity Cloud Services. With this, you can use Oracle IDCS as your Identity Provider. This is very useful for Single Sign-On purposes, and if you already have Oracle Cloud Infrastructure and you are using MuleSoft to integrate it with Oracle SaaS apps, this alternative for SSO should be a good fit for you.

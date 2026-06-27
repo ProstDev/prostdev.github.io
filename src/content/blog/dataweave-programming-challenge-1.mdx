@@ -132,6 +132,19 @@ readerNotes:
       max(lines(payload) joinBy "," splitBy ",,"  map(
           sum($ splitBy ",") as Number
       ))
+faqs:
+  - question: "What is the goal of this DataWeave challenge?"
+    answer: "Create a DataWeave script that adds all the numbers separated by a paragraph, then retrieves the highest of those sums. For the sample input the first group sums to 3, the second to 12, the third to 15, and so on, and the expected output is 29."
+  - question: "How do I separate the input into paragraphs in DataWeave?"
+    answer: "Instead of splitting by `\"\\n\"`, split by `\"\\n\\n\"` first with the `splitBy()` function so the payload is separated by paragraph; then use `map()` to go through each paragraph and `splitBy()` again to separate each paragraph's individual lines."
+  - question: "Which functions does this challenge suggest using?"
+    answer: "The clues point you to `splitBy()` to break the text into paragraphs and then lines, `map()` to iterate over each paragraph, `sum()` to add all the numbers in a paragraph, and `max()` to return the highest number from the resulting array."
+  - question: "Why do some solutions coerce values with `as Number`?"
+    answer: "If some of the numbers come through as strings instead of numbers, you use `as` to coerce them to Numbers; the post notes this is a bug that will hopefully be fixed soon."
+  - question: "Where can I try solving this challenge?"
+    answer: "You can solve it directly on the DataWeave Playground at https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F1, and the challenge itself is based on Advent of Code 2022 day 1 at https://adventofcode.com/2022/day/1."
+  - question: "Is there only one correct solution?"
+    answer: "No, there are many ways to solve this challenge. The post provides several sample solutions so you can compare your result, and it recommends referring only to the DataWeave documentation at https://docs.mulesoft.com/dataweave/latest/ while you work through it."
 ---
 
 > [!NOTE]

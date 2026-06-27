@@ -9,6 +9,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Platform, SSO, SAML, Oracle]
 draft: false
 heroImage: ../../assets/blog/anypoint-platform-single-sign-on-sso-saml-configuration-with-oracle-idcs-part-1.png
+faqs:
+  - question: "Which side acts as the Identity Provider and which as the Service Provider in this setup?"
+    answer: "Anypoint Platform acts as the Service Provider, and Oracle Identity Cloud Services (IDCS) works as the Identity Provider (IdP)."
+  - question: "What do I need before starting this SSO configuration?"
+    answer: "You need an active Anypoint Platform instance (a 30-day trial works), an active Oracle IDCS tenant (a 300-credits free trial works), some knowledge of SAML 2.0, and an understanding of the role of an Identity Provider versus a Service Provider."
+  - question: "How does the metadata flow between Oracle IDCS and Anypoint Platform?"
+    answer: "First you create a SAML Application in Oracle IDCS and click Download Identity Provider Metadata to generate an XML file with all the Identity Provider information, then in Anypoint Platform you add a new SAML Identity Provider and import that metadata XML, which auto-fills almost all of the SAML configuration fields such as Sign On URL, Issuer, Public Key, and Audience."
+  - question: "What information do I need to copy from Anypoint Platform back into Oracle IDCS?"
+    answer: "You need four things from Anypoint: the audience that must match the Entity ID on the IDCS side, the assertion consumer URL, the certificate key downloaded as a `.pem` file from the Anypoint Keys tab, and the login URL your users will use to log in through Oracle IDCS."
+  - question: "How do I test that the SSO configuration works?"
+    answer: "Open a new browser and go to the login URL you copied, which looks like `https://anypoint.mulesoft.com/login/domain/<orgName>`, then click the Continue with Oracle IDCS button, sign in with your Oracle IDCS credentials, and you should be logged in to the Anypoint Platform dashboard."
 ---
 
 It is very common to have the need to login into the Anypoint Platform console ([https://anypoint.mulesoft.com](https://anypoint.mulesoft.com/)) using what the customer already has in terms of an Identity Provider and an Identity Repository (LDAP). This could be for different reasons, such as:

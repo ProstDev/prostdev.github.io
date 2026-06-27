@@ -102,6 +102,17 @@ readerNotes:
       2. Join the Slack workspace where you can have more dynamic discussions with the team. You can find the Slack link here: https://dataweave.mulesoft.com/
 
       Please feel free to contact me through LinkedIn or email in case I can help you with anything else!
+faqs:
+  - question: "Can the `default` keyword catch errors in DataWeave like `try`/`orElse` does?"
+    answer: "Yes, in some cases. The post shows that `(\"ABC\" as Number) default \"Invalid number\"` returns the same \"Invalid number\" string as wrapping the coercion in `try(() -> (\"ABC\" as Number)) orElse \"Invalid number\"` does, even though `default` is mainly meant for `null` values."
+  - question: "When does the `default` keyword actually handle an exception?"
+    answer: "According to the explanation from Mariano de Achaval cited in the post, `default` handles only some exceptions, specifically when you call a function that doesn't support `null` and when you try to coerce a value to a data type, like coercing the string `\"ABC\"` to a Number. It does not work for all possible exceptions."
+  - question: "Should I use `default` or `try` for error handling in DataWeave?"
+    answer: "The post notes that using `default` this way is available but not recommended, as Mariano wrote, and that it is better to use the `try` function instead, though it doesn't hurt to know the `default` behavior exists for quick scripts where you just need to ensure a type coercion doesn't return an exception."
+  - question: "Why does coercing `\"ABC\"` to a Number fail in DataWeave?"
+    answer: "Running `\"ABC\" as Number` produces the error \"Cannot coerce String (ABC) to Number\" because the string ABC cannot be coerced to a Number, which the post describes as the expected behavior."
+  - question: "Where can I try out these DataWeave scripts?"
+    answer: "The post points you to the DataWeave Playground at https://dataweave.mulesoft.com/learn/playground or to Visual Studio Code, with a linked guide on moving your code from the DataWeave Playground to Visual Studio Code."
 ---
 
 The other day I was reading some StackOverflow DataWeave questions (as one does) and I got to this very interesting thread: [Why the “default” keyword acts like “try + catch / orElse” in some cases](https://stackoverflow.com/questions/73785223/why-the-default-keyword-acts-like-try-catch-orelse-in-some-cases). I wanted to take a moment to create an article about my own explanation of what I see in that thread. I already created a video about it, so, I might as well create a blog post too :)

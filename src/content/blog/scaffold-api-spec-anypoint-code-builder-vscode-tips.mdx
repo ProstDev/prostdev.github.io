@@ -9,6 +9,19 @@ tags: [MuleSoft, Anypoint Code Builder, Visual Studio Code]
 youtubeId: SIcxoyL5NtY
 draft: false
 heroImage: ../../assets/blog/scaffold-api-spec-anypoint-code-builder-vscode-tips.png
+faqs:
+  - question: "How do I scaffold an API spec in Anypoint Code Builder?"
+    answer: "Start with an API spec you've published to Anypoint Exchange, open Anypoint Code Builder inside VS Code, click \"Implement an API\", select your API asset from Exchange, name your project, then choose a local folder and hit \"Create Project\" — ACB then generates the flows and configs automatically."
+  - question: "What does ACB generate when you scaffold an API spec?"
+    answer: "ACB automatically generates a Mule flow for each endpoint, an HTTP Listener configuration, error handling logic for statuses like 400, 404, 405, 406, and 415, plus setup files including `mule-artifact.json`, `pom.xml`, `.gitignore`, and `log4j2.xml`."
+  - question: "Why does my scaffolded app return 200 OK even though the implementation is empty?"
+    answer: "When you run the app and test an endpoint with a tool like Postman, Postcode, or cURL, you should see 200 OK responses even though the implementation is empty — the post notes that's scaffolding done right, since ACB has wired up the flows and listeners before you add any logic."
+  - question: "How do I make XML open by default instead of the Canvas view in ACB?"
+    answer: "Open a `.xml` file such as a flow, click the three-dot icon at the top right and choose \"Configure Editors\", then edit the file association so XML is the default instead of Canvas; you can switch it back to `mulesoft.projectFile.canvas` anytime, or open both views at once with \"Open in Canvas and Code Editor.\""
+  - question: "How do I keep my ACB repo clean with .gitignore?"
+    answer: "Add `src/test/resources/embedded*/` to `.gitignore` and ignore machine-specific files like `.vscode`; VS Code makes this easy from the Source Control tab, where you can right-click any file and choose \"Add to .gitignore\"."
+  - question: "What can I do with the Mule Project Properties UI in ACB?"
+    answer: "Right-click your project and choose \"Open Mule Project Properties\" to view or set the Mule runtime and Java version, see which connectors were added, check compatibility across runtime, connector, and Java versions, and apply missing runtimes automatically."
 ---
 
 If you’ve ever used **Anypoint Studio** to implement an API from a spec, you already know how easy it is to generate flows from a RAML or OpenAPI file.

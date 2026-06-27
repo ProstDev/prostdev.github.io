@@ -7,6 +7,17 @@ tags: [MuleSoft, GitHub Actions, CloudHub, CI/CD]
 youtubeId: qao50tJn_zs
 draft: false
 heroImage: ../../assets/blog/part-2-ci-cd-pipeline-with-mulesoft-and-github-actions-secured-encrypted-properties.png
+faqs:
+  - question: "Do I need this configuration if my Mule app has no secured properties?"
+    answer: "No. This post is specifically about creating a pipeline that decrypts your secured properties, so if you don't have secured properties in your application you may not need this configuration."
+  - question: "What should I already have set up before building this pipeline?"
+    answer: "Your secure properties file(s) under `src/main/resources`, your encrypted properties, your Secure Properties Config in Global Elements (`secure-properties:config`), and the name of your decryption key property such as `secure.key`; it's also recommended to add the key name to `mule-artifact.json` (for example `\"secureProperties\": [\"secure.key\"]`) so it appears hidden in Runtime Manager. Make sure the app is correctly configured and works locally before attempting to create the pipeline."
+  - question: "How do I add the decryption key to my GitHub repository?"
+    answer: "In your GitHub repository go to the Settings tab while signed in, then Secrets and variables > Actions, and click New repository secret. In the Name field write `DECRYPTION_KEY`, in the Secret field write the actual value of your key (for example `MyMuleSoftKey`), and click Add secret. Keep the name `DECRYPTION_KEY` as-is because the pipeline uses it."
+  - question: "What changes does this pipeline add compared to the basic Part 1 pipeline?"
+    answer: "It uses the same base `build.yml` file with a few modifications: a new `KEY` variable that reads the decryption key from your secrets (`KEY: ${{ secrets.decryption_key }}`), and a `-Ddecryption.key` parameter passed into the maven deploy command. If you add this to the maven command manually, don't forget to add a backslash (`\\`) on the previous line."
+  - question: "Where do I set the actual name of my secured property in the pom.xml?"
+    answer: "In your Mule application's `pom.xml`, locate the `cloudHubDeployment` configuration and add a `<properties>` block containing `<secure.key>${decryption.key}</secure.key>`. Change the `secure.key` element to match the name of your own property, but keep `decryption.key` since that's what the GitHub Action pipeline uses."
 ---
 
 In the [previous article](https://www.prostdev.com/post/how-to-set-up-a-ci-cd-pipeline-to-deploy-your-mulesoft-apps-to-cloudhub-using-github-actions), we learned the basics to get started with a simple CI/CD pipeline to deploy a Mule application to CloudHub. We learned how to create Secrets in GitHub for your Anypoint Platform credentials, how to set up the `build.yml` file to set up the workflows, how to run the pipeline and the details of each of the steps in the pipeline. If you haven’t gone through that, I highly recommend you do. The steps for this post won’t be as detailed.

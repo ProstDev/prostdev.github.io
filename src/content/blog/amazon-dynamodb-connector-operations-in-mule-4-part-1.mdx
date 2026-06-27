@@ -7,6 +7,19 @@ category: Tutorials
 tags: [MuleSoft, AWS, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/amazon-dynamodb-connector-operations-in-mule-4-part-1.png
+faqs:
+  - question: "What problem does this post solve that the official connector docs don't?"
+    answer: "The post notes there is a lot of documentation on the Amazon DynamoDB Connector's usage, but none could be found that specifically shows how to structure the JSON requests, which are required for all DynamoDB connector operations. So it explains every operation along with its JSON request through simple use case scenarios."
+  - question: "Which DynamoDB connector operations are covered in Part 1?"
+    answer: "Part 1 covers 15 operations: Create Table, Describe Table, List Tables, Put Item, Batch Put Item (single and multiple tables), Get Item, Batch Get Item (single and multiple tables), Update Item, Query, Scan, Delete Item, and Batch Delete Item (single and multiple tables)."
+  - question: "What is the difference between Put Item and Update Item?"
+    answer: "Put Item creates a new item or replaces an existing one, so if an item with the same primary key already exists it is replaced entirely. Update Item edits an existing item's attributes (or adds a new item if it does not already exist), so in the example only the `isActive` and `country_name` columns are changed rather than the whole record."
+  - question: "How is the composite primary key set up for the CONTINENT-COUNTRY-INFO-TABLE?"
+    answer: "It uses a composite primary key combining a partition key and a sort key, where `continent_name` is the Primary Partition Key and `country_unique_id` is the Primary Sort Key. The post explains this gives extra flexibility when querying, for example providing only `continent_name` retrieves all the `country_unique_id` values associated with it."
+  - question: "What's the difference between the Query and Scan operations here?"
+    answer: "Query finds items based on primary key values on a table or secondary index that has a composite primary key, while Scan returns items by accessing every item in a table or secondary index and can narrow results with a FilterExpression. In the examples the Query on `continent_name = 'ASIA'` and `isActive = 'true'` returns 3 records, whereas the Scan on `continent_name = 'Europe'` and `isActive = 'true'` returns only 1 record."
+  - question: "Why do the batch request examples include `as Object {class:\"org.mule.extension.dynamodb.api.model.AttributeValue\"}`?"
+    answer: "In the batch operations the DataWeave request casts each attribute value with `as Object {class:\"org.mule.extension.dynamodb.api.model.AttributeValue\"}`, and wraps each PutRequest or DeleteRequest as `org.mule.extension.dynamodb.api.model.WriteRequest` (and key sets as `KeysAndAttributes`), which is how the request is structured for the connector's batch put, get, and delete operations."
 ---
 
 This blog post provides quick examples of how to use the Amazon DynamoDB Connector in Mule 4 using Anypoint Studio. There is a lot of documentation available on this connector’s usage, but none could be found that specifically shows how to structure the JSON requests, which are required for all DynamoDB connector operations.

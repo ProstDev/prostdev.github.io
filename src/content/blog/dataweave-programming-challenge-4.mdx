@@ -134,6 +134,19 @@ readerNotes:
     date: 2023-03-23
     replyTo: Felix Schnabel
     text: 'I like your usage of "update" on this one'
+faqs:
+  - question: "What are the rules of the Tower of Hanoi challenge?"
+    answer: "There are three rules: with each move you can only move one disk at a time from its current stack to a different stack, you can only place smaller disks on top of bigger disks (you can put disk 1 on disk 3 but not disk 5 on disk 2), and you can only move the disk at the top of any stack."
+  - question: "What does the input payload contain?"
+    answer: "The input payload contains the number of moves (starting at 0), the total number of disks in the game (`disks`), the target tower where all the disks have to be moved (`targetTower`), and the 3 towers each containing their disks (`towers`)."
+  - question: "How many moves does it take to solve each scenario?"
+    answer: "The expected outputs show 7 moves for scenario 1 (3 disks), 15 moves for scenario 2 (4 disks), and 127 moves for scenario 3 (7 disks), with all disks ending up in order on the target tower."
+  - question: "Why should I test against all three scenarios instead of just the Playground one?"
+    answer: "There are 3 different scenarios so you can confirm your code works properly and has no hardcoded values, but only the first scenario is provided in the Playground link, so you should copy and paste the other two to make sure your solution works."
+  - question: "How do I get unstuck if I can't solve the puzzle?"
+    answer: "The post offers four clues: read the Tower of Hanoi Wikipedia page for algorithm context, study the even-versus-odd legal-move sequence between pegs, apply the constraints about not stacking same-parity disks and never moving a disk twice in succession, and remember that solutions written in Python, C++, or Java don't necessarily apply to DataWeave so try to come up with your own."
+  - question: "Where can I solve this challenge?"
+    answer: "You can solve it on the DataWeave Playground via the link in the post at https://dataweave.mulesoft.com/learn/playground, or play the puzzle online first at https://www.mathsisfun.com/games/towerofhanoi.html to understand it."
 ---
 
 > [!NOTE]

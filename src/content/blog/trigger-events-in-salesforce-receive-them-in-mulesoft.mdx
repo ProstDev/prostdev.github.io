@@ -11,6 +11,17 @@ category: Tutorials
 tags: [MuleSoft, Salesforce, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/trigger-events-in-salesforce-receive-them-in-mulesoft.png
+faqs:
+  - question: "Which Salesforce events can a MuleSoft flow react to in this tutorial?"
+    answer: "The post builds three flows, one per event: On Create Event (the `On New Object` trigger), On Modify Event (the `On Modified Object` trigger), and On Delete Event (the `On Deleted Object` trigger), all using Lead as the Salesforce entity."
+  - question: "Why subscribe to Salesforce events instead of polling for changes?"
+    answer: "The post calls polling a common but very bad practice; instead of repeatedly asking Salesforce whether a Lead was created, updated, or deleted, you subscribe and react to events only when they happen and you are ready to receive them, which is a cleaner and more effective Event-Driven Architecture approach."
+  - question: "How do I configure the Salesforce connector in the Mule project?"
+    answer: "You first need a Salesforce developer account from https://developer.salesforce.com/ to generate the username, password, and security token, then store those in a `salesforce.yaml` properties file under `src/main/resources`, create a Configuration properties and a Salesforce_Config entry in the Global Elements tab, set Basic Authentication to read the username, password, and token from the YAML, and click Test Connection to confirm it succeeds."
+  - question: "Why do two log lines appear when I create a single Lead?"
+    answer: "Because every time you create an object it generates two events, one for creation and one for modification, so creating one Lead fires both the On New Object and On Modified Object flows."
+  - question: "What does the Since field do on the trigger configuration?"
+    answer: "Events in Salesforce are independent of the connector, so if events were already published before you start the MuleSoft app it will retrieve those earlier messages, but if you choose a date in the Since field then only events created after that date are retrieved, which is why the post warns to be careful with this field."
 ---
 
 We all know that MuleSoft is now part of Salesforce. It's been more than two years since Salesforce acquired it.

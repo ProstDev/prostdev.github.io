@@ -8,6 +8,19 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Code Builder, Docker, Solace, AsyncAPI]
 draft: false
 heroImage: ../../assets/blog/how-to-develop-asyncapis-on-anypoint-code-builder-with-solace-pubsub-locally-docker.png
+faqs:
+  - question: "Why run Solace PubSub+ locally with Docker instead of a cloud trial?"
+    answer: "The author wanted to re-run this demo as many times as needed without creating a 30 or 60-day cloud trial account with Solace, so running the broker locally with the Solace Docker image/container avoids the trial expiration. The catch is that the MuleSoft documentation only covered Solace in the cloud, not local, which is why this post exists."
+  - question: "What do I do if a port in the Docker run command is already busy?"
+    answer: "You can change the busy port to an available one, making sure you change the port on the left side of the colon and not the one on the right, since the format is `<your-local-port>:<docker-port>`. The author's port 9000 was busy on Mac, so the command was changed to map `9001:9000` instead."
+  - question: "Why is the Solace URL set to localhost:55554 in the AsyncAPI spec instead of 55555?"
+    answer: "On Mac the SMF port 55555 is mapped to local port 55554 because Mac OS now reserves port 55555, so the spec uses `localhost:55554`. On Linux or Windows you would typically set it up as `55555:55555`, in which case you should change the URL to match your port (the value on the left of the colon)."
+  - question: "How do I set up the queue in the Solace management tool to receive messages from MuleSoft?"
+    answer: "Open http://localhost:8080/ in your browser, log in with the credentials admin/admin, and click the default VPN. From the left side click Queues, add a new queue with the green +Queue button (the example uses the name user-signup) leaving the defaults, then open that queue, go to its Subscriptions tab, and add a new subscription/topic with the same name (user-signup). This configuration is required in order to receive the messages from MuleSoft."
+  - question: "How can I run both Mule apps locally at the same time when ACB doesn't allow it?"
+    answer: "As a workaround, change the Mule runtime version on one of the projects to a different one, for example accounts on runtime 4.8 and email on runtime 4.7, by right-clicking any file under `src/main/mule` and selecting Project Properties. With both projects running, send a request to localhost:8081/publish from a REST tool like Postman with the JSON body, and you should see the payload appear in the Email app's console in ACB."
+  - question: "Which port does MuleSoft use to connect to the Solace broker, and how do I confirm it?"
+    answer: "MuleSoft connects to Solace via `JCSMP`, which makes sense because Mule is Java/SpringBoot under the hood, and you are looking for the SMF over TCP port whose default number is 55555. To confirm it, run `docker exec -it solace /usr/sw/loads/currentload/bin/cli -A` in a regular terminal to connect with the Solace CLI, execute `show service`, press any key to continue, and read the SMF over TCP port from the output."
 ---
 
 First of all, I am brand-new to any Solace stuff. So there I was, working on a demo to connect Mule with [Solace](https://solace.com/) PubSub+ (Message Broker) but I didn't want to create a 30 or 60-day cloud trial account with them because I wanted to be able to re-run this demo as many times as needed. So, I saw you could run the broker using Docker. The problem is that all the documentation from the MuleSoft side were for Solace in the cloud and not local.

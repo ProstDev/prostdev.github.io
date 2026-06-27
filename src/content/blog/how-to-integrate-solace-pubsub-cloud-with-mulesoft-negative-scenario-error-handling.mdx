@@ -12,6 +12,17 @@ category: Tutorials
 tags: [MuleSoft, Solace, JMS, Salesforce]
 draft: false
 heroImage: ../../assets/blog/how-to-integrate-solace-pubsub-cloud-with-mulesoft-negative-scenario-error-handling.png
+faqs:
+  - question: "What is the common approach to error handling for message-based integrations described here?"
+    answer: "The post lays out five steps: first the error is captured in the error handler logic, then the message is enriched with additional information for later reprocessing, then the `deliveryCount` and other useful details are tracked in the User Properties, then the message is published to an Error Topic for retrying, and finally the message is processed from the error queue and, depending on the `redelivery_count`, routed back to the source queue or to the dead letter queue (Dead Message Queue) for further reprocessing by the operations team."
+  - question: "Why might the Salesforce Create connector throw an error in this flow?"
+    answer: "When the incoming JMS message is transformed and the flow attempts to create the Salesforce Account using the Create connector, an error occurs if the account already exists, and the Choice router validates whether a successful response came back from SFDC, throwing an error on failure."
+  - question: "How do I retry for a while before throwing an error on the Salesforce Create connector?"
+    answer: "The post notes you can add an Until Successful block around the Create SFDC connector to retry for a specified amount of time before throwing an error."
+  - question: "Which user properties are captured when publishing the message to the Error Topic?"
+    answer: "When the `sendNegativeAck` flow publishes the message to the error topic, it captures `DELIVERYCOUNT`, `EXCEPTIONDETAILS`, and `TIMESTAMP` in the User Properties field."
+  - question: "When does the message get sent to the Dead Letter Queue instead of being retried?"
+    answer: "In the retry-flow the message is republished to the source Topic while the `redelivery_count` (`attributes.properties.jmsxProperties.jmsxDeliveryCount`) is less than or equal to the `maxRedeliveryCount` variable from the properties file; once `redelivery_count` equals `maxRedeliveryCount`, the message is published to the Dead Letter Topic and a notification email can be triggered to the operations team. A transformation error is sent straight to the Dead Letter Queue since retrying does not make sense."
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*

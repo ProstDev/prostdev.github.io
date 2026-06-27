@@ -5,6 +5,19 @@ pubDate: 2021-01-19
 category: Guides
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/dataweave-2-0-core-functions-cheatsheet-1.png
+faqs:
+  - question: "How is this DataWeave cheatsheet organized?"
+    answer: "It compiles all of the core functions from MuleSoft's official documentation, separated by input and output type, so each section header describes the input and output a function works with (for example Array to Array, String to Boolean, or Object to Array)."
+  - question: "How do I find a specific function quickly?"
+    answer: "You can use ctrl+F or cmd+F to search for specific keywords and get to the function you're looking for, and each entry links to that function's official documentation page where you can find more details and examples."
+  - question: "Which DataWeave version is this cheatsheet for?"
+    answer: "This cheatsheet has been last updated for DataWeave version 2.12 (Mule 4.12)."
+  - question: "What does it mean for a function to be null-safe in DataWeave?"
+    answer: "Null-safe functions don't need an additional null-checker implemented because they accept null values and won't throw an error; the post lists them, including `distinctBy`, `filter`, `filterObject`, `flatMap`, `flatten`, `groupBy`, `isBlank`, `isEmpty`, `log`, `lower`, `map`, `mapObject`, `orderBy`, `pluck`, `trim`, `typeOf`, and `upper`."
+  - question: "How can I concatenate values in DataWeave besides the plus plus (++) function?"
+    answer: "In addition to the plus plus (++) function, you can concatenate objects by using the Object Destructor `{( )}`, and you can use `$( )` to concatenate strings, with links to both approaches provided in the post."
+  - question: "What's the difference between map and mapObject in DataWeave?"
+    answer: "Both iterate over their input, but `map` iterates over items in an array and outputs the result into a new array, while `mapObject` iterates over an object using a mapper that acts on keys, values, or indices and returns an object; the post notes mapObject returns an object whereas pluck returns an array."
 ---
 
 This is a compilation of all the core functions that can be used in DataWeave 2.0 according to [MuleSoft's official documentation](https://docs.mulesoft.com/dataweave/latest/dw-core), separated by input and output.

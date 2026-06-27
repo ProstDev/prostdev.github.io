@@ -9,6 +9,15 @@ author: "Shiva Sahu"
 category: Tutorials
 tags: [MuleSoft, DataWeave, JWT]
 heroImage: ../../assets/blog/jwt-token-creation-using-dataweave-1.png
+faqs:
+  - question: "What are the three parts of a JWT token?"
+    answer: "A JWT decodes into three parts: the header, the payload, and the signature. As shown with the jwt.io debugger, the sample token splits on its dots into those three encoded segments."
+  - question: "How do I create a JWT using DataWeave?"
+    answer: "In DataWeave you import `dw::Crypto`, `dw::core::Binaries`, and `dw::core::URL`, define your secret, `tokenHeader`, and `tokenPayload`, then base64url-encode the header and payload, sign the joined `header.payload` string with `HMACBinary(secret as Binary, ... , \"HmacSHA256\")`, and finally output `header ++ \".\" ++ payload ++ \".\" ++ signature`."
+  - question: "Why does the JWT code use Base64Url instead of regular Base64?"
+    answer: "Web tokens use Base64Url because it is safe to pass in a URL: it uses `-` instead of `+` and `_` instead of `/`, and it omits the `=` padding characters at the end of the string, which is why the `base64encodeURL` function does string replacement before producing the token."
+  - question: "Do the Java and DataWeave approaches produce equivalent tokens?"
+    answer: "Yes. The tokens generated from the Java class and from DataWeave decode to the same header and payload data, which the post confirms by decoding each generated token in the jwt.io debugger."
 ---
 
 Security implementations have been revolutionary through OAuth 2.0, OpenID Connect, SAML, etc. OAuth 2.0 and OpenID connect mostly use JWT as a token format. JWT is a very familiar term for the API fraternity.

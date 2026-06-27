@@ -21,6 +21,19 @@ readerNotes:
     replyTo: Alex Martinez
     text: |
       Yes.  It does.  Thank you so much!😃
+faqs:
+  - question: "Do I need Docker experience to use the DataWeave Playground?"
+    answer: "No. You can install the Docker image on your local machine by following the post linked here (no previous Docker experience needed), but the DataWeave team also created an online site you can access without running Docker at https://developer.mulesoft.com/learn/dataweave."
+  - question: "How can I see the real data type of a value when JSON hides it?"
+    answer: "Change the output from `application/json` to `application/dw`. With JSON, a coerced value like `\"2000-01-01\" as Date` still prints as `\"2000-01-01\"`, but with the `dw` output it prints as `|2000-01-01|`, so you can tell a Date from a String. The `dw` output also lets you read a function's definition."
+  - question: "How do I debug a DataWeave expression that isn't working?"
+    answer: "You can't debug it like a Mule Flow, but you can output expressions to the console with the `log` function. Just surround the value you want to log in parentheses, for example `log(random() * 100) > 74`, and it shows the value in the console without affecting your script or requiring a new variable."
+  - question: "What does the `do` statement do in DataWeave?"
+    answer: "It creates a local context that can include variables, functions, and the script, so you can have variables that aren't accessible outside that context and avoid ending up with a lot of global variables. A variable declared inside a `do` (like `newName`) can't be referenced outside it, and when you open a context inside a `map` you need to re-declare the object under the three dashes because it's treated as a new script section."
+  - question: "Why should I assign types to my DataWeave variables and functions?"
+    answer: "It's not strictly required, but it helps in several ways: you don't get confused about a variable's data type in a big script, your mistakes and potential bugs are reduced because you know what you could get back (such as a `Null` from an index selector via a `Number | Null` union), you catch errors early before deploying your Mule App, the next developer understands the code more easily, and you can use Function Overloading when you expect different behavior depending on the data type."
+  - question: "Is it okay to nest `do` statements inside each other?"
+    answer: "You can keep creating contexts inside contexts, but the post advises against it: it's hard to understand and may lead to spaghetti code, so using one `do` at a time is best."
 ---
 
 It took me some time to find and fully understand how to use these “hacks” *(they’re not really hacks, but they’ve made my life so much easier, so I’ll call them hacks)*. Trust me; they’re truly worth it, especially if you’re just starting to learn DataWeave.

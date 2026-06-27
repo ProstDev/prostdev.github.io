@@ -15,6 +15,19 @@ readerNotes:
     date: 2023-08-07
     replyTo: "Sirish Saxena"
     text: "It depends how your backend API supports the pagination. In most of the cases I have stumbled upon is very much similar to what I described. That means, you have to rely on the parameters of previous call to determine how can we process the subsequent pages."
+faqs:
+  - question: "What's the difference between the recursive and asynchronous approaches to pagination?"
+    answer: "The recursive approach calls the backend API repeatedly until no new pages exist; it is simple and easy to implement but synchronous, so the next page cannot be fetched until prior pages finish, the response is slow, and with too many iterations the Mule Runtime might crash with a \"Too many child contexts\" error. The asynchronous approach is more complex but processes pages in parallel via a VM endpoint, avoiding that bottleneck."
+  - question: "How do I know how many pages still need to be processed?"
+    answer: "After fetching the first page, you examine the response header named `link`, which GitHub uses to indicate pagination with Prev, Next, First, and Last entries. You extract the page number from the Last link, then subtract one for the already-processed first page; for example, if the last link says 35, then 35 - 1 = 34 pages remain to be processed."
+  - question: "Why does the implementation use a VM endpoint to fetch subsequent pages?"
+    answer: "Publishing the page payload to a VM endpoint makes the process asynchronous because the VM Publish endpoint works like Fire and Forget, so the Mule thread does not wait for that flow to return a response. The flow exposing the VM Listener only needs the page number passed as a payload, which lets it be called asynchronously from other flows."
+  - question: "How does the application track whether all pages have finished processing?"
+    answer: "Before publishing each page to the VM endpoint, a flag for that page number is stored in an Object Store, initially set to false, and updated to true once that page's results are processed. A sub-flow named WaitUntilAllPagesAreProcessed, called outside the For Each scope, checks those Object Store entries with a DataWeave script and calls itself recursively until none are still false."
+  - question: "Why is a delay added inside the WaitUntilAllPagesAreProcessed flow?"
+    answer: "If any page's processing flag is still false, a small delay is imposed before WaitUntilAllPagesAreProcessed calls itself recursively, which avoids having Mule crash because of too many recursive calls to the flow. The delay is configurable and kept to a minimum, such as 1000 ms."
+  - question: "How are the results from all the pages combined into one response?"
+    answer: "The first page result is stored under an Object Store key, and as each subsequent page is fetched the AppendGithubResults sub-flow retrieves that stored response, appends the current page's result, and stores it back to the same key. Once all pages are complete, the final combined response is fetched from that Object Store entry and transformed to form the final response to the client."
 ---
 
 ## Summary

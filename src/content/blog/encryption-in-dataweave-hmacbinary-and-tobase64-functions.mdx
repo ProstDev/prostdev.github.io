@@ -19,6 +19,15 @@ readerNotes:
     replyTo: "nimmala praveen"
     text: >-
       Thank you for your comment! Currently there is no provision of decrypting a string in DataWeave that I am aware of. You can use the JCE Encrypter/Decrypter, PGP Encrypter/Decrypter or XML Encrypter/Decrypter, if you want to encrypt & decrypt your payload.
+faqs:
+  - question: "How do I encrypt a single field in a JSON payload with DataWeave?"
+    answer: "Map over the payload and replace just the field you want masked, leaving the rest untouched. In this post the `payload.book map` script keeps `id`, `language`, and `author` as-is and only transforms `edition` with `Crypto::HMACBinary(toBase64($.edition), \"HmacSHA512\")`, so two confidential fields out of many can be masked before inserting the object into a database without bringing a new connector on board."
+  - question: "What imports do I need to use the Crypto module and toBase64 in DataWeave?"
+    answer: "Add two import lines to the script: `import dw::Crypto` to bring in the Crypto module that provides encryption functions through common algorithms like MD5 and SHA1, and `import toBase64 from dw::core::Binaries` to bring in the `toBase64` function from the `dw::core::Binaries` module."
+  - question: "Why does this post convert the value to Base64 before encrypting it?"
+    answer: "The author turns the actual data into its Base64 counterpart before encrypting it with a standard encryption technique. Base64 is an encoding technique that divides every three bits of binary data into corresponding six-bit units, represented in a 64-radix numeral system as seven-bit ASCII text, which makes the converted data roughly 33% larger than the original and not human readable."
+  - question: "Can I decrypt a value that was encrypted this way in DataWeave?"
+    answer: "No. As the author notes in the comments, there is currently no provision for decrypting a string in DataWeave that he is aware of; if you need to both encrypt and decrypt your payload you can use the JCE Encrypter/Decrypter, PGP Encrypter/Decrypter, or XML Encrypter/Decrypter instead."
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*

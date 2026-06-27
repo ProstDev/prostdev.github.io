@@ -7,6 +7,19 @@ category: Guides
 tags: [Python, Algorithms]
 draft: false
 heroImage: ../../assets/blog/reviewing-sorting-algorithms-insertion-sort.png
+faqs:
+  - question: "Why is it called Insertion Sort?"
+    answer: "The name comes from its basic principle of inserting an unsorted element into its rightful sorted position. As the post notes, it works like sorting a hand of playing cards, where each element has to find its place and be inserted there."
+  - question: "How does Insertion Sort work step by step?"
+    answer: "It maintains a sorted subset on the left and an unsorted subset on the right, iterating over every element from left to right. The first element is assumed sorted; then each unsorted element is compared against the sorted subset, larger sorted elements are shifted one position to the right, and the unsorted element is inserted into its rightful sorted position. For the example array `[10,4,8,6,1]` this grows the sorted side step by step until the result is `[1,4,6,8,10]`."
+  - question: "What is Insertion Sort's time complexity?"
+    answer: "The post explains the double looping (an outer loop for iteration and an inner loop for comparisons) makes the worst-case time complexity `O(n^2)`, since doubling the input makes the running time quadratic. Its best case, for an already sorted array, is linear at `O(n)` because the inner loop does no shifting."
+  - question: "Why is Insertion Sort considered a stable sorting algorithm?"
+    answer: "Because when there are duplicate elements, Insertion Sort won't move one element in front of the other and instead maintains the key value in order. The post identifies this preserved ordering of equal keys as what makes it a stable sorting algorithm."
+  - question: "Why does Insertion Sort perform well on an already sorted array?"
+    answer: "On an already sorted list there is no shifting or insertion of elements; as test case 3 in the log shows, no inner loops run and only the comparisons to check the rightful position are performed. Insertion Sort needs only `n` steps to sort an already sorted array of `n` elements, giving it a best-case linear `O(n)` time and an edge over Bubble and Selection Sort."
+  - question: "How many comparisons and iterations does Insertion Sort need?"
+    answer: "For an array of size `n = 5` the total iterations performed are `(n-1)`, and the total number of comparisons to sort is `(n-1) + (n-2) + (n-3) + (n-4)`, a pattern the post notes is similar to Selection Sort."
 ---
 
 Let’s sort it out!

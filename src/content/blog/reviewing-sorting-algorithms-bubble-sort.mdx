@@ -7,6 +7,19 @@ category: Guides
 tags: [Python, Algorithms]
 draft: false
 heroImage: ../../assets/blog/reviewing-sorting-algorithms-bubble-sort.png
+faqs:
+  - question: "How does bubble sort actually sort a list?"
+    answer: "Bubble sort is a comparison-based algorithm that compares two elements at a time to check for the correct order, and if they are out of order it swaps them; the swapping continues until the entire list is in sorted order."
+  - question: "Why is it called bubble sort?"
+    answer: "In each iteration the largest element tends to move up into its correct position, similar to bubbles rising to the surface while smaller elements bubble up toward the top of the list, which is where the name comes from."
+  - question: "How many iterations does bubble sort need for a list of n elements?"
+    answer: "It takes (n-1) iterations to sort a list of n elements, since the algorithm performs roughly n iterations n times; in the example with n=5 it takes a total of 4 iterations to complete the sorting."
+  - question: "Why is bubble sort considered unpopular or inefficient?"
+    answer: "Because to sort the list you iterate n times through an array of n elements, making the work n*n = n^2, so as the input grows in size (for example n=1000) the number of comparisons and swaps increases significantly; other sorting techniques have better time complexity and run much faster, so bubble sort is mainly used for educational purposes."
+  - question: "What is the best case for bubble sort?"
+    answer: "The best case is when the array is already a sorted list, where at most n comparisons are made and no swaps are required; if no swaps are performed in the first iteration it is positive that the list is already sorted, as shown with input like [2,3,6,7,9,12]."
+  - question: "What is the space complexity of bubble sort?"
+    answer: "The amount of memory required grows no more than O(n); in the example the total space required is for the variables assigned and the array size n."
 ---
 
 Let’s sort it out!

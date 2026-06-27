@@ -7,6 +7,17 @@ category: Guides
 tags: [MuleSoft]
 draft: false
 heroImage: ../../assets/blog/intro-to-scatter-gather-integration-pattern.png
+faqs:
+  - question: "What is the Scatter-Gather integration pattern?"
+    answer: "As described in the Enterprise Integration Patterns, Scatter-Gather is a message routing pattern that broadcasts messages to multiple recipients and aggregates the response back into a single message. In simple words, the messages are executed in parallel (scatter) and the response from each execution is bundled (gathered) as one single message."
+  - question: "How does Scatter-Gather work in MuleSoft?"
+    answer: "Scatter-Gather executes the messages in parallel (concurrent processing), sending them to the desired routes at the same time through a parallel thread pool. The Scatter-Gather processing completes only when all the messages are fully processed, so while individual routes finish at different times the overall step waits for every route before capturing the aggregated response."
+  - question: "When should I use Scatter-Gather instead of sequential processing?"
+    answer: "Use Scatter-Gather when the process responses are independent of each other, such as a fork-join or multicast scenario where messages need to be communicated simultaneously, and when performance matters since it can immensely cut down the processing duration. Use sequential processing instead when there is an interdependency between processes, meaning the response from process 1 is required for process 2 to complete."
+  - question: "Does Scatter-Gather halt processing if one of its routes fails?"
+    answer: "No. With effective error handling in place Scatter-Gather does not halt the processes abruptly; it gathers all the route information including the route that errored and aggregates the results as output. To retrieve only successful route payloads and ignore errors, this can be handled using the Mule 4 error handling process."
+  - question: "What does the Scatter-Gather output payload look like in the Mule 4 example?"
+    answer: "In the example the Scatter-Gather router invokes three flows concurrently and aggregates the response as a new payload, which is an Object of Object (a LinkedHashMap of size 3 in the debugger). A `Transform Message` component then flattens it into an array object using `flatten(payload..payload)`, and a Scatter-Gather block must have at least two routes to process."
 ---
 
 *GitHub repository with the Mule Project can be found at the end of the post.*

@@ -6,6 +6,17 @@ category: Guides
 tags: [API, REST]
 draft: false
 heroImage: ../../assets/blog/understanding-apis-part-2-api-analogies-and-examples.png
+faqs:
+  - question: "How is a restaurant an analogy for an API?"
+    answer: "You, the client, give a Request to the server: you want a hamburger that you picked from the menu. The server does whatever needs to be done to deliver the order, and then you receive a Response with what you asked for, the hamburger. We leave out the part where the server goes to the kitchen and the chef cooks the meal, because we only care about what the order was and what was delivered, not how it was made."
+  - question: "How does the calculator example map to an API?"
+    answer: "If you treat a regular calculator as an API, you send a \"2+2\" Operation as a Request, hit the equal button, and receive a \"4\" as a Response. You are not interested in how the calculator processed the information; you just want an accurate Response to the Inputs and Operation you sent in the Request."
+  - question: "Why don't you care how an API's Implementation works when consuming it?"
+    answer: "When you are consuming an API it does not matter whether the Implementation is built on Java, Python, or MuleSoft, nor whether it uses JSON or CSV internally, nor what systems it needs to call, because none of that is visible to you. You just want your Request to be processed and your Response returned according to the Inputs and Operations you sent."
+  - question: "What data types can the Human Resources API in the example accept?"
+    answer: "The HR API at FictionalCorp accepts Requests in CSV format, where the Request carries the CSV Data Type, the Input information for the two employees, and the Operation telling the API what to do; the Response comes back in the same CSV format with a new \"First Day\" field added. The same HR API also accepts the JSON Data Type, with the same Inputs, same Operation, and same Output but different Data Types for the Request and Response."
+  - question: "Where can I see what real APIs look like?"
+    answer: "The post links to the documentation for the Twitter API at https://developer.twitter.com/, the Slack API at https://api.slack.com/, the Google Maps API at https://developers.google.com/maps/documentation, and Facebook APIs at https://developers.facebook.com/. It is fine if you do not understand everything you see; the links are just to give you an idea of what real APIs look like."
 ---
 
 In Part 1 of this series, “[Understanding APIs (Part 1): What is an API?](https://www.prostdev.com/post/understanding-apis-part-1-what-is-an-api),” we learned about the acronym, the definition, the four aspects of an API, and how everything works together. We also defined this cute little diagram below. If you feel like you forgot some pieces, you can always go back and read the recap at the end for a quick summary.

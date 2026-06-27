@@ -89,6 +89,17 @@ readerNotes:
       - code: |
           ++ ({"status":true}, payload) distinctBy $$
         lang: dataweave
+faqs:
+  - question: "What is object concatenation in DataWeave?"
+    answer: "It is the action of combining two different objects into one single object that contains all the fields (keys) and values of both objects. For example, two JSON objects each with their own keys are merged into a single object that holds everything both objects had."
+  - question: "How do I concatenate two objects in DataWeave?"
+    answer: "The post shows three ways. The most popular is the `++` function, written either as `object1 ++ object2` or in prefix form `++(object1, object2)`. You can also use the object destructor `{( )}` syntax, or the array destructor `{([ ])}` syntax that lists objects inside square brackets so you do not have to wrap each object in its own parentheses."
+  - question: "What's the difference between `object1 ++ object2` and `++(object1, object2)`?"
+    answer: "They do exactly the same thing. The first writes the `++` function between the two objects, while the second writes the function first and positions the first and second arguments inside parentheses separated by a comma. Either way is correct; it just depends on what you are used to or the standard practice in your project."
+  - question: "How does the `{( )}` object destructor syntax work?"
+    answer: "When there are parentheses inside curly brackets, the parentheses become object destructors: the object is separated into its key/value pairs, and those pairs are then added to the new object being created by the outer curly brackets. So each source object is first destroyed into its key/value pairs, and then a new object is created that contains all of those pairs."
+  - question: "Why would I use the array `{([ ])}` syntax instead of just `{( )}`?"
+    answer: "Because the parentheses destructors not only destroy an object into key/value pairs, they also destroy arrays containing objects. Listing your objects inside an array with square brackets and then applying the object destructor on that array saves you from having to add parentheses around each individual object, which is easy to forget and can lead to syntax errors. It is the most complex of the three syntaxes but avoids surrounding each object in parentheses."
 ---
 
 In this post, I will explain what object concatenation is and how to utilize it.

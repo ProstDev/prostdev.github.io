@@ -6,6 +6,17 @@ category: Tutorials
 tags: [Smart Home]
 draft: false
 heroImage: ../../assets/blog/how-to-connect-your-philips-hue-smart-lights-with-google-calendar.png
+faqs:
+  - question: "What do I need before setting up this integration?"
+    answer: "The post assumes you already have a Google account for Google Calendar and your Smart Lights set up with the Hue application at https://www.philips-hue.com/en-ca/philips-hue-app. You should also create a Philips Hue account at https://account.meethue.com/ to store all your Hue data such as lights, rooms, scenes, and zones. The post does not cover the synchronization or installation of the lights themselves."
+  - question: "How does IFTTT connect my Google Calendar to my Philips Hue lights?"
+    answer: "You create an IFTTT applet at https://ifttt.com/home using the \"If This Then That\" model: first you sign in to your Philips Hue account at https://account.meethue.com/, then you connect IFTTT to the Google account linked to your calendar, next you configure the \"If This\" trigger as Google Calendar's \"Any event starts,\" and finally you set the \"Then That\" action to a Philips Hue action so the lights respond when an event begins."
+  - question: "Do I have to use my Google account email to sign up for IFTTT?"
+    answer: "No. You can sign up by choosing \"Continue with Google,\" which automatically links your Google account, or you can create an IFTTT account with any email and then link Google afterward from your IFTTT account's settings at https://ifttt.com/settings under \"Linked accounts\" for Google."
+  - question: "How do I make my lights turn red when a meeting starts?"
+    answer: "In the \"Then That\" step, search for Philips Hue, choose the \"Change color\" action, connect your Philips Hue account, then select the light, room, or zone you want and write the color name such as Red (ignoring the \"Add ingredient\" button) before clicking \"Create action.\" The post's example sets a Meeting Zone light to Red."
+  - question: "Can I trigger the lights before an event actually begins?"
+    answer: "Yes. When you configure the \"Any event starts\" trigger you select the calendar you want to use and can also set how much time before the event starts you want the integration to trigger using the \"Time before event starts\" field."
 ---
 
 If you’ve been working from home recently, you probably have had one of those dreaded WFH nightmares. You know the one I’m talking about. The one where you’re giving a presentation or you’re in the middle of a meeting with your webcam on, and your roommate or family suddenly enters the room.

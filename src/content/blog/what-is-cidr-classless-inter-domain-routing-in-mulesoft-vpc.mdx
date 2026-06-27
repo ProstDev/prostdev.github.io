@@ -7,6 +7,17 @@ category: Guides
 tags: [MuleSoft, Anypoint Platform, CloudHub, Networking]
 draft: false
 heroImage: ../../assets/blog/what-is-cidr-classless-inter-domain-routing-in-mulesoft-vpc.png
+faqs:
+  - question: "What does CIDR stand for and why is it used?"
+    answer: "CIDR stands for Classless Inter-Domain Routing, and it's a way of allocating IP addresses or hosts in a more efficient manner. It replaces the old class-based system, which wastes IP addresses: for example, an organization needing around 500 hosts would have to use Class B distribution, where more than 60,000 of its roughly 65,535 addresses go unused."
+  - question: "What does the `/n` in CIDR block notation mean?"
+    answer: "In the CIDR block notation `xxx.xxx.xxx.xxx/n`, the `n` is the number of bits used for the subnet mask. The subnet mask sets all network bits to ones and all host bits to zeros, so the host bits left over (32 minus n) determine how many addresses the block holds."
+  - question: "How do I calculate the total number of hosts from a subnet mask?"
+    answer: "Take the number of host bits, which is 32 minus the mask length, and raise 2 to that power. For `192.168.0.0/24` there are 8 host bits, giving 256 hosts (192.168.0.0 to 192.168.0.255); `/23` leaves 9 host bits for 512 hosts; and `/27` leaves 5 host bits for 32 hosts."
+  - question: "What are the smallest and largest subnet blocks I can assign to an Anypoint VPC?"
+    answer: "When creating a MuleSoft VPC, the smallest network subnet block you can assign for your Anypoint VPC is /24 and the largest is /16. You also need to make sure the CIDR mask you provide doesn't conflict with your on-premise or any other networks."
+  - question: "How do I size CIDR blocks for Production and Non-Production MuleSoft VPCs?"
+    answer: "Estimate the IPs each environment needs, remembering that 2 IPs are reserved per VPC for infrastructure and CloudHub uses at least two IP addresses per worker for zero-downtime. In the example, Production needs about 300 IPs so a /23 mask (512 IPs) is chosen, and Non-Production needs about 600 IPs so a /22 mask (1024 IPs) is chosen."
 ---
 
 ## Introduction

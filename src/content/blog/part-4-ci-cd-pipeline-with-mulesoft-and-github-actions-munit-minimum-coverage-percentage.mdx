@@ -7,6 +7,17 @@ tags: [MuleSoft, GitHub Actions, MUnit, CI/CD]
 youtubeId: DKQA5gRXvn0
 draft: false
 heroImage: ../../assets/blog/part-4-ci-cd-pipeline-with-mulesoft-and-github-actions-munit-minimum-coverage-percentage.png
+faqs:
+  - question: "How do I set a minimum MUnit coverage percentage that fails the pipeline?"
+    answer: "Add a `coverage` block to the existing `munit-maven-plugin` configuration in your `pom.xml` with `failBuild` set to `true` and `requiredApplicationCoverage` set to your minimum percentage; in this post it is set to 90, so the build fails if application coverage drops below that."
+  - question: "What's the difference between requiredApplicationCoverage, requiredResourceCoverage, and requiredFlowCoverage?"
+    answer: "`requiredApplicationCoverage` sets the minimum percentage for the whole application, while `requiredResourceCoverage` and `requiredFlowCoverage` set the minimums for resources and flows respectively; this post only uses `requiredApplicationCoverage` at 90 and leaves the other two commented out, and points to a live stream at https://youtu.be/Z0ORL0yoKCo and the official docs at https://docs.mulesoft.com/munit/latest/coverage-maven-concept#set-up-a-minimum-coverage-level for the differences."
+  - question: "Why do I need to add the secure.key environment variable to the plugin configuration?"
+    answer: "The `environmentVariables` block adds `secure.key` mapped to `${decryption.key}` because it needs to be passed down to the Mule application so it can decrypt the existing secured properties when the MUnits run; Part 2 of the series at https://www.prostdev.com/post/part-2-ci-cd-pipeline-with-mulesoft-and-github-actions-secured-encrypted-properties covers where those keys come from."
+  - question: "Which coverage report formats can I generate, and how do I choose them?"
+    answer: "Under the `formats` section you can generate `console`, `sonar`, `json`, and `html` reports, and you choose which ones by simply adding or removing the `format` field from the configuration, generating some or all of them."
+  - question: "Do I need to change build.yml or settings.xml to add the minimum coverage percentage?"
+    answer: "No, this step requires nothing to be added or modified in `build.yml` or `settings.xml`; you only add the coverage configuration to the `pom.xml`, though you can optionally add an upload-artifact step to `build.yml` if you want to download the generated reports after the pipeline finishes."
 ---
 
 In the [previous article](https://www.prostdev.com/post/part-3-ci-cd-pipeline-with-mulesoft-and-github-actions-munit-testing), we learned how to set up our Nexus credentials to be able to run the MUnits from the CI/CD pipeline. If you haven’t been following the series or you’re not familiar with GitHub Actions, we recommend you start from the [first article](https://www.prostdev.com/post/how-to-set-up-a-ci-cd-pipeline-to-deploy-your-mulesoft-apps-to-cloudhub-using-github-actions) to understand how we are setting up all the configurations we need.

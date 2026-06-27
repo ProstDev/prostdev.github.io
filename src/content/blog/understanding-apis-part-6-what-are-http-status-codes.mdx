@@ -6,6 +6,17 @@ category: Guides
 tags: [API, Postman, HTTP]
 draft: false
 heroImage: ../../assets/blog/understanding-apis-part-6-what-are-http-status-codes.png
+faqs:
+  - question: "What are HTTP Status Codes?"
+    answer: "HTTP Status Codes are numbers returned by the API and included in the Response. They indicate whether the operation you wanted to perform was a success or not, and they describe the kind of success or failure that happened, like telling you the data is ready, your Request is not correct, or the server is having issues and you should try again later."
+  - question: "What's the difference between a 200 OK and a 201 Created?"
+    answer: "A 200 OK means the Request is a success with no errors, and the Response contains the data requested by a GET or the data created or updated by a POST. A 201 Created means the Request is a success and a new resource was created, such as a new employee added to a company list, and the Response usually contains the data that was just created; it is mainly returned when using a POST or a PUT."
+  - question: "Why does a 202 Accepted not mean the Request was successful?"
+    answer: "A 202 Accepted is returned when some processing is still pending but hasn't been completed yet, which is useful when back-end processing will take too long, so the user gets a confirmation along with a pointer to monitor the status. It does not mean the Request was a success; it only means the server received it, and the processing can still fail."
+  - question: "What's the difference between a 401 Unauthorized and a 403 Forbidden?"
+    answer: "A 401 Unauthorized is returned when the Request must contain authorization information such as a username and password to use the API, but that data was missing or wrong. A 403 Forbidden is returned when the Request and the authorization are fine but the API still refuses to return the information for some other reason, such as a session that was open too long and expired."
+  - question: "When is a 500 Internal Server Error returned?"
+    answer: "A 500 Internal Server Error is returned when there is an error inside the API. The Request was perfectly fine and there were no errors when calling the server, but then something failed inside the Implementation. It is the most generic error that can be used when the server fails."
 ---
 
 We’re almost done learning the basic concepts we need to understand APIs better.

@@ -64,6 +64,17 @@ readerNotes:
       payload mapLeafValues ((value, path) ->
         if(!(path[-1].selector == "thisname") and value is String) upper(value) else value
       )
+faqs:
+  - question: "What is the goal of DataWeave programming challenge #7?"
+    answer: "The challenge is to create a DataWeave script that updates all the values in a JSON structure to uppercase, except the ones whose field equals `thisname`. For example, the field `name` with value \"a\" becomes \"A\", but the field `thisname` with value \"def\" stays the same."
+  - question: "Which DataWeave function does this challenge use to walk the JSON structure?"
+    answer: "It uses the `mapLeafValues` function from the `dw::util::Tree` module, which lets you transform each leaf value in the structure. Both provided solutions import `mapLeafValues from dw::util::Tree` and call it on the payload."
+  - question: "How do I skip the `thisname` field while uppercasing everything else?"
+    answer: "Inside `mapLeafValues`, you check the field name of each value with `path[-1].selector` and compare it to the string `\"thisname\"`; if it matches you return the value unchanged, otherwise you apply the `upper` function to convert it to uppercase."
+  - question: "What does `path[-1].selector` do in the solution?"
+    answer: "As described in Clue #4, `path[-1].selector` retrieves the name of each value's field so you can compare it with a given string value, which is how the script decides whether a value belongs to the `thisname` field and should be left alone."
+  - question: "What's the difference between the two provided solutions?"
+    answer: "Solution #1 uses the explicit lambda form `mapLeafValues ((value, path) -> ...)` and references the field name with `path[-1].selector`, while Solution #2 uses the shorthand anonymous-parameter form, referencing the value with `$` and the field name with `$$[-1].selector`; both produce the same result."
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

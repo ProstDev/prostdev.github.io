@@ -7,6 +7,17 @@ category: Tutorials
 tags: [Dell Boomi, Anypoint MQ]
 draft: false
 heroImage: ../../assets/blog/dell-boomi-integrations-using-the-atom-queue-connector.png
+faqs:
+  - question: "What is the Atom Queue connector used for in Dell Boomi?"
+    answer: "The Atom Queue connector is used to send and receive messages to and from native Boomi Integration Atom message queues, and it supports both Point-to-Point and Publish/Subscribe messaging."
+  - question: "How do I send a message to an Atom Queue?"
+    answer: "You build a process (in this proof of concept, the Send_Queue process) whose Start Shape uses the No Data option since it does not retrieve data from a source, a Message Shape that holds the message to send (a Hello message here), and an Atom Queue connector with the Send action, then end the flow with a Stop Shape. The connector needs two components configured: an Atom Queue Connection that specifies the message queue (configured here with the Queue Name AtomQueue_Test) and an Atom Queue Operation with the Send action whose Batch Size is set to 5 by default, which sets the number of documents to batch in each outgoing message."
+  - question: "How do I read a message from the Atom Queue?"
+    answer: "You create a second process (Read_Queue) whose Start Shape uses the Atom Queue connector with the Listen action for event-driven retrieval of messages from the queue, reusing the same Atom Queue Connection from the Send process, and a Notify Shape that uses the Current Data option to print the message received from the queue. After packaging and deploying the Read_Queue process it appears under Listeners on the Atom Management page, confirming it is in Listen mode."
+  - question: "How do I get first-in, first-out (FIFO) processing of messages across nodes?"
+    answer: "To receive first-in, first-out (FIFO) processing of messages across nodes, set the Maximum Concurrent Executions value to 1 on the Atom Queue Operation."
+  - question: "What happens when message delivery to an Atom Queue fails?"
+    answer: "If message delivery fails, a Dead Letter Queue is created corresponding to the Destination Queue and the failed messages are placed in it after 6 retry attempts by the shared queue server of the same Atom Queue component, and those messages can be manually retried from the Queue Management tab in the Platform UI. If the destination is something other than an Atom Queue Server and you need to catch failed messages, the best approach is to re-queue them in the catch branch of a try/catch, placing them back on the original queue or onto a retry queue."
 ---
 
 The Atom Queue connector is used to send and receive messages to and from native Boomi Integration Atom message queues. The connector supports both Point-to-Point and Publish/Subscribe messaging.

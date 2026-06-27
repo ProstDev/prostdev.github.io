@@ -7,6 +7,19 @@ tags: [MuleSoft, GitHub Actions, CloudHub, CI/CD]
 youtubeId: hfQaYcjUB9c
 draft: false
 heroImage: ../../assets/blog/part-6-ci-cd-pipeline-with-mulesoft-and-github-actions-deploying-to-cloudhub-2-0.png
+faqs:
+  - question: "Why do I have to change the version in pom.xml every time I push?"
+    answer: "Because each push publishes the asset to Exchange and then deploys it to CloudHub, and each Exchange asset has to have a different version; if you reuse a version you will get an error saying the version has already been published, so you should change the version in your `pom.xml` on every push."
+  - question: "What value should the `<provider>` field use when deploying to CloudHub 2.0?"
+    answer: "The `<provider>` must always be set to `MC` when deploying to CloudHub 2.0."
+  - question: "What's the difference between the NONE, LTS, and EDGE release channels?"
+    answer: "In the `<releaseChannel>` field, `NONE` sets up Mule Runtime 4.4.0, `LTS` sets up the latest available LTS version (which changes each year and was 4.6.x when the post was written, the most stable option for 4.6), and `EDGE` sets up the latest available EDGE version (which changes every 4 months and keeps you on the latest possible version, though a few things might break along the way)."
+  - question: "Where do I put the connected app's client id and secret instead of the pom.xml?"
+    answer: "You don't put them in the `pom.xml`; you authenticate using a server in the Maven `settings.xml` file, referencing them as `${client.id}` and `${client.secret}`, and the values are passed in through the GitHub Actions `build.yml` from the `CONNECTED_APP_CLIENT_ID` and `CONNECTED_APP_CLIENT_SECRET` repository secrets so they are never hardcoded in the project."
+  - question: "How do I find the correct target name for my trial account?"
+    answer: "There is only one `<target>` available for a trial account, so before setting it up you can go to Runtime Manager > Deploy Application to see which region is available for your shared space (in the post's case it's US East, Ohio), and you can refer to the CloudHub 2.0 regions and DNS records table at https://docs.mulesoft.com/cloudhub-2/ch2-architecture#regions-and-dns-records to retrieve the target name you need."
+  - question: "Which scopes does the connected app need for the CloudHub 2.0 deployment?"
+    answer: "Select the following nine scopes when creating the connected app: Exchange Contributor, View Environment, View Organization, Create Applications, Delete Applications, Manage Application Data, Manage Runtime Fabrics, Manage Settings, and Read Applications."
 ---
 
 We already learned how to set up secured properties, MUnit coverage, and even a connected app to authenticate when you're using Multi-Factor Authentication (MFA) in your Anypoint Platform account. From now on, we will continue authenticating using a connected app for best practices.

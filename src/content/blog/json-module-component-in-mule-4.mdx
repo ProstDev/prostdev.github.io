@@ -7,6 +7,19 @@ category: Tutorials
 tags: [MuleSoft, JSON, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/json-module-component-in-mule-4.png
+faqs:
+  - question: "What is the JSON Module used for in Mule 4?"
+    answer: "The JSON Module Connector is used to validate a JSON payload against a predefined JSON schema of your choice. Because schema validation falls outside the scope of DataWeave functionality, the JSON Module can be used for this purpose in MuleSoft."
+  - question: "How do I add the JSON Module to my Mule app?"
+    answer: "You can add it manually to your Mule app in Anypoint Studio or Design Center, or, if you want to use Maven, add the `mule-json-module` dependency (groupId `org.mule.modules`, with the `mule-plugin` classifier) into your `pom.xml` file."
+  - question: "Why does the JSON Module throw a `JSON:SCHEMA_NOT_HONOURED` exception?"
+    answer: "It is thrown when the JSON payload does not match the schema it is validated against. In the post's example, `document.json` does not match `mySchema.json`, so the `JSON:SCHEMA_NOT_HONOURED` exception is raised, caught in the error handler, and the `error.errorMessage.payload` is written to a file."
+  - question: "What exceptions can the JSON Module throw?"
+    answer: "The JSON Module can throw any of these exceptions: `JSON:INVALID_INPUT_JSON`, `JSON:INVALID_SCHEMA`, `JSON:SCHEMA_NOT_FOUND`, and `JSON:SCHEMA_NOT_HONOURED`."
+  - question: "How can I avoid fetching referenced schemas from the internet?"
+    answer: "Some JSON schemas reference other schemas through a public URI, but you might not want to fetch them from the internet for performance and security reasons. The JSON Module has an option to redirect the schema, which lets you replace an external reference with a local one without needing to modify the schema itself."
+  - question: "What does the \"Allow Duplicate Keys\" option do?"
+    answer: "The JSON Module has an option called \"Allow Duplicate Keys\" which, when set to true, allows the duplication of keys; otherwise, validation will fail."
 ---
 
 *GitHub repository with the Mule Project can be found at the end of the post.*

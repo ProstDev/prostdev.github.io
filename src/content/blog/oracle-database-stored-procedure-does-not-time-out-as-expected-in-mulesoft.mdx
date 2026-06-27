@@ -9,6 +9,17 @@ category: Guides
 tags: [MuleSoft, Oracle, Docker]
 draft: false
 heroImage: ../../assets/blog/oracle-database-stored-procedure-does-not-time-out-as-expected-in-mulesoft.png
+faqs:
+  - question: "Why does the MuleSoft database connector ignore the query timeout on an Oracle stored procedure?"
+    answer: "The origin of the problem is not your MuleSoft code but the Oracle driver. Even with a query timeout configured on the database connector, the connector waits for the stored procedure to finish regardless of how long it takes and only then returns the response, so the timeout configuration is not honored."
+  - question: "How do I make the timeout configuration work for a long-running Oracle stored procedure in MuleSoft?"
+    answer: "Per the MuleSoft documentation, add the parameter `-Doracle.net.disableOob=true` at runtime startup. In a local environment go to Run > Run Configurations > Arguments in Anypoint Studio, add the parameter to the startup configuration, and run the application again; after that the timeout is honored. The reference is https://help.mulesoft.com/s/article/Database-connector-Query-timeout-not-working-as-expected-on-oracle-database"
+  - question: "What happens after the timeout starts working correctly?"
+    answer: "Because the stored procedure takes between 5 and 10 seconds to respond while the database connector waits a maximum of 2 seconds, subsequent executions return an error indicating that the user (the MuleSoft application) canceled the operation with the database, shown as `ORA-01013` user requested cancel of current operation. This means the timeout parameter is now working properly."
+  - question: "What is the WAIT_FOR_A_WHILE stored procedure used in this example?"
+    answer: "It is an Oracle stored procedure created intentionally to simulate a long-running execution. It does nothing but sleep a random amount of time between 5 and 10 seconds using `DBMS_LOCK.Sleep(DBMS_RANDOM.VALUE(5,10))` and then write a finished message to the database log."
+  - question: "Why does the response still take around 6 seconds even after the timeout is honored?"
+    answer: "That is also a problem on the Oracle JDBC driver side. The timeout configuration is honored, but the driver takes a long time to return control back to the MuleSoft app. This was isolated and tested with a simple Java class with the same behavior, so to solve it fully you would need to raise a ticket with the Oracle support team."
 ---
 
 In a recent MuleSoft project, I noticed a problem when trying to run an Oracle stored procedure that took a fair amount of time to complete.

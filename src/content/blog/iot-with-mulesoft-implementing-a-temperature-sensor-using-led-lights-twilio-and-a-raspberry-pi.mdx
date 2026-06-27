@@ -11,6 +11,19 @@ readerNotes:
   - author: "Manik Magar"
     date: 2020-10-15
     text: "Nice article @Sravan! Kudos!\n\nIn case if you want to use docker to run mule on raspberry pi, you can see the image available here\n\nhttps://javastreets.com/blog/2017/10/run_mule_esb_in_docker_on_raspberrypi3.html\n\nMore image tags are here - https://hub.docker.com/r/javastreets/mule/tags"
+faqs:
+  - question: "Why use MuleSoft to implement IoT instead of another integration platform?"
+    answer: "The post's quick answer is ease of integration and speed of delivery. The Mule engine can be embedded directly into IoT devices to exchange data with IoT cloud services and backend apps, and the Mule Runtime engine can expose APIs on any IoT device so Mule APIs can be deployed on devices and turn them on and off."
+  - question: "How does the temperature sensor use case work end to end?"
+    answer: "When you hit the endpoint `http://localhost:8081/test?toNumber=919999999999`, the request is sent to the Mule application, the receiver's number is stored in a variable, the Mule app connects to the Raspberry Pi and senses the temperature with a temperature sensor, the temperature is stored in a variable, the app sends the details to the receiver's mobile via the Twilio Connector, and if the data is received as expected a green LED blinks, otherwise a red LED blinks."
+  - question: "Why do I need to install Java 8 on the Raspberry Pi?"
+    answer: "Raspbian OS ships with Java 11.x already installed, but the post notes there are permission issues with that version for this use case, so you uninstall Java 11 with `sudo apt-get purge openjdk*` and install Java 8 with `sudo apt-get install openjdk-8-jdk`."
+  - question: "Why do I have to patch the bundled Service Wrapper after installing Mule?"
+    answer: "Mule runtime uses the Tanuki Service Wrapper to run as a UNIX daemon, but out of the box the bundled wrapper is not optimized for the Raspberry Pi's ARM architecture, so you download the Armhf port of the Java Service Wrapper and copy a few required files (libwrapper.so, wrapper.jar, and the wrapper binary) into the Mule runtime's lib/boot directory."
+  - question: "Do I have to write the Python scripts that control the LEDs and read the temperature inside the Mule app?"
+    answer: "No. The post states you are not writing any Python scripts in the Mule application; the scripts to light the LEDs and sense temperature are already written and placed in a specified location, and that location path is referenced from the Groovy scripts, which use the `groovy` operation to run them."
+  - question: "What does the Mule flow need before sending a message to Twilio?"
+    answer: "You must give a proper message structure before sending to Twilio because it expects a specific format containing the body, to, from, and message fields; you also need a Twilio developer account and the destination number must already be registered with Twilio, since messages are sent only to registered numbers. If you do not want to use Twilio you can build your own use case, such as printing the temperature instead."
 ---
 
 Hey Muleys,

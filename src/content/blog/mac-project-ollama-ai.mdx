@@ -10,6 +10,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Code Builder, Ollama, AI, CloudHub]
 draft: false
 heroImage: ../../assets/blog/mac-project-ollama-ai.png
+faqs:
+  - question: "Why do I need ngrok to deploy this app to CloudHub?"
+    answer: "Ollama runs on your local computer at `localhost:11434`, which CloudHub cannot reach. You download and install ngrok to make your Ollama endpoint publicly available from the internet, run `ngrok http 11434 --host-header=\"localhost:11434\"`, then copy the Forwarding URL into `OLLAMA_BASE_URL` in your `llm-config.json` so CloudHub can access it."
+  - question: "How do I configure the MuleSoft AI Chain connector to talk to Ollama?"
+    answer: "After adding the Chat answer prompt connector, create a Connection Config named `MAC_Config` with LLM type OLLAMA, Config type Configuration Json, a file path of `mule.home ++ \"/apps/\" ++ app.name ++ \"/llm-config.json\"` (click the fx button so it is a formula, not a hardcoded value), Model name llama3 (depending on the model you installed locally), Temperature 0.7, LLM timeout 60, LLM timeout unit SECONDS, and Max tokens 500."
+  - question: "What model name should I use in the connector config?"
+    answer: "Use the model you actually installed locally with Ollama. The post uses llama3 as an example, but it notes the Model name will depend on the model you installed (such as llama3 or llama3.2), so make a note of which version you started running."
+  - question: "How do I test the app locally before deploying?"
+    answer: "Run the application locally, and once it has started send a POST request to `localhost:8081/api/chat` with a JSON body that includes your question. If you get a successful response from Ollama you can continue; otherwise troubleshoot before moving on, then stop the app."
+  - question: "What do I change before deploying to CloudHub?"
+    answer: "Open your `pom.xml` and change the version to 1.0.0 by removing the SNAPSHOT suffix, save it, then use the Deploy to CloudHub button in `mac-ollama-proj.xml`, selecting CloudHub 2.0, a region like `US-EAST-2`, the Sandbox environment, and the Runtime version. If you hit a lot of issues deploying from ACB, you can instead take the generated JAR from the `target/` folder and deploy it manually to Runtime Manager."
 ---
 
 This post guides you through building an AI-powered API using Ollama and MuleSoft. You'll start by installing Ollama locally, designing and implementing the API, and testing it in your development environment. With ngrok, you'll expose the API publicly, and finally, deploy it to CloudHub for production use.

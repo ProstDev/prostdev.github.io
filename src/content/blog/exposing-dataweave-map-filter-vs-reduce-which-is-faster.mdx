@@ -8,6 +8,17 @@ category: Opinion
 tags: [MuleSoft, DataWeave]
 youtubeId: xCPb678hDAo
 heroImage: ../../assets/blog/exposing-dataweave-map-filter-vs-reduce-which-is-faster-1.png
+faqs:
+  - question: "Is reduce faster than map and filter in DataWeave?"
+    answer: "No. Even though `reduce` only iterates the array once and `map`+`filter` iterates it twice, timing the approaches over 10,000 objects showed `onlyReduce` was by far the slowest at around 0.124531, while `mapAndFilter` came in at 0.000063 and `filterAndMap` at 0.000046, so the single-iteration assumption did not hold."
+  - question: "Why did the author expect reduce to be faster?"
+    answer: "The original `map`+`filter` solution iterated the whole array twice (once to map and add the new fields, once to filter), so the author rewrote it with `reduce` to collapse the work into a single iteration, assuming fewer iterations would mean better performance."
+  - question: "How do I time DataWeave functions to compare their performance?"
+    answer: "Import the `time` function from the `dw::util::Timer` module (https://docs.mulesoft.com/dataweave/latest/dw-timer-functions-time), wrap each function in `time(() -> myFunction())`, and read the elapsed time with `then $.end - $.start`; the post generates 10,000 test objects and runs `mapAndFilter`, `onlyReduce`, and `filterAndMap` this way."
+  - question: "What's the difference between filter+map and map+filter here?"
+    answer: "Both produce the same output, but `filterAndMap` removes the non-matching objects first and then maps only what remains, while `mapAndFilter` maps every object (adding the fields) and then filters; the author predicted and confirmed that `filterAndMap` is the faster of the two."
+  - question: "What's the main takeaway about optimizing DataWeave code?"
+    answer: "Nothing is as it seems, so if a few milliseconds matter for your use case you should time your approaches before assuming which one is more performant rather than reasoning about iteration counts alone."
 ---
 
 I was working on some code that was using both map and filter together and I started thinking if there was a better way to refactor this code to make it more performant.

@@ -7,6 +7,19 @@ category: Tutorials
 tags: [MuleSoft, DataWeave]
 draft: false
 heroImage: ../../assets/blog/implementing-netsuite-saved-search-with-mulesoft.png
+faqs:
+  - question: "What authentication methods does the MuleSoft NetSuite connector support?"
+    answer: "The connector provides Login authentication, Request based authentication, SSO authentication, and Token authentication, with Token authentication being one of the most common ways to connect NetSuite."
+  - question: "What do I need to connect to NetSuite using Token authentication?"
+    answer: "For Token authentication you need a Consumer key, a Consumer secret, a Token ID, and a Token secret."
+  - question: "How do I run a basic employee search where lastName starts with \"J\"?"
+    answer: "Use the connector's Search operation with the record type set to `EMPLOYEE_BASIC`, and pass a Transform Message payload that sets `lastName` with `operator: \"STARTS_WITH\"` and `searchValue: \"J\"`, cast as an `EmployeeSearchBasic` object."
+  - question: "How do I use a NetSuite Saved Search from MuleSoft?"
+    answer: "Run the Search operation with the record type `EMPLOYEE_ADVANCED` and pass a payload containing the `savedSearchId` and `savedSearchScriptId` that NetSuite provided (for example `savedSearchId: \"8656\"` and `savedSearchScriptId: \"EmployeeSearch8656\"`), cast through the `EmployeeSearch` and `EmployeeSearchAdvanced` classes."
+  - question: "How do I return only specific fields like firstName, middleName, and lastName from a search?"
+    answer: "Use an advanced search where the payload sets a `columns.basic` section listing `firstName`, `middleName`, and `lastName` (each with a `customLabel`), alongside any criteria such as `isInactive` with `searchValue: false` to limit results to active employees."
+  - question: "What is the difference between a basic search and an advanced search in these examples?"
+    answer: "A basic search casts the payload to a class like `EmployeeSearchBasic` and uses the `EMPLOYEE_BASIC` record type for straightforward field filters, while an advanced search uses the `EMPLOYEE_ADVANCED` record type and supports Saved Searches plus separate `criteria` and `columns` sections cast through `EmployeeSearchAdvanced`."
 ---
 
 ## Introduction

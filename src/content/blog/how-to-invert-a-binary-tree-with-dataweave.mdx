@@ -6,6 +6,15 @@ author: "Stefano Bernardini"
 category: Tutorials
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/how-to-invert-a-binary-tree-with-dataweave-1.png
+faqs:
+  - question: "What is a binary tree in this post?"
+    answer: "The post defines a tree as a set of nodes where each node can be connected to many children and each node has one parent except the root node, which has no parent. A binary tree is then a tree where each node has at most two children, called \"left\" and \"right\"."
+  - question: "How do I model a binary tree as a type in DataWeave?"
+    answer: "The post defines a `Tree` type with a `value` of type `String` and two optional children, `left?` and `right?`, each itself a `Tree`, so the optional fields let a node have a left child, a right child, both, or neither."
+  - question: "How does the DataWeave solution invert the tree?"
+    answer: "It uses recursion: for each node it keeps the same `value`, then sets the new `left` to `invertTree(node.right)` only if `node.right?` exists and the new `right` to `invertTree(node.left)` only if `node.left?` exists, swapping the children at the first level and recursively applying the same solution to the left and right sub-trees."
+  - question: "Why might I get a Stack Overflow error, and how do I avoid it?"
+    answer: "The post notes that the solution uses regular recursive functions, so if the recursion level exceeds 255 iterations you will receive a Stack Overflow error; to avoid this you can use tail-recursive functions instead, as described in the linked MuleSoft article at https://blogs.mulesoft.com/dev-guides/how-to-tutorials/untie-multilevel-structures-dataweave-recursive-calls/."
 ---
 
 The [DataWeave language](https://docs.mulesoft.com/mule-runtime/latest/dataweave) is a simple, powerful tool used to query and transform data inside of Mule.

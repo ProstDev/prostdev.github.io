@@ -7,6 +7,19 @@ category: Opinion
 tags: [MuleSoft, Java]
 draft: false
 heroImage: ../../assets/blog/down-the-rabbit-hole-vol-1-using-gpus-in-mulesoft-1.png
+faqs:
+  - question: "What does this Mule plugin actually do?"
+    answer: "It's a pet project plugin that gives MuleSoft the ability to use Cuda cores for parallel asynchronous processing, the idea being that leveraging Cuda cores lets you achieve high levels of processing speed and power for intensive tasks like neural network training for payload validation, image processing, and video encoding."
+  - question: "Should I use this in production?"
+    answer: "No. Nicky is explicit that this is not recommended or supported and should not be done in a production environment or started in your projects; if not done properly, using Cuda cores could cause instability, crashes, and other issues. It's shared as an exploration of what's possible, worth a read for those interested in the technology."
+  - question: "What hardware and software do I need to use Cuda cores from MuleSoft?"
+    answer: "You need a machine with an NVidia GPU, since without that hardware you can't utilize Cuda cores for parallel processing, and then you install the developer packages for Cuda, which include the tools and libraries needed to program the Java code that interacts with the GPU."
+  - question: "How does the Java code communicate with the GPU?"
+    answer: "Once the Cuda developer packages are installed you use JCuda, a Java binding for the Cuda runtime and driver API, to communicate directly with the GPU memory and write Java code that can take advantage of Cuda cores."
+  - question: "What's the difference between the Cuda Runtime API and the Driver API?"
+    answer: "The Runtime API is basic, pre-compiled functionality, while the Driver API lets you write your own kernel, almost like low-level C programs."
+  - question: "How do I add JCuda to my Mule project?"
+    answer: "You include the JCuda JAR files in your Mule project, which you can download from the JCuda website, and once they're included you can start writing Java code that utilizes the GPU. The post links the JCuda tutorial at http://www.jcuda.org/tutorial/TutorialIndex.html."
 ---
 
 Hello, fellow tech enthusiasts! My name is Nicky, and I’m a MuleSoft expert developer and architect with six years of experience in the field. I’m also a recognized MuleSoft mentor and a big fan of learning by doing weird stuff.

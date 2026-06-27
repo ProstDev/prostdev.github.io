@@ -9,6 +9,17 @@ pubDate: 2021-02-09
 category: Tutorials
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/how-to-check-for-empty-values-in-an-array-in-dataweave-part-2-sizeof-filter-isempty-default.png
+faqs:
+  - question: "How do I get the empty values out of an array in DataWeave?"
+    answer: "Use the `filter` function followed by `isEmpty`, as in `[\"notEmpty\", \"\", null] filter isEmpty($)`, which returns just the empty items. The post notes this is an improvement over the previous part's `groupBy` approach because you get the same result in one step instead of two."
+  - question: "Why does sizeOf fail when I pass it a null value?"
+    answer: "When you filter a null value the result is also null, so calling `sizeOf` on it fails because `sizeOf` only accepts the Array, Object, Binary, and String data types as arguments, not Null."
+  - question: "How do I stop the script from erroring when the input is null instead of an array?"
+    answer: "Use the `default` operator to fall back to an empty array, as in `sizeOf(null default [] filter isEmpty($))`. The `default []` turns a null into an empty array, `filter` then outputs an empty array, and `sizeOf` works on empty arrays, returning zero as expected."
+  - question: "How do I turn this logic into a reusable function?"
+    answer: "Define it above the three dashes using the `fun` keyword and replace the hardcoded array with the function's argument, like `fun containsEmptyValues(arr) = if ( sizeOf(arr default [] filter isEmpty($)) > 0 ) true else false`, then call it with different values to test your cases."
+  - question: "Why does the function also work with objects when the use-case was only strings and nulls?"
+    answer: "Because it relies on the `isEmpty` function, which accepts the Array, String, Null, and Object data types, so passing an object such as an empty object still works. The post notes that if you swapped `isEmpty` for `isBlank` instead, those object cases would fail because `isBlank` only accepts String or Null."
 ---
 
 I had this use-case where I had to make sure all the values inside an [array](https://en.wikipedia.org/wiki/Array_data_structure) were not empty. By “empty,” I’m referring to an empty string (“”), a null value (*null*), or even an empty array ([]). There were some cases when I would receive a null value instead of an array. The array could only contain strings or nulls, but not objects. However, I’ll be adding tests to check for empty objects as well.

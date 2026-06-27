@@ -9,6 +9,17 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Platform, API, RAML]
 draft: false
 heroImage: ../../assets/blog/how-to-use-mulesoft-s-visual-api-designer-to-create-a-to-do-api-specification-using-clicks-not-code-1.png
+faqs:
+  - question: "Do I need to know RAML or OAS to use MuleSoft's visual API Designer?"
+    answer: "No. The visual tool lets you configure your own API specification with just clicks, so you don't have to learn RAML or OAS, and it generates the code you need in whichever format you want."
+  - question: "How do I start designing an API with the visual tool in Design Center?"
+    answer: "After logging into Anypoint Platform, navigate to Design Center, click the Create + button, select New API Specification, name your project, choose the Guide me through it option to use the visual tool, then click Create API."
+  - question: "How do I add query parameters to filter the list of To-Dos?"
+    answer: "Go to GET > Query Parameters on the /todos resource and click Add Query Parameter, adding parameters like titleContains, isChecked, fromDate, and toDate; uncheck the Required option to make them optional so the user can choose whether to use the filters."
+  - question: "Why does the DELETE method use a 204 No Content response with no body?"
+    answer: "Because the id of the To-Do to delete is already retrieved from the URI Parameter, and once it's removed there's no need to return that information back in the response's body, so a 204 - No content response with no request or response body is used."
+  - question: "What's the potential problem with using the To-Do data type when creating a new To-Do?"
+    answer: "Because the To-Do data type has a required id property and that same type is used for creating a To-Do, the id becomes required in the request body even though the user shouldn't provide it (it should be assigned from the backend); one workaround is to change the POST body's type to Object and manually re-add title, checked, and dueDate, but that breaks reuse and means changes have to be made in both places."
 ---
 
 Did you know MuleSoft provides this neat Graphical User Interface (GUI) where you can configure your own API specification with just clicks? That's right, you don't have to learn RAML or OAS anymore. You can just follow this visual tool to create them and it gives you the code you need in whichever format you need it!

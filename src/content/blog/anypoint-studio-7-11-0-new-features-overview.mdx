@@ -11,6 +11,17 @@ category: News
 tags: [MuleSoft, DataWeave, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/anypoint-studio-7-11-0-new-features-overview.png
+faqs:
+  - question: "What are the new features in Anypoint Studio 7.11.0?"
+    answer: "This version of Anypoint Studio includes three new features for MuleSoft developers: support for Mule Runtime 4.4, DataWeave 2.4 with language improvements and new modules, and the new \"Referenced by\" function that lists all flow references to a particular flow or subflow."
+  - question: "How do I use Mule Runtime 4.4 in a new project?"
+    answer: "When you create a new project in Studio 7.11.0, just select Mule Server 4.4.0 EE from the runtime list and you will start using the new features. You will then find the 4.4 version everywhere in your project, including the `pom.xml` file and dependencies, and as the `minMuleVersion` set to \"4.4.0\" in the `mule-artifact.json` file."
+  - question: "What does the DataWeave onNull function do?"
+    answer: "The onNull function executes a callback function if the preceding expression returns a null value, and then replaces the null value with the result of that callback. The post shows it used to avoid an error when concatenating \"Hello\" with a null payload."
+  - question: "How does the hammingDistance function work in DataWeave 2.4?"
+    answer: "The hammingDistance function returns the number of positions at which two strings of equal length have different characters, so comparing the 8-bit strings 11011001 and 10011101 returns 2 because they differ only at positions 2 and 5. It lives in the Strings module, so it must be imported explicitly in your DataWeave script."
+  - question: "What is the \"Referenced by\" function used for?"
+    answer: "The \"Referenced by\" function is useful when you have multiple configuration files in a complex Mule application and want to jump to the flows referencing a particular flow or subflow. You right-click the flow or subflow and select the \"Referenced by\" option (Ctrl+Shift+G), then double-click any reference in the resulting list to be positioned on that flow reference."
 ---
 
 Are you already using the newest version of Anypoint Studio? If the answer is yes, let me guide you through the coolest features it has. If the answer is no, go ahead and download it [here](https://www.mulesoft.com/lp/dl/studio) to start playing with it!

@@ -9,6 +9,17 @@ tags: [MuleSoft, Salesforce, Data Cloud, Postman]
 youtubeId: CNAnWwUxycg
 draft: false
 heroImage: ../../assets/blog/part-3-data-cloud-mulesoft-integration.png
+faqs:
+  - question: "Do I have to use Postman to call this MuleSoft integration?"
+    answer: "No. The article uses Postman, but you can use any other REST client like Thunder Client, cURL, or Advanced REST Client. You download the Postman collection (and other collections/requests) from the alexandramartinez/datacloud-mulesoft-integration repo on GitHub at https://github.com/alexandramartinez/datacloud-mulesoft-integration/tree/main/rest-clients-requests."
+  - question: "How do I point the Postman collection at my deployed Mule app?"
+    answer: "Create a new environment instead of a Global variable to follow best practices: in the Environments tab click Create Environment, name it CloudHub, add a variable called `host` whose current value is your Mule app URL (the public Endpoint/URL you retrieved at the end of Part 2), Save it, then select the CloudHub environment from the environment dropdown at the top-right before running the requests."
+  - question: "Why does the `schema` endpoint flatten my JSON before generating the YAML?"
+    answer: "Because the Ingestion API doesn't accept nested objects on the schema, the `schema` endpoint transforms your multi-level object into the single level needed for Data Cloud, then returns the OpenAPI YAML schema based on that flattened input, which you need to create your Ingestion API and Data Stream in Data Cloud. You can change the OpenAPI version with the `openapiversion` query parameter in the request's Params tab."
+  - question: "How do I insert or delete records, and what should the request body look like?"
+    answer: "For both insert and delete you first add the `sourceApiName` and `objectName` query parameters in the Params tab so Data Cloud knows where to act, then send a JSON Array in the Body tab: for insert each Object in the array is a new record, and for delete each item is the Primary Key of the record to remove. A successful call returns a 200 - OK response, though it may take a few minutes for the data to update in Data Cloud."
+  - question: "Is there a limit to how many records I can insert or delete at once?"
+    answer: "Yes. Streaming in Data Cloud is limited to a maximum of 200 records per insertion and a maximum of 200 records per deletion."
 ---
 
 A little bird told me that deleting records in Data Cloud is actually not that easy to do. So, I did my research and came up with a Mule application for you all to reuse to (hopefully) make your lives easier when dealing with Data Cloud!

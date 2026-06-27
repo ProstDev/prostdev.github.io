@@ -7,6 +7,19 @@ category: Guides
 tags: [Python, Algorithms]
 draft: false
 heroImage: ../../assets/blog/reviewing-sorting-algorithms-selection-sort.png
+faqs:
+  - question: "Why is it called selection sort?"
+    answer: "It gets its name from the iterations it performs through the input array: the algorithm selects the current smallest element and swaps it into its sorted place, repeating until the list is sorted. This effectively splits the array into two sections, one unsorted and one sorted, selecting one item at a time by its size and moving it to its sorted position."
+  - question: "What is the time and space complexity of selection sort?"
+    answer: "Its time complexity is O(n^2) in both the best and worst cases, because even with an already sorted list it still has to iterate over every element to check, so the number of steps stays the same as for an unsorted list. Its space complexity is O(1) because it is an in-place algorithm that only stores one minimum value and its index, so the space required doesn't grow with the input size."
+  - question: "How many comparisons does selection sort need to sort n elements?"
+    answer: "The first iteration needs (n-1) comparisons, the second (n-2), the third (n-3), and so on, which sums to the formula n(n-1)/2. For the example array of n=5 that is 4+3+2+1 = 10 comparisons, for n=13 it is 78, and for n=100 it would be 4950."
+  - question: "What's the difference between selection sort and bubble sort?"
+    answer: "In bubble sort adjacent elements are compared and swapped, while in selection sort the smallest element is selected to swap into place. Selection sort is faster and more efficient, needing only O(n) swaps versus O(n^2) for bubble sort, and it is in-place so it doesn't allocate extra memory whereas bubble sort consumes additional space; however, bubble sort's best case is O(n) when no swaps occur in the first iteration, while selection sort stays at O(n^2) even in its best case."
+  - question: "How many iterations does selection sort perform on an array of n elements?"
+    answer: "It performs (n-1) iterations, sorting only one element on each pass, so the example array of size n=5 took 4 iterations and the longer array of n=13 took 12 iterations."
+  - question: "Is selection sort a stable sorting algorithm?"
+    answer: "The default implementation of selection sort is not stable; however, it can be made stable if required, and the post links to https://www.geeksforgeeks.org/stable-selection-sort/ to explore the stable variant further."
 ---
 
 Let's sort it out!

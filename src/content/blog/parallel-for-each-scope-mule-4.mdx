@@ -7,6 +7,17 @@ category: Guides
 tags: [MuleSoft]
 draft: false
 heroImage: ../../assets/blog/parallel-for-each-scope-mule-4.png
+faqs:
+  - question: "What's the difference between the For-each scope and the Parallel For-each scope?"
+    answer: "Both split a collection of messages into elements, but the For-each scope processes them one at a time while the Parallel For-each scope processes each element simultaneously in separate routes, then aggregates the result into a collection of all messages in the same sequence they were before the split."
+  - question: "How many routes does the Parallel For-each scope create?"
+    answer: "The number of routes is equal to the size of the collection, so a collection configured as [1,2,3,4] makes the Mule runtime create 4 routes. Unlike the scatter-gather, you cannot see these separate routes visually in the canvas."
+  - question: "Can a variable created inside the Parallel For-each scope be used outside the scope?"
+    answer: "No. The processing of one element is invisible to other elements, and creation or modification of an existing variable inside the scope is not visible outside the scope."
+  - question: "How does the Parallel For-each scope handle an error in one of the routes?"
+    answer: "All routes continue processing even if there is an exception in one of the routes, and then the runtime executes the code in the error handler. By default the flow control will not go to the processor placed next to the Parallel For-each scope."
+  - question: "How do I make the flow continue to the next processor even when a route fails?"
+    answer: "Wrap the processing in a Try scope with an On-Error Continue processor, which lets the flow control reach the processor placed next to the Parallel For-each scope even in case of errors."
 ---
 
 Processing a single element of a collection is a very common scenario and for that, we have the For-each scope and Batch processing in MuleSoft.

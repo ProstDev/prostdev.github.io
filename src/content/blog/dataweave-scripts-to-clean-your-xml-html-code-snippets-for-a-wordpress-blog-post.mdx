@@ -6,6 +6,17 @@ category: Tutorials
 tags: [MuleSoft, DataWeave]
 draft: false
 heroImage: ../../assets/blog/dataweave-scripts-to-clean-your-xml-html-code-snippets-for-a-wordpress-blog-post-1.png
+faqs:
+  - question: "Why does WordPress break my XML code snippets?"
+    answer: "WordPress mistakes the XML tags for HTML code, so instead of showing a regular XML snippet the article strips the tags out and leaves only the bare values, as shown in the Maven snippet example in the post."
+  - question: "How do I fix XML tags being stripped in a WordPress post?"
+    answer: "Instead of pasting the regular `<` and `>` characters in the code snippet, replace them with `&lt;` and `&gt;` respectively, so for example `<plugin>` becomes `&lt;plugin&gt;`."
+  - question: "How do I clean an XML snippet with DataWeave?"
+    answer: "The first approach takes an XML input, uses `write(payload,\"application/xml\")` to turn it into a String, then chains `replace` to strip the `<?xml version='1.0' encoding='UTF-8'?>` header and swap `<` for `&lt;` and `>` for `&gt;`."
+  - question: "What's the difference between the two DataWeave approaches in this post?"
+    answer: "The first approach uses an XML input format and the `write()` function, while the second uses a plain text input so both XML and HTML snippets work, drops the `write()` call, and removes one `replace` since the XML header no longer needs to be stripped."
+  - question: "Where can I find these DataWeave scripts?"
+    answer: "They live in the author's dataweave-scripts GitHub repo at https://github.com/alexandramartinez/dataweave-scripts, and each approach has an Open in the Playground link in the post."
 ---
 
 In case you're not familiar with my [dataweave-scripts](https://github.com/alexandramartinez/dataweave-scripts) GitHub repo, it's the place where I keep some of the scripts I've created to help the community with transformation questions or simply some scripts that have been handy to me.

@@ -310,6 +310,19 @@ readerNotes:
       sum(payload splitBy  "\n" map (
           scoring[$] default 0
       ))
+faqs:
+  - question: "What is the goal of this DataWeave challenge?"
+    answer: "The goal is to create a DataWeave script that keeps your score across a series of Rock Paper Scissors games. The input has two columns where the first column is what your opponent chose and the second column is what you chose, and the script adds up your points over all 10 rounds."
+  - question: "How are points scored in this challenge?"
+    answer: "You earn 0 points if you lost the round, 3 points if the round was a draw, and 6 points if you won the round. The game rules are that Rock defeats Scissors, Paper defeats Rock, and Scissors defeat Paper, with R meaning Rock, P meaning Paper, and S meaning Scissors."
+  - question: "What is the expected output for the sample input?"
+    answer: "For the given input the expected output is 30, which is the total of the 10 rounds scoring 3, 6, 0, 0, 3, 6, 6, 0, 3, and 3."
+  - question: "How do I split the input into individual rounds and moves?"
+    answer: "You can use `splitBy` with the newline character to break the payload into rounds, which is the same as using the `lines()` function from the Strings module, and then use `splitBy()` again on each round to separate your opponent's move and yours so you can compare them."
+  - question: "How can I keep a running total of the score?"
+    answer: "You can use `reduce()` to keep the score in the accumulator, or if you prefer you can use `map()` to get the points of each round and then use `sum()` to add all the numbers together at the end."
+  - question: "Where can I solve this challenge and read the reference?"
+    answer: "You can solve it on the DataWeave Playground at https://dataweave.mulesoft.com/learn/playground?projectMethod=GHRepo&repo=alexandramartinez%2Fdataweave-challenges&path=challenges%2F2 and refer only to the DataWeave documentation at https://docs.mulesoft.com/dataweave/latest/ as you work through it. The challenge is based on Advent of Code 2022 day 2 at https://adventofcode.com/2022/day/2"
 ---
 
 > [!NOTE]

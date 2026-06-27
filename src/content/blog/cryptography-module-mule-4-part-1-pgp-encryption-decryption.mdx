@@ -7,6 +7,19 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Studio, DataWeave]
 draft: false
 heroImage: ../../assets/blog/cryptography-module-mule-4-part-1-pgp-encryption-decryption.png
+faqs:
+  - question: "What strategies does the Mule 4 Cryptography module include?"
+    answer: "The Cryptography module includes three different strategies: PGP, XML, and JCE. This article covers the PGP technique, a cryptographic way that allows secure communication between two entities using public and private keys."
+  - question: "Why do I need to dearmor the PGP keys before using them in Mule?"
+    answer: "The keys generated and exported from Kleopatra are in ASC format, which is not supported by Mule yet, so you need to dearmor them first. Run `./gpg --dearmor <PATH_TO_YOUR_ASC_FILE>` for each key, which creates new files alongside the ASC files with `.gpg` appended to their filename that are supported in Mule."
+  - question: "What do I configure in the encryption and decryption global configurations?"
+    answer: "Create two global configurations: an Encryption config where you configure the public key, keyId, and fingerprint, and a Decryption config where you configure the private key, keyId, and fingerprint."
+  - question: "How do I encrypt only a specific field instead of the entire payload?"
+    answer: "You can reuse the same pgp-encryption-flow and pgp-decryption-flow flows for field-level encryption; the only change is the way you refer to these flows from the main flow, and for that the DataWeave lookup function is very useful, letting you encrypt or decrypt just a sensitive field such as the email."
+  - question: "How can I reuse this PGP code as a common service across many APIs?"
+    answer: "There are two ways to set up this Mule code as a common service: externalize the flow and publish it on the Anypoint Exchange, or create a common API that will encrypt and decrypt the payload, which helps achieve the encryption/decryption non-functional requirement in many APIs."
+  - question: "Why convert the encrypted output to a base64 data type?"
+    answer: "To log or use the payload in the next processor, you convert the encrypted stream to a base64 data type, which is why the encryption output is returned as a base64 string."
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*

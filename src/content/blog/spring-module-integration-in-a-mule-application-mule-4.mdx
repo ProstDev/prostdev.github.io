@@ -9,6 +9,17 @@ category: Tutorials
 tags: [MuleSoft, Spring, Anypoint Studio, PostgreSQL, Java]
 draft: false
 heroImage: ../../assets/blog/spring-module-integration-in-a-mule-application-mule-4-1.png
+faqs:
+  - question: "How do I add the Spring module to a Mule 4 project?"
+    answer: "In Anypoint Studio the Spring module is provided in the default configuration, so you open the Mule Palette, click add modules, search for Spring, and add the module to your project."
+  - question: "What goes in the Spring config in Anypoint Studio?"
+    answer: "In the Spring config you set the name to `Spring_Config` and provide the files as `beans.xml`, where `beans.xml` is a file you create under `src/main/resources`."
+  - question: "Which dependencies and shared libraries are needed for the Spring JDBC datasource?"
+    answer: "You add the `spring-jdbc` and `postgresql` dependencies in `pom.xml`, and you also add both `spring-jdbc` and `postgresql` as shared libraries inside the shared libraries tag."
+  - question: "How does the Mule flow connect to the PostgreSQL database created by the Spring beans?"
+    answer: "The Spring `dataSource` bean (a `DriverManagerDataSource`) reads its url, username, and password from the application properties, and then in the Database Config you use a Data Source Reference connection pointing to that `dataSource` bean and select the PostgreSQL jar for the JDBC driver."
+  - question: "How do I call a Spring bean's method from a Mule flow?"
+    answer: "It is very simple from a Mule flow: you use an Invoke component to call the Spring bean's function, for example calling the `sayHello()` method on the `userService` instance, which returns \"Hello from Shyam\" because Shyam is configured as the first name in the bean property."
 ---
 
 The Spring module enables Mule apps to use the Spring framework. In this article, we will use a database datasource that is created by spring beans. Also, we will invoke one bean’s method from a Mule flow.

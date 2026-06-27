@@ -236,6 +236,19 @@ readerNotes:
       var alpha_numeric_strings = split_phrases map ((item, index) -> item filter (isAlphanumeric($)))
       ---
       sum(alpha_numeric_strings map ((item, index) -> if(lower(item) == lower(item)[-1 to 0]) sizeOf(split_phrases[index]) else 0))
+faqs:
+  - question: "What does this DataWeave challenge ask you to do?"
+    answer: "Each line of the input payload is treated as a separate phrase, and you review every phrase to find the ones that are palindromes, ignoring punctuation, spaces, and special characters. Then you retrieve the character count of the original phrase (including its punctuation, spaces, and special characters) and return the total sum of all the palindromes' character counts."
+  - question: "How is the expected output of 148 calculated?"
+    answer: "It is the sum of the character counts of every palindrome phrase in the input, counting each original phrase in full. For example `Anna` counts as 4, `2020/02/02` counts as 10, and `Mr. Owl ate my metal worm` counts as 25, and adding up the lengths of all the palindrome lines gives 148."
+  - question: "Why is `Mr. Owl ate my metal worm` considered a palindrome here?"
+    answer: "Because punctuation and spaces are not considered when checking for a palindrome, so once you strip them out it becomes `mrowlatemymetalworm`, which reads the same in reverse. The character count, though, is taken from the original phrase including its spaces and the period, which is 25."
+  - question: "Which DataWeave functions does the sample solution use?"
+    answer: "The solution imports `lines`, `isAlphanumeric`, `mapString`, and `reverse` from `dw::core::Strings`, then uses `lower` to normalize case, `mapString` with `isAlphanumeric` to drop non-alphanumeric characters, `reverse` to compare the cleaned line against itself, and `sizeOf` plus `sum` to count and total the characters."
+  - question: "Do I need to use regex to remove the special characters?"
+    answer: "No, the clues note that you do not need regex to find the alphanumeric characters because you can use `isAlphanumeric()` from the Strings module, and you can iterate through a string's characters with `mapString()` instead of `map()`."
+  - question: "How can I replace `payload splitBy \"\\n\"` in this challenge?"
+    answer: "One of the clues points out that `payload splitBy \"\\n\"` can be replaced with the `lines()` function from the Strings module, which splits the input payload into its individual phrases."
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

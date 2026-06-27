@@ -9,6 +9,19 @@ tags: [MuleSoft, Salesforce, Data Cloud, Anypoint Platform]
 youtubeId: WVkf2ni-S6s
 draft: false
 heroImage: ../../assets/blog/part-1-data-cloud-mulesoft-integration.png
+faqs:
+  - question: "What does Part 1 of this Data Cloud + MuleSoft integration cover?"
+    answer: "This first part only goes through the Salesforce and Data Cloud settings you need to set up before even calling Data Cloud through the Mule app, namely the Connected App, OAuth, Ingestion API, and Data Stream settings."
+  - question: "Why do I need to create a Connected App in Salesforce?"
+    answer: "You create a Connected App in Salesforce to authenticate to Data Cloud, enabling OAuth settings and the Client Credentials Flow, then generating a Consumer Key and Consumer Secret that your Mule integration will use."
+  - question: "How are the generated Consumer Key and Consumer Secret used in the Mule app?"
+    answer: "The Staged Consumer Key and Staged Consumer Secret you generate and apply from the Connected App's Manage Consumer Details become your main consumer details, and they are used as `cdp.consumer.key` and `cdp.consumer.secret` in your Mule application's settings in Anypoint Platform (the properties in Runtime Manager)."
+  - question: "What do sourceApiName and objectName map to when calling the Mule application?"
+    answer: "`sourceApiName` is the Source API Name from the Ingestion API, which in this example is `MuleSoft_Ingestion_API`, and `objectName` is whichever object you wish to insert or delete records to, which in the example schema is either `runner_profiles` or `exercises`."
+  - question: "Why is the maid field selected as the Primary Key in the Data Stream?"
+    answer: "In the Data Stream, `maid` is selected as the Primary Key because it is the field needed per record to delete records using the Mule app."
+  - question: "Do I have to use the example YAML schema for the Ingestion API?"
+    answer: "No, if you already have an Ingestion API with a YAML schema you just take note of its name and object names, otherwise you can upload the provided example schema whose objects are `runner_profiles` and `exercises`."
 ---
 
 A little bird told me that deleting records in Data Cloud is actually not that easy to do. So, I did my research and came up with a Mule application for you all to reuse to (hopefully) make your lives easier when dealing with Data Cloud!

@@ -7,6 +7,19 @@ category: Guides
 tags: [Python, Algorithms]
 draft: false
 heroImage: ../../assets/blog/reviewing-sorting-algorithms-merge-sort.png
+faqs:
+  - question: "What is the time complexity of Merge Sort?"
+    answer: "Merge Sort runs in linearithmic time, O(n log n), for the best, worst, and average case scenarios alike. The division done by the `mergesort` function is the logarithmic part, while the `merge` function and recursion are linear, and combining the two gives the O(n log n) runtime."
+  - question: "How does the divide and conquer approach work in Merge Sort?"
+    answer: "It has three parts: first divide, where the array is split into the smallest possible subproblems until each sublist holds a single element; then conquer, where the smallest subproblem is solved as a base case; and finally combine, where the sorted sublists are merged back together recursively to build up the final sorted array."
+  - question: "Why is a single-element sublist already considered sorted in Merge Sort?"
+    answer: "Because there is only one value and nothing else to compare it against, so the smallest sublist is always a sorted list by itself and is treated as the base case that stops the recursion."
+  - question: "How is Merge Sort different from Bubble Sort, Selection Sort, and Insertion Sort?"
+    answer: "Those three peers are in-place algorithms with a quadratic O(n^2) worst-case time complexity and sort one item at a time through iteration, whereas Merge Sort uses recursion to sort multiple sublists at a time, runs in O(n log n), and is an out-of-place algorithm that needs a temporary buffer array."
+  - question: "Why does Merge Sort use more memory than its peers?"
+    answer: "Merge Sort is an out-of-place sorting algorithm that requires a temporary array to store the sorted merge values, so it needs O(n) space that grows with the dataset, while Bubble Sort, Insertion Sort, and Selection Sort are in-place algorithms with O(1) space."
+  - question: "When should I use Insertion Sort instead of Merge Sort?"
+    answer: "For small datasets Insertion Sort is beneficial since its best-case time complexity is O(n) for a fully sorted array and its O(1) space complexity beats Merge Sort's O(n); for large datasets Merge Sort is the better choice. In Python and Java the built-in sort is actually a hybrid of both called Tim Sort (https://en.wikipedia.org/wiki/Timsort)."
 ---
 
 Let’s sort it out!

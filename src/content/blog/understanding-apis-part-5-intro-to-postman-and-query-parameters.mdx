@@ -8,6 +8,17 @@ category: Tutorials
 tags: [API, Postman]
 draft: false
 heroImage: ../../assets/blog/understanding-apis-part-5-intro-to-postman-and-query-parameters.png
+faqs:
+  - question: "How do I make my first request in Postman?"
+    answer: "Download Postman for free from their website at https://www.postman.com/downloads/, open it, click the plus (+) button to open a new Untitled Request, paste a URI such as `https://official-joke-api.appspot.com/random_joke` into the box that says \"Enter request URL\", and click \"Send\" to see the formatted Response."
+  - question: "What are Query Parameters?"
+    answer: "Query Parameters (also known as Query Params) are fields appended to the URI that are used to send additional information or data to the API, and they are usually used to filter or search for data; for example, searching Google for \"cats\" uses the URI https://www.google.com/search?q=cats, where `q` is the Query Param name and `cats` is its value."
+  - question: "How do I identify Query Parameters in a URI?"
+    answer: "Query Parameters follow the question mark (?), the Query Param name sits before the equal sign (=) with its value after it, and if there is more than one they are joined together using the ampersand character (&), as in `myhost.com/mypath?queryparam1=cats&queryparam2=dogs&queryparam3=squirrels`."
+  - question: "Why does a Query Param value contain codes like %20 and %28?"
+    answer: "URIs can't contain some characters such as a space, parentheses, or commas, so those characters are translated into HTML URL encodings like \"%20\", \"%28\", and \"%29\"; for instance, the encoded `Toronto%20%28and%20vicinity%29%2C%20Ontario%2C%20Canada` translates back into the original string \"Toronto (and vicinity), Ontario, Canada\"."
+  - question: "Do I have to URL-encode special characters myself in Postman?"
+    answer: "No. Postman is smart enough to know that these characters need to be translated into the ASCII Encoding and does it in the background without you noticing, so pasting the plain text \"Toronto (and vicinity), Ontario, Canada\" into the destination Query Param works fine; calling the URL from your browser also works, though the browser shows you the translated URL."
 ---
 
 Part 5 already! What a trip it’s been. :)

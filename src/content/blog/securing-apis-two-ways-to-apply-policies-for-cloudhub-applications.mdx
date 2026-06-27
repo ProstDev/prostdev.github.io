@@ -7,6 +7,17 @@ category: Tutorials
 tags: [MuleSoft, API, Anypoint Platform, CloudHub, RAML]
 draft: false
 heroImage: ../../assets/blog/securing-apis-two-ways-to-apply-policies-for-cloudhub-applications.png
+faqs:
+  - question: "What are the two ways to apply policies for CloudHub applications?"
+    answer: "There are two ways to apply policies via Anypoint Platform's API Manager: without creating a Proxy API (using the API ID in Auto-Discovery of your actual application), or by creating a Proxy API where Mule itself creates a proxy application on top of your actual application which has the API Auto-Discovery."
+  - question: "What do I need to apply a policy without creating a Proxy API?"
+    answer: "You need two things: the API ID generated in API Manager and used in the global element Auto-Discovery of your application, and the Anypoint Platform Client ID and Client Secret, which you get from Access Management under the Environments tab for the environment your application is deployed to and then set as `anypoint.platform.client_id` and `anypoint.platform.client_secret` Runtime properties when deploying."
+  - question: "Why does my API show as Unregistered in API Manager?"
+    answer: "When you first manage the API from Exchange the instance shows the status Unregistered; once you add the API ID to the Auto-Discovery global element and provide the Client ID and Client Secret as Runtime properties, the status turns from Unregistered to Active and you can start applying policies via Policies and then Apply New Policy."
+  - question: "Do I need to restart the application after applying a policy?"
+    answer: "No. There's no need to restart the application once the policy is applied; it reflects within seconds automatically, and even if you add one or more policies later no restart of the application is required."
+  - question: "How do I decide between using a Proxy API and not using one?"
+    answer: "Without a Proxy you save a vCore and worker but must know the Client ID and Client Secret (unless deployment is managed by a CI/CD process), manually create the Auto-Discovery global element, and you expose your actual endpoint to the client, which suits APIs used within the organization or intranet; with a Proxy you need an additional vCore and worker per proxy app but the Client ID is managed internally with no manual process, and you expose the proxy endpoint instead of the actual endpoint, which gives more security and suits APIs used outside your organization."
 ---
 
 > [!NOTE]

@@ -7,6 +7,17 @@ tags: [MuleSoft, GitHub Actions, CloudHub, CI/CD]
 youtubeId: jvtw3fcSyKY
 draft: false
 heroImage: ../../assets/blog/part-5-ci-cd-pipeline-with-mulesoft-and-github-actions-enabling-mfa-through-a-connected-app.png
+faqs:
+  - question: "Why can't I use my Anypoint Platform username and password in the pipeline when MFA is enabled?"
+    answer: "Because you sign in to Anypoint Platform using MFA (multi-factor authentication, through an app on your phone or an SMS code, for example), you can no longer rely on just your username and password, so you have to create a Connected App and authenticate the pipeline with its ID and secret instead."
+  - question: "How do I create a Connected App in Anypoint Platform for the pipeline?"
+    answer: "Sign in to Anypoint Platform and navigate to Access Management > Connected Apps, click Create app, give it a name like `github-actions`, select App acts on its own behalf, click Add Scopes, then save and copy both the ID and Secret to use in the pipeline."
+  - question: "Which scopes does the Connected App need for this CI/CD demo?"
+    answer: "For the current business group and the Sandbox environment, the post selects Design Center Developer, View Environment, View Organization, Profile, Cloudhub Organization Admin, Create Applications, Delete Applications, Download Applications, Read Applications, and Read Servers."
+  - question: "How do I change my pom.xml to authenticate with a Connected App instead of a username and password?"
+    answer: "In the `org.mule.tools.maven` plugin's `cloudHubDeployment` configuration, replace the `<username>` and `<password>` fields with `<connectedAppClientId>${client.id}</connectedAppClientId>`, `<connectedAppClientSecret>${client.secret}</connectedAppClientSecret>`, and `<connectedAppGrantType>client_credentials</connectedAppGrantType>`."
+  - question: "What changes do I make in build.yml to send the Connected App credentials?"
+    answer: "In the deploy job's Deploy to Sandbox step, replace the `USERNAME` and `PASSWORD` env entries with `ID: ${{ secrets.CONNECTED_APP_CLIENT_ID }}` and `SECRET: ${{ secrets.CONNECTED_APP_CLIENT_SECRET }}`, then change the Maven command from sending `-Danypoint.username` and `-Danypoint.password` to sending `-Dclient.id=\"$ID\"` and `-Dclient.secret=\"$SECRET\"`."
 ---
 
 So far we’ve been setting up our CI/CD pipelines using our Anypoint Platform username and password. However, if you’re using an enterprise account, most likely you’re using MFA or Multi-Factor Authentication for your account. The process to create your CI/CD pipeline with this authentication method is quite different.

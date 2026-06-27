@@ -11,6 +11,17 @@ category: Tutorials
 tags: [MuleSoft, Runtime Fabric, Oracle, Kubernetes, Docker]
 draft: false
 heroImage: ../../assets/blog/mulesoft-runtime-fabric-deployed-on-oracle-cloud-infrastructure-oci-part-1.png
+faqs:
+  - question: "What is the difference between MuleSoft Standalone, Runtime Fabric, and Private Cloud Edition?"
+    answer: "Standalone and Runtime Fabric are hybrid models where the control plane stays in MuleSoft's cloud and the runtime plane runs on premise or on a cloud provider, while Private Cloud Edition keeps both the runtime plane and the control plane at your end so you install, patch, upgrade, and monitor everything yourself. Standalone is the common MuleSoft runtime running directly at the OS level, whereas Runtime Fabric runs the fabric on a Kubernetes-based implementation."
+  - question: "What are the two ways to install Runtime Fabric described here?"
+    answer: "The first is installing on top of an existing Kubernetes cluster you already have, for example on AWS, GKE, or AKE, which is best if you want to leverage what you already have. The second is a manual installation on top of your own hardware in your datacenter or on compute at your cloud provider, which is the approach this article follows and is a good option if you do not already have a Kubernetes cluster."
+  - question: "How is the three-node OCI cluster set up in this demo?"
+    answer: "The cluster uses three nodes where one node acts as the Controller and the other two represent the Workers, all running on OCI compute instances of type `VM.Standard.E2.2` with CentOS as the operating system, and all VMs placed in the public subnet so the compute instances are reachable."
+  - question: "How do I set the RTF_MULE_LICENSE variable?"
+    answer: "The `RTF_MULE_LICENSE` value comes from a `.lic` license file you receive with a valid and active MuleSoft subscription. You base64-encode that file by running `base64 -w0 license.lic`, and the output of that command is what you set as the `RTF_MULE_LICENSE` variable value."
+  - question: "How do I run the installation across the controller and workers?"
+    answer: "After setting the environment variables and running `generate-configs.sh`, you copy each generated snippet to the matching node to write its `env` file, then copy `init.sh` into `/opt/anypoint/runtimefabric` on every node. You run `sudo /opt/anypoint/runtimefabric/init.sh` first on the controller, and once it reports the cluster endpoints you execute the same command on the workers in parallel; the whole process can take 10-25 minutes and you can monitor it with `tail -f /var/log/rtf-init.log`."
 ---
 
 MuleSoft is so flexible and modern in such a way, that for deployment models where the customer needs to have control over the infrastructure, and CloudHub is not an option (maybe regulations concerns) it offers on premise deployments such as:

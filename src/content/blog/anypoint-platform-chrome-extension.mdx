@@ -10,6 +10,17 @@ category: Guides
 tags: [MuleSoft, Anypoint Platform]
 draft: false
 heroImage: ../../assets/blog/anypoint-platform-chrome-extension.png
+faqs:
+  - question: "What information can I see in the Anypoint Platform Chrome Extension?"
+    answer: "At the top of the extension you can see the Organization name, Organization id, and Environment id, which are useful when making an HTTP call with the CloudHub or Hybrid API or when using the Anypoint CLI. Once you select a specific Runtime Manager application you can also see its name, the target system where it is deployed, its current status, its schedulers, and its related alerts."
+  - question: "Which Anypoint Platform pages does the extension work on so far?"
+    answer: "For now the extension only works on the Runtime Manager page and when diving into Runtime Manager applications; the author notes there is still a lot of work to do and plans to add information for the main pages."
+  - question: "What file format do I get when I download an application artifact?"
+    answer: "When you select a Runtime Manager application you get a button to download the artifact directly from your browser: if the application is a Mule 4 application you get a `.jar` file, and if it was deployed in Mule 3.9.X the artifact is downloaded as a `.zip` file."
+  - question: "How do I see schedulers and alerts for an application?"
+    answer: "Inside an application the extension shows the schedulers created in CloudHub and Hybrid, instead of having to go into the application and click on schedulers to enable or disable them. For alerts, you click the \"Alerts\" tab to see the related alerts, and you can click on an alert to be redirected to make the changes you need."
+  - question: "Where can I get the Anypoint Platform Chrome Extension?"
+    answer: "You can get the extension from the Chrome Web Store at https://chrome.google.com/webstore/detail/anypoint-platform-chrome/gofndnflkobgljnjjalmehnlamoifmhc?hl=en&authuser=0, and you can use the support page on the Chrome Extension page to give feedback."
 ---
 
 As developers we always want to have information at first hand whenever we need to access information.

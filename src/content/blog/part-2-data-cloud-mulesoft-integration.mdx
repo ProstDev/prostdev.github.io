@@ -9,6 +9,19 @@ tags: [MuleSoft, Salesforce, Data Cloud, CloudHub, Anypoint Platform]
 youtubeId: A48011haXRw
 draft: false
 heroImage: ../../assets/blog/part-2-data-cloud-mulesoft-integration.png
+faqs:
+  - question: "Do I need to know MuleSoft to follow this tutorial?"
+    answer: "No. You do not have to know MuleSoft beforehand because the post guides you through every step, from deploying the Mule application to CloudHub to copying the public endpoint URL."
+  - question: "What do I need before deploying the Mule app to CloudHub?"
+    answer: "You need an Anypoint Platform account (a free 30-day trial works), the Mule app's JAR file downloaded from https://github.com/alexandramartinez/datacloud-mulesoft-integration/releases, and the Salesforce credentials from Part 1: `salesforce.username`, `salesforce.password`, `cdp.consumer.key`, and `cdp.consumer.secret`."
+  - question: "Which runtime version should I select when deploying?"
+    answer: "Set the Release Channel to None so you can select Runtime Version `4.4.0`, which is the version used when the app was created and this post was published; if you use the JAR version `2.1.0` or newer you can instead select runtime `4.7.0` and/or Java 11/17."
+  - question: "How do I protect my Salesforce credentials in the Properties tab?"
+    answer: "Paste the properties in the Text view, then switch back to the Table view and click the Protect button next to each value so the credentials are no longer visible; this Protect button is only available for CloudHub 2.0."
+  - question: "Why shouldn't I share the public endpoint URL?"
+    answer: "Anyone with that URL can access your Data Cloud API, so you should not share it publicly; if it is exposed you have to delete the app from the Settings tab and deploy a new one with a new name, and you can Stop and Start the app so it only runs while you are using it."
+  - question: "What is the `anypoint.platform.gatekeeper` property for?"
+    answer: "It is a property set to `disabled` that has to be added for JAR version `2.0.0` and newer; you can skip it if you are using the `1.0.0` version."
 ---
 
 A little bird told me that deleting records in Data Cloud is actually not that easy to do. So, I did my research and came up with a Mule application for you all to reuse to (hopefully) make your lives easier when dealing with Data Cloud!

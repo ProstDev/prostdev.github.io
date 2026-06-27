@@ -10,6 +10,19 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Studio, REST]
 draft: false
 heroImage: ../../assets/blog/mule-4-unsplash-connector.png
+faqs:
+  - question: "What operations does this Mule 4 Unsplash connector support?"
+    answer: "The connector implements two operations: Get Random Photo, which retrieves a random set of photos from the Unsplash API, and Search Photo, which lets you search photos based on search terms and returns picture information."
+  - question: "How do I create the custom connector project?"
+    answer: "First run the Maven archetype command `mvn org.mule.extensions:mule-extensions-archetype-maven-plugin:generate` in your terminal, then answer the prompts for the extension name, groupId, artifactId, version, and main package, optionally run `mvn eclipse:eclipse` so the IDE recognizes the project, and finally import the generated project into your IDE (the author uses IntelliJ IDEA and imports it as a Maven project)."
+  - question: "Which auto-generated Java classes does the connector use?"
+    answer: "It uses only two of the auto-generated classes: `UnsplashConfiguration`, which sets up general parameters such as the Unsplash Access Key required for API calls, and `UnsplashOperations`, which defines the connector's operations, in this case `GetRandomPhoto` and `SearchPhoto`."
+  - question: "What attributes can I set on the Get Random Photo and Search Photo operations?"
+    answer: "Get Random Photo lets you specify count (the number of images to retrieve), keyword (the keyword for the images you want), and orientation (portrait, landscape, or squarish), while Search Photo takes optional attributes for search terms, page, and per page (how many records per page you want)."
+  - question: "How do I install the custom module so it appears in Anypoint Studio?"
+    answer: "Run `mvn clean install` from the terminal or IntelliJ IDEA, and afterward the new module appears in the Add Modules palette under Workspace, where you can drag and drop it into your project."
+  - question: "Where can I get the connector and the sample implementation code?"
+    answer: "Both projects are on GitHub: the connector itself is at https://github.com/emoran/mule4-unsplash-connector and the implemented sample code is at https://github.com/emoran/unsplash-connector-implementation."
 ---
 
 *GitHub repositories with the projects can be found at the end of the post.*

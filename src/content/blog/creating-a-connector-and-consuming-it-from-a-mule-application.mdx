@@ -51,6 +51,19 @@ readerNotes:
     date: 2022-10-13
     replyTo: "kkrish.mathi"
     text: "Hi! Hopefully the author is able to help you on this, but in case he doesn't reply on time, you can also try posting at https://help.mulesoft.com for others to see your question in the community!"
+faqs:
+  - question: "What is an Anypoint Connector?"
+    answer: "An Anypoint Connector is a reusable component that interacts with Mule runtime and Anypoint Studio; it communicates with a target resource, conveys information between that resource and Mule, and transforms the data into a Mule message."
+  - question: "Why would I create a custom connector instead of using an out-of-the-box one?"
+    answer: "When no out-of-the-box connector is available and you would need a series of complex steps to call a third party API (such as authorizing the client, getting an access token, implementing caching, or calling a database), it is recommended to use a custom connector that calls the third party API and hides that complexity, so the consumer API has no idea how the connector calls it."
+  - question: "How do I create a custom connector project in Mule 4?"
+    answer: "In Mule 4 you no longer need a separate API Dev Kit; with Java JDK 1.8 and the Maven Apache plugin you run `mvn org.mule.extensions:mule-extensions-archetype-maven-plugin:1.2.0:generate`, which creates a basic template project with sample operations, the required files, and test cases, prompting you for parameters like the extension name, groupId, version, artifactId, and package."
+  - question: "How do I find my Organization Id for the groupId?"
+    answer: "Log in to your Anypoint Platform account, navigate to Access Management then Organization, and click the name of the business group; a pop-up window opens where you can find the Organization Id."
+  - question: "What changes do I make to the connector's POM file before publishing?"
+    answer: "First add a `mule-maven-plugin` to the `<build>` section, then create a profile with the exchange distribution repository information (where `groupId` is a variable extracted from the POM's groupId properties), and finally add a `<server>` section in the `settings.xml` file from your `./m2` folder whose `server.id` matches the `repository.id` in the profile."
+  - question: "How do I publish the connector and then consume it from a Mule application?"
+    answer: "Deploy it to Anypoint Exchange with `mvn deploy -Pexchange -DskipTests`, where the `-P` parameter specifies the profile name from the POM file, and then in your Mule project add the connector as a dependency in the POM (with the matching groupId, artifactId, and version, plus a `mule-plugin` classifier) so Maven resolves it and you can use it like any other out-of-the-box connector."
 ---
 
 ## What is a Connector?

@@ -12,6 +12,19 @@ category: Tutorials
 tags: [MuleSoft, Docker, SonarQube, Maven, CI/CD]
 draft: false
 heroImage: ../../assets/blog/easiest-way-to-integrate-automatic-code-review-of-mulesoft-apps-using-sonarqube-and-docker-container.png
+faqs:
+  - question: "How do I get a SonarQube instance up and running for MuleSoft code reviews?"
+    answer: "The quickest way is a Docker container: pull the image with `docker pull fperezpa/mulesonarqube:7.7.3`, then run it with `docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 fperezpa/mulesonarqube:7.7.3`. Once it is running you have a SonarQube instance ready to perform MuleSoft code analysis."
+  - question: "How do I log in to the SonarQube instance after running it?"
+    answer: "Go to http://localhost:9000/projects and use admin/admin as the default username and password to log in; you can change it later."
+  - question: "Why do I need to remove the .xml extension from SonarQube's default XML plugin?"
+    answer: "Your MuleSoft code is also XML, and the Mule plugin is the one that should inspect those files. Removing the `.xml` extension from the default XML plugin stops it from checking your MuleSoft application and lets the Mule plugin take over. You do this under Administration, then Configuration and General Settings, then the XML section, removing the `.xml` line and clicking Save."
+  - question: "How do I run the SonarQube code analysis on my MuleSoft project?"
+    answer: "Open a command line, navigate to your MuleSoft project's home directory, and run `mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.sources=.\\src`, where `-Dsonar.host.url` is the URL where your SonarQube instance is running and `-Dsonar.sources` is the path to the code to analyze (typically the src folder under your MuleSoft project home). When it finishes, the report is available in your SonarQube instance under Projects."
+  - question: "Why did SonarQube flag a bug about credentials in the example project?"
+    answer: "The example application has an HTTP Listener with hardcoded host and port values, which was done intentionally. The report highlights that credentials and resources should be managed with application properties instead, since hardcoding them is not a good practice for MuleSoft applications."
+  - question: "Can I customize the rules SonarQube uses to review MuleSoft code?"
+    answer: "Yes. There is a set of Mule rules already configured (found under Rules, then Mule), plus two Quality Profiles, one for Mule 4 applications and one for Mule 3, with Mule 4 as the default. You can explore the default Mule rules and modify or add rules as needed to match your own MuleSoft coding standards."
 ---
 
 ## Using SonarQube and Docker

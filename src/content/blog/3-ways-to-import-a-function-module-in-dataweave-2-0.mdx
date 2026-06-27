@@ -8,6 +8,19 @@ pubDate: 2021-04-20
 category: Guides
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/3-ways-to-import-a-function-module-in-dataweave-2-0.png
+faqs:
+  - question: "Why do I need to import a module in DataWeave at all?"
+    answer: "You only need to import modules that are not part of the core functions. The core functions are available without an import, while everything else lives in a module you have to bring in first."
+  - question: "What are the 3 ways to import a function or module in DataWeave 2.0?"
+    answer: "First, you can import the module directly with `import dw::core::Strings` and reference it each time, like `Strings::capitalize(\"alex martinez\")`. Second, you can import all functions from a module with the asterisk and the `from` keyword, like `import * from dw::core::Arrays`, so you call functions without the module prefix. Third, you can import one or more specific functions by listing them, like `import every, some from dw::core::Arrays`."
+  - question: "How do I reference a function when I import the module directly?"
+    answer: "You use the name of the module, then add two colons (`::`), and finally the name of the function, for example `Strings::capitalize(\"alex martinez\")`, after which you can continue using the function as usual."
+  - question: "What's the difference between importing all functions with the asterisk and listing specific functions?"
+    answer: "Both approaches let you call the function directly without referencing the module name. Importing all functions with `import * from` brings in everything in the module, while listing specific functions like `import every, some from` requires you to name each function you use, which makes it clear exactly which functions are being imported and lets you search a function to see which module it comes from."
+  - question: "Why does my script throw an 'Unable to resolve reference' error when listing imported functions?"
+    answer: "When you explicitly list the functions you import, you will get an error if you forget to list one of the functions you are using. For example, importing only `every` while also calling `some` produces an error because `some` is not listed in the import statement."
+  - question: "Which import approach should I use?"
+    answer: "The option you choose really depends on your personal preference or the standards of your project. The author's favorite is listing functions individually, because for big scripts you may not know which function comes from which module and you can just search for the function to see which module imports it."
 ---
 
 There are different ways to import a module in DataWeave. You need to do this for the modules that are not a part of the [core functions](https://docs.mulesoft.com/mule-runtime/4.3/dw-core). Here is a list of all the modules in DataWeave: [Mule Docs - DataWeave Reference](https://docs.mulesoft.com/mule-runtime/4.3/dw-functions).

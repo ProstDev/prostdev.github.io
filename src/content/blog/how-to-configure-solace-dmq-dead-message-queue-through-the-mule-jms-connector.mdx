@@ -11,6 +11,17 @@ category: Tutorials
 tags: [MuleSoft, Solace, JMS]
 draft: false
 heroImage: ../../assets/blog/how-to-configure-solace-dmq-dead-message-queue-through-the-mule-jms-connector.png
+faqs:
+  - question: "What is a Dead Message Queue (DMQ) in Solace?"
+    answer: "A DMQ is a durable queue that messages are moved to instead of being discarded. By default, Guaranteed messages are removed from a durable endpoint and discarded when the number of redelivery attempts exceeds the Max Redelivery value, or when a message's Time-To-Live (TTL) value is exceeded and the endpoint respects message TTL expiry. If you don't want those messages discarded, you assign a DMQ to the endpoint so DMQ-eligible messages are sent there instead."
+  - question: "Why are my DMQ-eligible messages still being discarded?"
+    answer: "If an endpoint's assigned DMQ doesn't exist, the removed Guaranteed messages will still be discarded even if they are DMQ-eligible. By default each durable endpoint is assigned a DMQ named `DEAD_MSG_QUEUE`, but this queue does not pre-exist and must be created by a management user, so you need to make sure the DMQ actually exists."
+  - question: "How do I configure DMQ and TTL on a queue in Solace?"
+    answer: "In the advanced settings of the queue (in the post, `test-queue-1`) enable 'Respect TTL', set the 'Maximum TTL' (the post uses 180 seconds, which can be set based on your need), and set the 'DMQ Name' to the destination queue (the post uses `test-queue-2`). With this setting, whenever a message reaches `test-queue-1` it stays there for 180 seconds before it's pushed to the DMQ `test-queue-2`."
+  - question: "How do I make a published message DMQ-eligible through the Mule JMS connector?"
+    answer: "First enable the 'Publisher Messages DMQ Eligible' property in the JMS JNDI of the Message VPN by going to JMS JNDI, then Connection Factories, then /jms/cf/default and enabling it. Then in the Mule app set the property `SOLACE_JMS_PROP_DEAD_MSG_QUEUE_ELIGIBLE` to `true` in the JMS Config Provider Properties, after which messages publish to the topic with 'DMQ Eligible' set to 'Yes'."
+  - question: "What happens to the message after the TTL elapses?"
+    answer: "Once published with DMQ Eligible set to Yes, the message stays in the queue `test-queue-1` for 180 seconds, and before that TTL elapses it is automatically published to the DMQ (`test-queue-2`) for further processing rather than being discarded."
 ---
 
 In this post, I will be explaining how to configure Solace DMQ through the Mule JMS Connector. There can be many business scenarios where the processing of the message will be delayed by a predefined amount of time. In such scenarios, we can make use of the concept of the TTL property and the DMQ.

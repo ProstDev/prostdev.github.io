@@ -93,6 +93,17 @@ readerNotes:
       output application/json
       ---
       sumDigits(sumValue((read(payload, "text/plain") splitBy('\n'))))
+faqs:
+  - question: "What does this DataWeave challenge ask you to do?"
+    answer: "It asks you to create a DataWeave script that sums all the digits from the input payload until only one digit is left. For example, 123 + 456 = 579, then 579 breaks down into 5 + 7 + 9 = 21, then 21 breaks down into 2 + 1 = 3, and the final result is 3 because it is a 1-digit number."
+  - question: "What is the expected output for the sample input?"
+    answer: "For the sample input payload shown in the post (which can be in txt format), the expected output is the single digit 2."
+  - question: "What clues does the post give if I'm stuck?"
+    answer: "The post offers three clues: first, you can sum each line from the input payload to end up with just one number; then use `sizeOf()` to get the length of a String; and finally you can use `reduce()` to sum some of the digits."
+  - question: "What's the difference between the two provided solutions?"
+    answer: "Both solutions use the same recursive `sumNums` function, but Solution #1 starts from `sum(lines(payload))` to total the lines first, while Solution #2 instead does `payload replace \"\\n\" with \"\"` and then pipes that into `sumNums($) as Number`."
+  - question: "Where should I look for help while solving this challenge?"
+    answer: "The post recommends referring to the DataWeave documentation only, at https://docs.mulesoft.com/dataweave/latest/, and trying to avoid using Google or asking others so you can learn on your own and become a DataWeave expert. You can also solve it on the DataWeave Playground."
 ---
 
 Try to solve this challenge on your own to maximize learning. We recommend you refer to the [DataWeave documentation](https://docs.mulesoft.com/dataweave/latest/) **only**. Try to avoid using Google or asking others so you can learn on your own and become a DataWeave expert!

@@ -11,6 +11,19 @@ tags: [MuleSoft, Anypoint Studio]
 youtubeId: kpOpW5IY5bY
 draft: false
 heroImage: ../../assets/blog/notification-center-for-new-versions-of-connectors-modules.png
+faqs:
+  - question: "What is the Notification Center for new versions of connectors?"
+    answer: "It is a feature introduced in Anypoint Studio 7.10.0 that gives you recommendations when new connector versions are available, so you stay on the latest innovation and avoid running older versions of the modules or connectors in your project."
+  - question: "How do I update my connectors to the latest version using Anypoint Studio 7.10.0?"
+    answer: "Right-click on your project, choose Manage Dependencies, then Manage Modules, and Studio connects to Anypoint Exchange to fetch all alternative versions for your connectors; then click on each connector, click the Update Version button, and finally click Apply and Close."
+  - question: "What do the blue dots mean in the Manage Modules panel?"
+    answer: "The blue dots indicate that there are available new versions for those connectors."
+  - question: "Does updating a connector change my `pom.xml` automatically?"
+    answer: "Yes, after you update the versions you can confirm that the `pom.xml` file is automatically updated with the new dependencies versions."
+  - question: "How can I confirm a connector version is actually the latest?"
+    answer: "You can verify that the versions of your dependencies are the latest for each connector on the Anypoint Connector Release Notes page at https://docs.mulesoft.com/release-notes/connector/anypoint-connector-release-notes."
+  - question: "What other new features were introduced in Anypoint Studio 7.10.0?"
+    answer: "Besides the Notification Center for new connector versions, the release added the new Metadata Assistant for extracting and propagating metadata across sub-flows through a wizard, Refactor rename for flows that propagates flow name changes across flow references automatically, and a Themes improvement where new workspaces match your operating system's Light or Dark appearance preference."
 ---
 
 Let’s do a quick and short blog post! This post is about the new Anypoint Studio 7.10.0 version which has been released this past July 29th, 2021.

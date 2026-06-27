@@ -10,6 +10,19 @@ category: Tutorials
 tags: [MuleSoft, DataWeave]
 draft: false
 heroImage: ../../assets/blog/how-to-check-for-empty-values-in-an-array-in-dataweave-part-4-arrays-module.png
+faqs:
+  - question: "What does \"empty\" mean when checking an array in DataWeave?"
+    answer: "In this post, an empty value means an empty string (\"\"), a null value (`null`), or an empty array (`[]`). The array could only contain strings or nulls (not objects), but tests for empty objects are added as well."
+  - question: "How do I use the `some` function from the Arrays module to check for empty values?"
+    answer: "First import it with `import some from dw::core::Arrays`, then replace the else expression with `arr some isEmpty($)`, which checks if at least one of the items inside the array is an empty value and returns true if so. You keep the first `isEmpty(arr)` condition because `arr some isEmpty($)` returns false instead of true when arr is null or an empty array (`[]`)."
+  - question: "How does the pattern matching (match/case) solution handle each input?"
+    answer: "It immediately returns true for an empty array (`case [] -> true`); if the value is not an empty array it goes to the second case `case a is Array -> a some isEmpty($)` which checks type Array and runs the `some` logic; finally the `else -> isEmpty(arr)` branch handles the remaining case when the value is null."
+  - question: "What's the difference between the pattern matching and function overloading solutions?"
+    answer: "Function overloading executes pattern matching logic underneath, defining the same function twice (one expecting a `Null` type that returns true, one expecting an `Array`). The post notes that if performance is an issue you should use function overloading instead of the pattern matching solution."
+  - question: "Why do the early solutions return false instead of true for null and an empty array?"
+    answer: "Solutions 1 and 2 (using `sizeOf`/`groupBy`/`filter`/`isEmpty`/`default`) return false instead of true for a null value and for an empty array, which is why the post keeps an explicit first condition like `if (isEmpty(arr)) true` in later solutions to return the expected true value for those cases."
+  - question: "Do `not true or true` and `! true or true` produce the same output?"
+    answer: "No. The first returns false and the second returns true, because they are run as `not (true or true) = not (true) = false` versus `(! true) or true = (false) or true = true`. You can read more in the Mule Docs - Logical Operators at https://docs.mulesoft.com/mule-runtime/4.3/dw-operators#logical_operators."
 ---
 
 I had this use-case where I had to make sure all the values inside an [array](https://en.wikipedia.org/wiki/Array_data_structure) were not empty. By “empty,” I’m referring to an empty string (“”), a null value (*null*), or even an empty array ([]). There were some cases when I would receive a null value instead of an array. The array could only contain strings or nulls, but not objects. However, I’ll be adding tests to check for empty objects as well.

@@ -7,6 +7,19 @@ category: Guides
 tags: [MuleSoft, Anypoint Platform, Flex Gateway, API, Docker]
 draft: false
 heroImage: ../../assets/blog/universal-api-management-anypoint-flex-gateway-and-api-governance-1.png
+faqs:
+  - question: "What is Universal API Management in Anypoint Platform?"
+    answer: "Universal API Management lets you manage, govern, or secure your APIs within a single control plane, regardless of whether they are Mule or non-Mule APIs or where they are located (on-premise, cloud, or anywhere). It lets organizations control, manage, and secure their APIs under a single umbrella, adapt any architecture with a lightweight and flexible API Gateway, and govern all APIs under a single platform."
+  - question: "Where can Flex Gateway be installed?"
+    answer: "Flex Gateway can be set up on three different operating systems: as a Linux Service, as a Docker Container, or as a Kubernetes Ingress Controller. It can also run in two modes, Local and Connected, and be deployed anywhere such as Cloud, Docker, Kubernetes, or customer-hosted environments."
+  - question: "What authentication mechanisms are supported for installing Flex Gateway?"
+    answer: "There are three authentication mechanisms supported for installing Flex Gateway: Anypoint username and password, an auth token, and a Connected App."
+  - question: "Can a single Flex Gateway manage multiple APIs across different technologies and locations?"
+    answer: "Yes, you can use a single Flex Gateway for multiple APIs no matter where they are running or in which technologies they are implemented. For example, a single Flex Gateway can run in a Docker container with multiple replicas, registered in Anypoint Platform, to connect multiple APIs built in any technology. You can alternatively use multiple Flex Gateways, one per API, grouped according to your needs."
+  - question: "What does API Governance do and which default rulesets does it include?"
+    answer: "API Governance lets you apply governance rulesets to your APIs to ensure consistency, produce consistent API specs across the enterprise, improve API quality and security, enforce Anypoint and OpenAPI best practices, ensure design-time conformance, and reduce the Top 10 OWASP security risks. Its default rulesets include Anypoint Best Practices, Authentication Security Best Practices, HTTPS Enforcement, OpenAPI Best Practices, OWASP API Security Top 10 2019 Checklist, and Required Examples."
+  - question: "How do I implement API Governance for my APIs?"
+    answer: "First create a profile in Anypoint Platform's API Governance and select which rulesets to enable for that profile, and you can also add filters and notifications. Filters determine which APIs are scanned against the profile, while notifications email users when APIs are not designed according to the rulesets and are marked as Non-Conformant. Each API then carries one of three statuses: Not Validated when it has not been validated against the profile, Conformant when it satisfies the associated rulesets, and Non-Conformant when it does not."
 ---
 
 As you are aware that recently MuleSoft has introduced Universal API Management capabilities via Flex Gateway and API Governance components as part of Anypoint Platform. These two components are very important as a part of API lifecycle management and those will help to manage any APIs using a single platform and ensure that whatever API specs that you are designing are with best practices and all security aspects have been taken care of during API design.

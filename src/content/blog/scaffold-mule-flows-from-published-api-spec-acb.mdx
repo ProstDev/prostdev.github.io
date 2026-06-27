@@ -9,6 +9,19 @@ category: Tutorials
 tags: [MuleSoft, Anypoint Code Builder, Anypoint Exchange, Visual Studio Code]
 draft: false
 heroImage: ../../assets/blog/scaffold-mule-flows-from-published-api-spec-acb-1.png
+faqs:
+  - question: "Why would I scaffold Mule flows from an API specification instead of starting from scratch?"
+    answer: "Scaffolding lets you get started on your Mule application with a base project that is created from your specification, instead of building the Mule project and Mule flows from scratch."
+  - question: "What does the scaffolded Mule project include?"
+    answer: "Once you scaffold the project you get Mule flows for each HTTP method in your specification, basic error handling for different HTTP status codes, and an initial Mule project with some Transform Message components where applicable."
+  - question: "What do I need before I can scaffold flows in Anypoint Code Builder?"
+    answer: "You need an Anypoint Platform account, an API specification already published in Anypoint Exchange, Visual Studio Code installed, and the Anypoint Extension Pack installed to enable Anypoint Code Builder in VS Code."
+  - question: "How do I create the Mule project in Anypoint Code Builder?"
+    answer: "Inside Anypoint Code Builder select the Implement an API quick action, click Allow and sign in to Anypoint Platform when prompted, search for your asset's name and select it with Add Asset, then click Create Project and wait a few seconds for processing to finish."
+  - question: "Where do I find the generated flows after the project is created?"
+    answer: "You can see the flows in the configuration file located under `src/main/mule`, and clicking the Flow List button at the top-left of the graphical view shows a complete list of all the flows implemented in the current XML file."
+  - question: "Why do some generated flows already contain a Transform Message component?"
+    answer: "Some flows include a Transform Message component to show which DataWeave code is needed to retrieve data such as URI Parameters, which happens when your API Specification contains a URI Parameter, and additional Transform Message components are added for cases where you set up an example in the API Specification."
 ---
 
 In this post, I am going to show you how to scaffold your flows in Anypoint Code Builder from a published API specification.

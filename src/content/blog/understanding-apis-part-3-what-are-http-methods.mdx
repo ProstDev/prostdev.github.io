@@ -10,6 +10,19 @@ category: Guides
 tags: [API, REST]
 draft: false
 heroImage: ../../assets/blog/understanding-apis-part-3-what-are-http-methods.png
+faqs:
+  - question: "What are the most popular HTTP methods?"
+    answer: "There are 9 HTTP methods in total (GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, and PATCH), but the most popular ones are GET, POST, PUT, PATCH, and DELETE."
+  - question: "What does each of the popular HTTP methods do?"
+    answer: "GET is used to read or retrieve data from the server or API, POST is used to create new data, PUT is mostly used to update or replace existing data (but can also create new data), PATCH is used to update or modify parts of the existing data, and DELETE is used to delete data."
+  - question: "What's the difference between POST and PUT?"
+    answer: "Both can create data, but the difference is idempotency: POST is not an idempotent method, so sending the same information more than once can result in duplicated data, which is why it's used for creation only; PUT is an idempotent method, so sending the same information more than once has the same effect as sending it just once."
+  - question: "What's the difference between PUT and PATCH?"
+    answer: "PUT is mostly used to update or replace existing data, while PATCH is used to update or modify only parts of the existing data, such as fixing a typo in just an employee's first name. PUT is an idempotent method, and PATCH can be idempotent depending on how the API Implementation works."
+  - question: "Why is the Operation in the Human Resources API example just GET?"
+    answer: "Because GET is used to read or retrieve data, and that example only retrieved the employees' first day of employment; the information sent in the Request was merely used to perform a search of the data, and no information was changed in the server."
+  - question: "What does idempotent mean for an HTTP method?"
+    answer: "An idempotent method is one where sending the same information more than once will have the same effect as sending it just once; PUT is idempotent, POST is not (which can lead to duplicated data), and PATCH can be idempotent depending on the API Implementation."
 ---
 
 In [part 1](https://www.prostdev.com/post/understanding-apis-part-1-what-is-an-api) of this series, we learned what an API is and the 4 aspects that we can use to define it, which are Inputs, Operations, Outputs, and Data Types. We also outlined this nice diagram to have a visual representation:

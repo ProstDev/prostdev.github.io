@@ -7,6 +7,17 @@ category: Guides
 tags: [MuleSoft, Error Handling, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/3-simple-rules-5-examples-to-understand-the-error-handling-in-mule-4-1.png
+faqs:
+  - question: "What is the difference between On-Error Propagate and On-Error Continue?"
+    answer: "After all components in the error-handling block execute, On-Error Propagate raises the error back to the calling flow, while On-Error Continue does not raise the error and instead continues to the next processor after the flow-ref in the calling flow. When you only have a single flow they behave the same way except that On-Error Continue ends with a 200 status and On-Error Propagate ends with a 500 status."
+  - question: "Why does On-Error Continue skip the remaining processors in the flow where the error happened?"
+    answer: "On-Error Continue continues only to the next processor of the calling flow, but it will not continue within the same flow. So if the error is handled in a private flow, it will not execute the logger after the error in that private flow; instead it returns to the calling flow and runs the next processor there, for example a Set Payload component in the flow that called it."
+  - question: "When does Mule fall back to the default error handler?"
+    answer: "Mule routes an error to your error-handling block only if the `errorType` from the error matches what you set in that block. If nothing matches (for example actual `HTTP:CONNECTIVITY` versus a handled `HTTP:NOT_FOUND`), Mule uses its default error handling, and if the flow is not called by any other flow it returns the default Error Response Body with a status code of 500 by default."
+  - question: "How do I know which error types a flow can produce?"
+    answer: "Mule 4 identifies the error types that can occur in a flow by looking at the connectors placed in it, so the error-type drop-down shows the relevant types; for example a flow with an HTTP Request and Database components surfaces the DB and HTTP error types, and it even shows the EXPRESSION error type when the flow contains some DataWeave syntax."
+  - question: "Why don't sub-flows have their own error handling?"
+    answer: "A sub-flow does not have an Error Handling scope, so only flows and private flows have an Error Handling block that can contain On-Error Propagate and On-Error Continue. An `errorType` itself is a combination of a Namespace and an Identifier, such as `HTTP:UNAUTHORIZED` where the Namespace is HTTP and the Identifier is UNAUTHORIZED."
 ---
 
 Hey Muleys,

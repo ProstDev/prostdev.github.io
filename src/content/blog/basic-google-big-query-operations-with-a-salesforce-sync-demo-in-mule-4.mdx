@@ -12,6 +12,19 @@ category: Tutorials
 tags: [MuleSoft, DataWeave, Salesforce, Google BigQuery, Anypoint Studio]
 draft: false
 heroImage: ../../assets/blog/basic-google-big-query-operations-with-a-salesforce-sync-demo-in-mule-4.png
+faqs:
+  - question: "What are the six flows in this Salesforce-to-BigQuery sync app?"
+    answer: "The app uses six flows, first `Sync` which triggers the process with a scheduler, then `DescribeInstance` which calls the Salesforce describe operation and loops over the objects you want, then `DescribeIndividualSalesforceObject` which captures a specific object's fields and field types to build a payload BigQuery recognizes, then `BigQueryCreateTable` which creates the table from the object name and fields, then `QuerySalesforceObject` which dynamically queries the object and pulls the data, and finally `InsertDataIntoBigQuery` which pushes the data into BigQuery."
+  - question: "How do I map Salesforce field types to BigQuery types in this demo?"
+    answer: "A DataWeave `validateField` function converts Salesforce types to BigQuery types, mapping REFERENCE, ID, PICKLIST, TEXTAREA, ADDRESS, EMAIL, PHONE and URL to STRING, mapping DOUBLE and CURRENCY to FLOAT, mapping INT to INTEGER, and leaving any other type as is. LOCATION fields are filtered out entirely because the post notes Location fields are tricky and you can't do much with the API on them."
+  - question: "Which Salesforce objects does the sync job process?"
+    answer: "The demo pulls three objects: Account, Contact, and a custom object called `Project__c`. The DataWeave filter in `DescribeInstance` also restricts to objects where `queryable`, `replicateable`, `retrieveable`, `searchable` and `triggerable` are all true so it only pulls objects that can be queried."
+  - question: "Why does the query limit the result to 100 records?"
+    answer: "The `QuerySalesforceObject` flow limits the output to 100 records, and the post notes that on a bigger scale this should be done as a batch process instead."
+  - question: "What do I need to set up before connecting Mule to Salesforce and BigQuery?"
+    answer: "On the Salesforce side you need a username, password, and security token (and a developer instance works if you don't already have one). On the Google Cloud side you sign up for GCP, create a new project, create a service account with the BigQuery Admin role, generate a JSON key for it, and create a dataset named salesforce in BigQuery. The JSON key is then copied under the `src/main/resources` folder so the app can authenticate against your project."
+  - question: "How do I add the Google BigQuery connector to the Mule project?"
+    answer: "From Exchange you search for \"BigQuery\", select the connector, and use the \"Add to project\" option, after which its operations appear in the Mule Palette."
 ---
 
 *GitHub repository with the Mule project can be found at the end of the post.*

@@ -6,6 +6,17 @@ author: "Sravan Lingam"
 category: Tutorials
 tags: [MuleSoft, DataWeave]
 heroImage: ../../assets/blog/3-simple-steps-to-convert-a-flat-file-into-json-csv-xml.png
+faqs:
+  - question: "What are the three steps to convert a flat file into JSON, CSV, or XML?"
+    answer: "First you create the copybook that defines your incoming fields and save it with a `.cpy` extension, then you auto-generate the FFD file from that copybook using a Transform Message and its Define Metadata option, and finally you do the transformation by placing a Set Payload followed by a Transform Message to produce the output format you want."
+  - question: "What is a copybook and what is a flat file?"
+    answer: "A flat file is data in a plain text format, usually received from mainframe systems, SFTP, or Files, where rows are separated by a new line. A copybook is a selection of code that defines data structures, so instead of rewriting the same data structure across many programs you define the fields' data types, length, and structure once in a copybook, which then helps generate FFD files using a Transform Message."
+  - question: "How do I auto-generate the FFD file from my copybook?"
+    answer: "Drag and drop a Transform Message component into an empty flow, go to the Input section and click Define Metadata, click Add and give it a Type Id, select Copybook from the Type drop-down, click Import and select the copybook you created, then click Select; an FFD file is then created automatically under `src/main/resources` schemas as `BirthDetails.ffd`, which you should copy and paste into `src/main/resources`."
+  - question: "Why does the input need padding spaces in a flat file?"
+    answer: "Because a flat file always has a FIXED length, so if a field such as BIRTHNAME is defined for 10 characters but the name has only 6 characters, the remaining 4 must be empty spaces; for example a 3-character state value like USA needs 7 spaces appended to make a valid flat file, and if one of these validations fails in the input you will get transformation errors."
+  - question: "How do I change the output to CSV or XML instead of JSON?"
+    answer: "For CSV you just replace `application/json` with `application/csv`, and for XML you need another Transform Message after the `application/json` output because that output has no root tag — if you try to map directly to `application/xml` it will throw an error."
 ---
 
 Hello Muleys,

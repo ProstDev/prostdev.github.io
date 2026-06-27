@@ -9,6 +9,19 @@ category: Tutorials
 tags: [MuleSoft, Flex Gateway, Grafana, Docker]
 draft: false
 heroImage: ../../assets/blog/mulesoft-s-anypoint-flex-gateway-logs-integration-with-grafana-loki-1.png
+faqs:
+  - question: "What do I need before sending Flex Gateway logs to Grafana Loki?"
+    answer: "This article lists an Anypoint Platform instance, a Flex Gateway installed in either connected or local mode, access to the Flex Gateway logs, a Grafana Cloud free-tier account, and the Promtail agent pointed at the Flex Gateway."
+  - question: "What is the difference between Flex Gateway connected mode and local mode?"
+    answer: "In connected mode you manage your APIs from Anypoint Platform, which the article calls very appealing for its management advantages, while in local mode you do not manage your APIs from Anypoint Platform but directly from the command line of the system where you installed the gateway, such as Linux, Kubernetes, or Docker."
+  - question: "How do I get access to the Flex Gateway logs on Linux?"
+    answer: "The article focuses on the gateway log file: create a directory such as `mkdir $HOME/flex-gateway/logs`, then from inside it run `journalctl -u flex-gateway-* > flexlog.log` to capture the agent log lines into a file you can then ship to Loki."
+  - question: "How does Promtail send the logs into Grafana Loki?"
+    answer: "Promtail is a lightweight agent run inside Docker that you point at the directory of log files you want to send to Loki; the article runs it with a `docker run` command that mounts the `promtail` config directory and the `$HOME/flex-gateway/logs` directory into the container so it tails the Flex Gateway log."
+  - question: "How do I view the Flex Gateway logs once they reach Grafana?"
+    answer: "Go to Grafana Explore, select the Loki logs data source, and write a query in the builder or coding mode that filters on the filename label equal to `/var/log/flexlog.log`, after which Grafana shows the Flex Gateway log lines and a volume graph."
+  - question: "Does this article cover the per-API log files?"
+    answer: "No. The author keeps this first article simple by using only the gateway agent log, and notes that every API can be configured to have its own log file and that reading those API-specific logs will be covered in the second article of the series."
 ---
 
 I’ve been writing about the MuleSoft Flex gateway for the past months, and you can find it here: [https://medium.com/@rcarrascosps](https://medium.com/@rcarrascosps)
