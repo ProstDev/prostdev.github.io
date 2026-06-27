@@ -1112,6 +1112,161 @@ export const VIDEOS: Video[] = [
       'Get the years, months, and days between two dates in DataWeave 2.0 with the between function from the Periods module — in under 30 seconds.',
     playlists: ['getting-to-the-point'],
   },
+  {
+    youtubeId: '0VgIRB3JfZM',
+    slug: 'array-of-strings-and-keys-filtering-dataweave',
+    title:
+      'Why is my Array of Strings not filtering correctly? It may be an Array of Strings and Keys instead!',
+    description:
+      "When distinctBy won't filter an array correctly, the culprit may be that it holds Keys, not Strings — they look identical in JSON output. Two DataWeave 2.0 fixes: map the values and coerce Keys to Strings, or joinBy to concatenate each array into a String.",
+    playlists: ['other-videos'],
+    duration: '6:18',
+    publishedAt: '2025-02-05',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/array-string-key-dataweave',
+      },
+    ],
+  },
+  {
+    youtubeId: 'TqrmeLhGtQc',
+    slug: 'upsert-fields-object-array-update-operator-dataweave',
+    title:
+      'How to upsert fields from an object in an array with the update operator in DataWeave 2.0 | Mule 4',
+    description:
+      'Use the DataWeave 2.0 update operator to match an object in an array and update its fields — including the upsert (!) operator to insert a field that was not there. Plus three ways to avoid null values: a per-field conditional, a do scope, and skipNullOn.',
+    playlists: ['other-videos'],
+    duration: '10:02',
+    publishedAt: '2024-09-16',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/upsert-object-from-array',
+      },
+    ],
+  },
+  {
+    youtubeId: 'wBllgVhIrg8',
+    slug: 'interactive-tutorial-anypoint-platform-api-catalog-killercoda',
+    title:
+      'Interactive MuleSoft tutorial: Anypoint Platform API Catalog by Rolando Carrasco | UAPIM | Exchange',
+    description:
+      'A walkthrough of an interactive, browser-based MuleSoft tutorial built by Ambassador Rolando Carrasco on Killercoda — create a Connected App, install and authenticate the API Catalog CLI, introspect API specs, and publish assets to Exchange, all in a remote environment.',
+    playlists: ['other-videos'],
+    duration: '14:19',
+    publishedAt: '2024-04-10',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/interactive-tutorial-mulesoft-anypoint-platform-api-catalog-by-rolando-carrasco',
+      },
+      {
+        label: 'Interactive tutorial on Killercoda',
+        url: 'https://killercoda.com/borlandc/scenario/mule-tester',
+      },
+    ],
+  },
+  {
+    youtubeId: 'xCPb678hDAo',
+    slug: 'exposing-dataweave-map-filter-vs-reduce-which-is-faster',
+    title: 'Exposing DataWeave: Map+Filter vs. Reduce — which is faster?',
+    description:
+      'A hands-on comparison of three DataWeave 2.0 approaches to the same map-then-filter problem — map+filter, filter+map, and a single-pass reduce — benchmarked over 10,000 items. The surprising result: reduce is by far the slowest, so time your approaches before assuming.',
+    playlists: ['other-videos'],
+    duration: '9:25',
+    publishedAt: '2024-04-04',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/exposing-dataweave-map-filter-vs-reduce-which-is-faster',
+      },
+    ],
+  },
+  {
+    youtubeId: '-u9jZ45Ut1A',
+    slug: 'add-jvm-command-line-arguments-mule-4-runtime-anypoint-code-builder',
+    title:
+      'How to add JVM/Command-line arguments to the Mule 4 Runtime in Anypoint Code Builder (ACB)',
+    description:
+      'Pass JVM or command-line arguments to the Mule Runtime inside Anypoint Code Builder by editing the "Mule Runtime: Default Arguments" setting — useful for env-separated properties files and for passing a secure/encryption key to a Mule app with secured properties.',
+    playlists: ['other-videos'],
+    duration: '5:18',
+    publishedAt: '2024-02-02',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/how-to-add-jvm-command-line-arguments-to-the-mule-4-runtime-in-anypoint-code-builder-acb',
+      },
+      {
+        label: 'GitHub repository',
+        url: 'https://github.com/ProstDev/args-in-acb',
+      },
+    ],
+  },
+  {
+    youtubeId: 'kpOpW5IY5bY',
+    slug: 'anypoint-studio-7-10-notification-center-connector-versions',
+    title: 'Anypoint Studio 7.10.0 | Notification center for new versions of connectors/modules',
+    description:
+      "A quick look at Anypoint Studio 7.10.0's new notification center — blue dots in Manage Modules flag connectors with a newer version in Anypoint Exchange, so you can update them in a couple of clicks instead of checking the connector release notes by hand.",
+    playlists: ['other-videos'],
+    duration: '3:53',
+    publishedAt: '2021-08-13',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/notification-center-for-new-versions-of-connectors-modules',
+      },
+    ],
+  },
+  {
+    youtubeId: '1Gb3IW0UvuY',
+    slug: 'what-is-an-api-understanding-apis-part-1',
+    title: 'What is an API? | Understanding APIs (Part 1)',
+    description:
+      'A from-scratch explanation of what an API is: the implementation (the body), the request and response, and the four aspects every API has — inputs, operations, outputs, and data types — wrapped up with a simple diagram you can refer back to.',
+    playlists: ['other-videos'],
+    duration: '5:05',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/understanding-apis-part-1-what-is-an-api',
+      },
+    ],
+  },
+  {
+    youtubeId: 'wFSUFu6zGFI',
+    slug: '5-reasons-why-you-need-an-ide',
+    title: '5 reasons why you need an IDE',
+    description:
+      'What an IDE is and five ways it saves a new developer time — syntax highlighting, text autocompletion, refactoring options, importing libraries, and one-click build/compile/run instead of memorizing console commands.',
+    playlists: ['other-videos'],
+    duration: '9:11',
+    publishedAt: '2020-07-14',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/5-reasons-why-you-need-an-ide',
+      },
+    ],
+  },
+  {
+    youtubeId: '4OGSdpmtR-s',
+    slug: '3-ways-to-concatenate-objects-in-dataweave-2-0',
+    title: '3 ways to concatenate objects in DataWeave 2.0',
+    description:
+      'Object concatenation in DataWeave 2.0 — combining two objects into one — done three ways: the popular ++ (plus plus) function, the object destructor {( )}, and the object destructor with an array {([ ])} so you do not have to wrap each object in its own parentheses.',
+    playlists: ['other-videos'],
+    duration: '7:26',
+    publishedAt: '2020-07-13',
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/combining-objects-concatenation-in-dw-2-0',
+      },
+    ],
+  },
 ];
 
 /**
