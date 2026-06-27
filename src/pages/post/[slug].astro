@@ -67,8 +67,10 @@ const jsonLd = [
       { '@type': 'ListItem', position: 3, name: title, item: url },
     ],
   },
-  // FAQPage rich result — emitted only when the post carries `faqs`. Answers are grounded in the
-  // post body (see the add-faqs skill); the on-page <Faqs> + the .md `## FAQs` block mirror this.
+  // FAQPage JSON-LD — an answer-engine signal for non-Google crawlers (ChatGPT/Perplexity/Copilot);
+  // emitted only when the post carries `faqs`. (Google deprecated the FAQ rich result in May 2026,
+  // and Gemini/AI Overviews ground on the visible <Faqs> text, not this schema.) Answers are grounded
+  // in the post body (see the add-faqs skill); the on-page <Faqs> + the .md `## FAQs` block mirror this.
   ...(faqs && faqs.length > 0
     ? [
         {
