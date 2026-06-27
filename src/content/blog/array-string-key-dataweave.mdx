@@ -15,9 +15,9 @@ heroImage: ../../assets/blog/array-string-key-dataweave.png
 
 Ok so here's what was happening to me and I didn't know why.
 
-I was doing a bunch of transformations and at one point I'd add some keys and/or values into an array. So, some of the arrays were of type Array&lt;String> (because no key was added here) while some of them where Array&lt;Key | String>
+I was doing a bunch of transformations and at one point I'd add some keys and/or values into an array. So, some of the arrays were of type `Array<String>` (because no key was added here) while some of them where `Array<Key | String>`
 
-I didn't think much about it at first, since I would -incorrectly- see all the arrays in the JSON output were of type Array&lt;String>. Like this:
+I didn't think much about it at first, since I would -incorrectly- see all the arrays in the JSON output were of type `Array<String>`. Like this:
 
 > [!NOTE]
 > The item in line 4 was coerced into a Key for demonstration purposes.
@@ -94,7 +94,7 @@ It was until one of those million times finally led me to see the array types we
 
 ### Solution 1
 
-There are different solutions for this problem. One would be to make sure any new items are of type String and not Key. This completely removes the issue since now you'd be comparing two arrays of type Array&lt;String>, which correctly returns only one array in the output.
+There are different solutions for this problem. One would be to make sure any new items are of type String and not Key. This completely removes the issue since now you'd be comparing two arrays of type `Array<String>`, which correctly returns only one array in the output.
 
 ```dataweave title="transform.dwl"
 %dw 2.0
