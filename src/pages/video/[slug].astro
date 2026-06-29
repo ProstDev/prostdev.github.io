@@ -39,9 +39,12 @@ const { prev, next } = primaryPlaylist
 const url = new URL(`/video/${video.slug}`, SITE.url).href;
 const mdUrl = `/video/${video.slug}.md`;
 
-// Social-share image: the YouTube maxres thumbnail (absolute raster URL) so LinkedIn/X/Facebook
-// render the video's own card instead of falling back to the branded /og-default.png.
+// YouTube maxres thumbnail — used as the VideoObject JSON-LD thumbnailUrl below.
 const ogImage = thumbnail(video.youtubeId, 'max');
+
+// Social-share image: a build-time-generated branded card (title over the thumbnail) served as a
+// static PNG from /og/video/<slug>.png. See src/pages/og/video/[slug].png.ts + src/lib/og-image.ts.
+const shareImage = `/og/video/${video.slug}.png`;
 
 const jsonLd = [
   {
@@ -72,7 +75,7 @@ const headings = [...baseHeadings, ...transcriptHeadings.filter((h) => h.depth =
   title={video.title}
   description={video.description}
   type="video.other"
-  image={ogImage}
+  image={shareImage}
   contained={false}
   jsonLd={jsonLd}
 >
