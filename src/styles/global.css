@@ -471,13 +471,30 @@ summary,
   text-align: center;
 }
 
+/* ── Prose long-string wrapping (WCAG 1.4.10 Reflow) ──
+   Defense-in-depth so a long unbroken token in BODY prose (a bare URL, a long path) wraps instead
+   of running off the right edge / pushing the page sideways on a ~360px phone. `break-word` (NOT
+   `anywhere`) breaks ONLY a token that would otherwise overflow — it doesn't hyphenate and leaves
+   normal text untouched, and (unlike `anywhere`) it's ignored for min-content sizing so it can't
+   surprise the layout. Specificity (0,1,0) beats typography's :where()-wrapped rules without
+   !important. (Reader notes / FAQs render outside .prose and carry their own overflow-wrap.) */
+.prose {
+  overflow-wrap: break-word;
+}
+
 /* ── Inline code (`var` / `CONNECTED_APP_CLIENT_ID`) ──
    @tailwindcss/typography styles inline `code` by ADDING literal backtick characters via
    `code::before/::after { content: "`" }` and gives it no background — so an inline var read
    as `` `var` `` with stray backticks and no visual chip. Render it as a proper bordered chip
    using the semantic tokens (flips per theme). Scoped to EXCLUDE `pre code` so Shiki code
    BLOCKS are untouched (they own their own frame). The typography rules are :where()-wrapped
-   (zero specificity), so these single-class rules win without !important. */
+   (zero specificity), so these single-class rules win without !important.
+   overflow-wrap:break-word (NOT white-space:nowrap) so a pathologically long chip — e.g. the
+   `mule.home ++ "/apps/" ++ app.name ++ "/llm-config.json"` formula in a table cell — wraps
+   instead of forcing horizontal overflow; short chips (`MAC_Config`, `llama3`) still stay on one
+   line since break-word only acts when a token would otherwise overflow. box-decoration-break:clone
+   makes each wrapped fragment a clean chip (border/bg/padding per line) instead of an open-ended
+   slice — same treatment as `.reader-note code`. */
 .prose :where(code):not(pre code) {
   background-color: var(--code-bg);
   border: 1px solid var(--code-border);
@@ -486,7 +503,9 @@ summary,
   padding: 0.125em 0.375em;
   font-size: 0.875em;
   font-weight: 500;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .prose :where(code):not(pre code)::before,
 .prose :where(code):not(pre code)::after {

@@ -77,7 +77,10 @@ const headings = [...baseHeadings, ...transcriptHeadings.filter((h) => h.depth =
   jsonLd={jsonLd}
 >
   <div class="mx-auto grid w-full max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
-    <article data-pagefind-body>
+    <!-- min-w-0: lets the mobile single-column grid track shrink below its widest descendant so
+         scroll containers (code/tables) stay contained instead of pushing the page sideways on
+         mobile WebKit. Mirrors post/[slug].astro. (lg: already gets this via minmax(0,1fr).) -->
+    <article data-pagefind-body class="min-w-0">
       <nav class="mb-4 text-sm text-muted" aria-label="Breadcrumb">
         <a href="/" class="hover:text-accent">Home</a> ›
         {primaryPlaylist && <><a href={`/${primaryPlaylist.slug}`} class="hover:text-accent">{primaryPlaylist.title}</a> › </>}

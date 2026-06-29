@@ -102,7 +102,12 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <div class="mx-auto grid w-full max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
-    <article data-pagefind-body>
+    <!-- min-w-0: on mobile this is an implicit single `auto` grid track, so the article keeps the
+         default grid-item min-width:auto and won't shrink below its widest descendant (a wide table,
+         a long inline-code chip) — pushing the whole page sideways on mobile WebKit even though the
+         table/code scroll containers are individually contained. min-w-0 lets the track shrink so
+         those scroll containers do their job. (lg: already gets this via minmax(0,1fr).) -->
+    <article data-pagefind-body class="min-w-0">
       <!-- Breadcrumb -->
       <nav class="mb-4 text-sm text-muted" aria-label="Breadcrumb">
         <a href="/" class="hover:text-accent">Home</a> ›
