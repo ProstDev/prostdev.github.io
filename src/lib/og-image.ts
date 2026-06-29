@@ -226,7 +226,35 @@ export function card({ title, eyebrow, bg }: { title: string; eyebrow: string; b
   };
 }
 
+/**
+ * Build a "bare" card: a full-bleed background image with NO scrim, eyebrow, title, or wordmark.
+ * Used for videos, whose YouTube thumbnails ALREADY bake in their own title + branding — overlaying
+ * our card's title on top produced unreadable text-on-text. The image is `objectFit: cover`'d to the
+ * 1200×630 OG frame (a 16:9 thumbnail loses ~22px top/bottom, keeping its centered title + face).
+ * Falls back to the branded gradient `card()` when the image is missing.
+ */
+export function bareImageCard({ title, eyebrow, bg }: { title: string; eyebrow: string; bg?: string | null }) {
+  if (!bg) return card({ title, eyebrow, bg });
+  return {
+    type: 'div',
+    props: {
+      style: { display: 'flex', width: OG_WIDTH, height: OG_HEIGHT, backgroundColor: BRAND_DEEP },
+      children: [
+        {
+          type: 'img',
+          props: {
+            src: bg,
+            width: OG_WIDTH,
+            height: OG_HEIGHT,
+            style: { width: OG_WIDTH, height: OG_HEIGHT, objectFit: 'cover' },
+          },
+        },
+      ],
+    },
+  };
+}
+
 /** Render a card element tree to a 1200×630 PNG `ImageResponse` (a `Response` subclass). */
-export function renderCard(element: ReturnType<typeof card>): ImageResponse {
+export function renderCard(element: ReturnType<typeof card> | ReturnType<typeof bareImageCard>): ImageResponse {
   return new ImageResponse(element as any, { width: OG_WIDTH, height: OG_HEIGHT, fonts: loadFonts() });
 }
