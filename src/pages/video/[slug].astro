@@ -6,7 +6,7 @@ import DocActions from '@/components/DocActions.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
 import ReportIssue from '@/components/ReportIssue.astro';
 import Icon from '@/components/Icon.astro';
-import { VIDEOS, getPlaylist, watchUrl, videosInPlaylist, playlistNeighbors } from '@/data/videos';
+import { VIDEOS, getPlaylist, watchUrl, videosInPlaylist, playlistNeighbors, thumbnail } from '@/data/videos';
 import { getTranscript } from '@/lib/transcripts';
 import { SITE } from '@/config';
 
@@ -39,13 +39,17 @@ const { prev, next } = primaryPlaylist
 const url = new URL(`/video/${video.slug}`, SITE.url).href;
 const mdUrl = `/video/${video.slug}.md`;
 
+// Social-share image: the YouTube maxres thumbnail (absolute raster URL) so LinkedIn/X/Facebook
+// render the video's own card instead of falling back to the branded /og-default.png.
+const ogImage = thumbnail(video.youtubeId, 'max');
+
 const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'VideoObject',
     name: video.title,
     description: video.description,
-    thumbnailUrl: `https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg`,
+    thumbnailUrl: ogImage,
     uploadDate: video.publishedAt ? new Date(video.publishedAt).toISOString() : undefined,
     contentUrl: watchUrl(video.youtubeId),
     embedUrl: `https://www.youtube.com/embed/${video.youtubeId}`,
@@ -68,6 +72,7 @@ const headings = [...baseHeadings, ...transcriptHeadings.filter((h) => h.depth =
   title={video.title}
   description={video.description}
   type="video.other"
+  image={ogImage}
   contained={false}
   jsonLd={jsonLd}
 >

@@ -12,7 +12,7 @@ import Icon from '@/components/Icon.astro';
 import SeriesNav from '@/components/SeriesNav.astro';
 import ReaderNotes from '@/components/ReaderNotes.astro';
 import Faqs from '@/components/Faqs.astro';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import { getPosts, formatDate, readingTime, categoryUrl, getSeriesParts } from '@/lib/content';
 import { getSeriesForPost } from '@/data/series';
 import { getVideoByYoutubeId } from '@/data/videos';
@@ -30,6 +30,13 @@ const { title, description, author, pubDate, updatedDate, category, tags, heroIm
 
 const url = new URL(`/post/${post.id}`, SITE.url).href;
 const mdUrl = `/post/${post.id}.md`;
+
+// Social-share image: optimize the post's heroImage to a 1200-wide raster and make it absolute,
+// so LinkedIn/X/Facebook render the post's own card (they reject SVG and require absolute URLs).
+// Falls back to the branded /og-default.png in Seo.astro when a post has no heroImage.
+const ogImage = heroImage
+  ? new URL((await getImage({ src: heroImage, width: 1200, format: 'png' })).src, SITE.url).href
+  : undefined;
 
 // Multi-part series navigation (prev/next + jump menu), driven by src/data/series.ts.
 const series = getSeriesForPost(post.id);
@@ -90,6 +97,7 @@ const jsonLd = [
   title={title}
   description={description}
   type="article"
+  image={ogImage}
   contained={false}
   jsonLd={jsonLd}
 >
