@@ -12,6 +12,7 @@
     "remigrate": "node scripts/remigrate-posts.mjs",
     "recover-gists": "node scripts/recover-gists.mjs",
     "check-dw-version": "node scripts/check-dataweave-version.mjs",
+    "sync-youtube": "node scripts/sync-youtube-metadata.mjs",
     "astro": "astro"
   },
   "dependencies": {
