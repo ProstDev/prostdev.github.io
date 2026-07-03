@@ -13,6 +13,7 @@
     "recover-gists": "node scripts/recover-gists.mjs",
     "check-dw-version": "node scripts/check-dataweave-version.mjs",
     "sync-youtube": "node scripts/sync-youtube-metadata.mjs",
+    "youtube-analytics": "node scripts/youtube-analytics.mjs",
     "astro": "astro"
   },
   "dependencies": {
