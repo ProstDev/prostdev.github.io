@@ -6,10 +6,10 @@ import PlaylistRow from '@/components/PlaylistRow.astro';
 import AiFriendly from '@/components/AiFriendly.astro';
 import Icon from '@/components/Icon.astro';
 import { SITE, SOCIAL } from '@/config';
-import { videosInPlaylist, latestVideos, featuredVideo, primaryPlaylists, sectionHref } from '@/data/videos';
+import { videosInPlaylist, latestVideos, featuredVideos, primaryPlaylists, sectionHref } from '@/data/videos';
 
 const latest = latestVideos(6);
-const featured = featuredVideo();
+const featured = featuredVideos();
 const playlists = primaryPlaylists();
 ---
 <BaseLayout
@@ -27,7 +27,7 @@ const playlists = primaryPlaylists();
   ]}
 >
   <!-- Hero -->
-  <section class="mx-auto w-full max-w-5xl px-4 pt-10 pb-6 text-center sm:px-6 sm:pt-14">
+  <section class="mx-auto w-full max-w-7xl px-4 pt-10 pb-6 text-center sm:px-6 sm:pt-14">
     <h1 class="text-4xl font-extrabold tracking-tight sm:text-6xl">
       <span class="text-accent">ProstDev</span>
       <span class="text-muted"> | </span>
@@ -38,9 +38,13 @@ const playlists = primaryPlaylists();
       and deep dives to level up your integration skills. 🚀
     </p>
 
-    <div class="mx-auto mt-8 max-w-3xl">
-      <LiteYouTube youtubeId={featured.youtubeId} title={featured.title} href={`/video/${featured.slug}`} class="shadow-xl" />
-      <p class="mt-3 text-sm font-medium text-muted">👆 most viewed</p>
+    <div class="mx-auto mt-8 grid max-w-7xl gap-x-6 gap-y-8 md:grid-cols-2">
+      {featured.map(({ video, caption }) => (
+        <div>
+          <LiteYouTube youtubeId={video.youtubeId} title={video.title} href={`/video/${video.slug}`} class="shadow-xl" />
+          <p class="mt-3 text-sm font-medium text-muted">{caption}</p>
+        </div>
+      ))}
     </div>
 
     <div class="mt-6 flex flex-wrap items-center justify-center gap-3">

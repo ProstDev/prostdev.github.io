@@ -1297,18 +1297,55 @@ export function latestVideos(limit = LATEST_SLUGS.length): Video[] {
 }
 
 /**
- * Homepage hero — the single video featured at the top of the homepage, currently the
- * channel's most-viewed video (caption: "most viewed"). DECOUPLED from LATEST_SLUGS on
- * purpose: the most-viewed video is not necessarily the newest upload, so it does NOT belong
- * in the upload-ordered "Latest videos" list. Update this slug when the featured video changes.
+ * Homepage hero — the TWO videos featured side-by-side at the top of the homepage.
+ * ORDER IS MEANINGFUL: index 0 = LEFT column (desktop) / TOP (mobile stack), index 1 =
+ * RIGHT / BOTTOM. Ordered oldest→newest so the mobile stack reads chronologically.
+ *
+ * Each pick carries its own editorial `caption` because only ONE of the two is the
+ * channel's most-viewed video — a shared "most viewed" label would be inaccurate.
+ * Keep captions short (they render on one line under a fixed 16:9 thumbnail).
+ *
+ * DECOUPLED from LATEST_SLUGS on purpose: an evergreen/most-viewed pick is not
+ * necessarily a recent upload, so it does NOT belong in "Latest videos".
+ * Update these slugs/captions when the featured picks change.
  */
-export const FEATURED_SLUG = 'getting-started-acb-vscode-hello-world';
+export interface FeaturedVideo {
+  video: Video;
+  /** Editorial caption rendered beneath the thumbnail (may include an emoji). */
+  caption: string;
+}
 
-/** Homepage hero video (see FEATURED_SLUG). Throws at build if the slug is stale. */
-export function featuredVideo(): Video {
-  const v = getVideo(FEATURED_SLUG);
-  if (!v) throw new Error(`FEATURED_SLUG "${FEATURED_SLUG}" not found in VIDEOS`);
-  return v;
+const FEATURED: { slug: string; caption: string }[] = [
+  { slug: 'mulesoft-from-start-mulesoft-overview', caption: '👑 most viewed' },
+  { slug: 'getting-started-acb-vscode-hello-world', caption: '🚀 start with ACB' },
+];
+
+/**
+ * Back-compat literal for scripts/youtube-analytics.mjs, whose parser greps this file for
+ * the FEATURED_SLUG assignment below. Keep it a single-quoted string literal (NOT
+ * FEATURED[0].slug — the regex needs a literal) AND equal to FEATURED[0].slug, the left /
+ * most-viewed pick. The assert below fails the build if the two ever drift. (Don't write the
+ * assignment pattern in prose above this line — the regex matches the file's FIRST occurrence.)
+ */
+export const FEATURED_SLUG = 'mulesoft-from-start-mulesoft-overview';
+if (FEATURED_SLUG !== FEATURED[0].slug) {
+  throw new Error('FEATURED_SLUG must equal FEATURED[0].slug (kept as a literal for the analytics parser).');
+}
+
+/**
+ * Homepage hero videos, resolved LEFT→RIGHT (see FEATURED). Throws at build if any slug
+ * is stale OR if the count isn't exactly 2, so the two-column layout can't silently degrade.
+ */
+export function featuredVideos(): FeaturedVideo[] {
+  const resolved = FEATURED.map(({ slug, caption }) => {
+    const video = getVideo(slug);
+    if (!video) throw new Error(`FEATURED slug "${slug}" not found in VIDEOS`);
+    return { video, caption };
+  });
+  if (resolved.length !== 2) {
+    throw new Error(`FEATURED must contain exactly 2 videos (got ${resolved.length}); the homepage hero is a two-column layout.`);
+  }
+  return resolved;
 }
 
 export function getPlaylist(id: string): Playlist | undefined {
