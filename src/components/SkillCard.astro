@@ -1,0 +1,44 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { skillUrl } from '@/lib/content';
+
+interface Props {
+  skill: CollectionEntry<'skills'>;
+}
+const { skill } = Astro.props;
+const { title, description, tagline, difficulty, tags, heroImage } = skill.data;
+const url = skillUrl(skill.id);
+---
+<article class="group flex h-full flex-col overflow-hidden rounded-xl border border-default bg-surface-card transition-shadow hover:shadow-md">
+  <a href={url} class="block">
+    {heroImage ? (
+      <Image src={heroImage} alt={title} width={640} height={360} class="aspect-video w-full object-cover" />
+    ) : (
+      <div class="aspect-video w-full bg-gradient-to-br from-brand-400 to-brand-700"></div>
+    )}
+  </a>
+  <div class="flex flex-1 flex-col p-5">
+    {difficulty && (
+      <div class="mb-2">
+        <!-- Difficulty chip: solid accent fill uses --accent-strong behind --accent-contrast text
+             (brand-500 under white fails AA at 3.46:1). Static, so the helper-class-override caveat
+             doesn't apply — but we use the arbitrary [var(--…)] utilities to stay consistent. -->
+        <span class="inline-block rounded-full bg-[var(--accent-strong)] px-2.5 py-0.5 text-xs font-semibold text-[var(--accent-contrast)]">
+          {difficulty}
+        </span>
+      </div>
+    )}
+    <h3 class="text-lg font-bold leading-snug">
+      <a href={url} class="text-default transition-colors group-hover:text-accent">{title}</a>
+    </h3>
+    <p class="mt-2 line-clamp-3 flex-1 text-sm text-muted">{tagline ?? description}</p>
+    {tags.length > 0 && (
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        {tags.slice(0, 3).map((t) => (
+          <span class="inline-block rounded-full border border-default px-2 py-0.5 text-xs text-muted">{t}</span>
+        ))}
+      </div>
+    )}
+  </div>
+</article>

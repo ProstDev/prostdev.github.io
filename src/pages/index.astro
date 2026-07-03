@@ -38,9 +38,9 @@ const playlists = primaryPlaylists();
       and deep dives to level up your integration skills. 🚀
     </p>
 
-    <div class="mx-auto mt-8 grid max-w-7xl gap-x-6 gap-y-8 md:grid-cols-2">
+    <div class="featured-grid mx-auto mt-8 grid max-w-7xl gap-x-6 gap-y-8 md:grid-cols-2">
       {featured.map(({ video, caption }) => (
-        <div>
+        <div class="featured-card">
           <LiteYouTube youtubeId={video.youtubeId} title={video.title} href={`/video/${video.slug}`} class="shadow-xl" />
           <p class="mt-3 text-sm font-medium text-muted">{caption}</p>
         </div>
@@ -92,3 +92,34 @@ const playlists = primaryPlaylists();
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  /* Coordinated focus effect on the two featured hero videos.
+     Desktop, mouse-only — hovering one grows it while the other shrinks. */
+  @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+    .featured-card {
+      transition: transform 300ms ease;
+      transform-origin: center;
+      will-change: transform;
+    }
+    /* Grow the hovered card + lift it above its shrinking neighbor. */
+    .featured-grid:has(.featured-card:hover) .featured-card:hover {
+      transform: scale(1.1) translateY(-4px);
+      position: relative;
+      z-index: 1;
+    }
+    /* Shrink the non-hovered card. */
+    .featured-grid:has(.featured-card:hover) .featured-card:not(:hover) {
+      transform: scale(0.85);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .featured-card {
+      transition: none;
+    }
+    .featured-grid:has(.featured-card:hover) .featured-card:hover,
+    .featured-grid:has(.featured-card:hover) .featured-card:not(:hover) {
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import DocActions from '@/components/DocActions.astro';
+import CodeBlockEnhancer from '@/components/CodeBlockEnhancer.astro';
+import ReportIssue from '@/components/ReportIssue.astro';
+import Icon from '@/components/Icon.astro';
+import { Image } from 'astro:assets';
+import { getSkills, formatDate, readingTime } from '@/lib/content';
+import { SITE } from '@/config';
+
+export async function getStaticPaths() {
+  const skills = await getSkills();
+  return skills.map((skill) => ({ params: { slug: skill.id }, props: { skill } }));
+}
+
+const { skill } = Astro.props;
+const { Content, headings } = await render(skill);
+const { title, description, tagline, difficulty, tags, heroImage, icon, pubDate, updatedDate } = skill.data;
+
+const url = new URL(`/skill/${skill.id}`, SITE.url).href;
+const mdUrl = `/skill/${skill.id}.md`;
+const ogImage = `/og/skill/${skill.id}.png`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: title,
+    description,
+    datePublished: pubDate.toISOString(),
+    dateModified: (updatedDate ?? pubDate).toISOString(),
+    author: { '@type': 'Person', name: SITE.author },
+    publisher: { '@type': 'Organization', name: SITE.name },
+    mainEntityOfPage: url,
+    keywords: tags.join(', '),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'Skills', item: `${SITE.url}/skills` },
+      { '@type': 'ListItem', position: 3, name: title, item: url },
+    ],
+  },
+];
+---
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  image={ogImage}
+  contained={false}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto grid w-full max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+    <article data-pagefind-body class="min-w-0">
+      <!-- Breadcrumb -->
+      <nav class="mb-4 text-sm text-muted" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-accent">Home</a> ›
+        <a href="/skills" class="hover:text-accent">Skills</a> ›
+        <span>{title}</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-6">
+        <div class="mb-3 flex flex-wrap items-center gap-3">
+          {difficulty && (
+            <span class="inline-block rounded-full bg-[var(--accent-strong)] px-2.5 py-0.5 text-xs font-semibold text-[var(--accent-contrast)]" data-pagefind-meta="difficulty">
+              {difficulty}
+            </span>
+          )}
+          <span class="text-sm text-muted">{formatDate(pubDate)} · {readingTime(skill.body)}</span>
+        </div>
+        <h1 class="flex items-center gap-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
+          {icon && <Icon name={icon} class="h-8 w-8 text-accent" />}
+          {title}
+        </h1>
+        <p class="mt-3 text-lg text-muted">{tagline ?? description}</p>
+
+        <div class="mt-5 flex flex-wrap items-center justify-between gap-4 border-y border-default py-3">
+          <span class="text-sm text-muted">Claude Code skill</span>
+          <DocActions markdownUrl={mdUrl} />
+        </div>
+      </header>
+
+      {heroImage && (
+        <Image src={heroImage} alt={title} width={1280} height={720} class="mb-8 w-full rounded-xl border border-default" />
+      )}
+
+      <!-- Body -->
+      <div class="prose prose-lg max-w-none dark:prose-invert prose-headings:scroll-mt-24">
+        <Content />
+      </div>
+      <CodeBlockEnhancer />
+
+      <!-- Tags -->
+      {tags.length > 0 && (
+        <div class="mt-10 flex flex-wrap gap-2 border-t border-default pt-6">
+          {tags.map((t) => (
+            <span class="inline-block rounded-full border border-default px-2.5 py-0.5 text-sm text-muted">{t}</span>
+          ))}
+        </div>
+      )}
+    </article>
+
+    <!-- Right rail TOC -->
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 space-y-6">
+        <TableOfContents headings={headings} />
+      </div>
+    </aside>
+  </div>
+
+  <ReportIssue pageUrl={url} pageTitle={title} />
+</BaseLayout>

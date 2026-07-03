@@ -96,6 +96,20 @@ export function postUrl(id: string): string {
   return `/post/${id}`;
 }
 
+/** All non-draft (in prod) skills, newest first. Mirrors getPosts for the `skills` collection. */
+export async function getSkills(): Promise<CollectionEntry<'skills'>[]> {
+  const skills = await getCollection('skills', ({ data }) =>
+    isProd ? data.draft !== true : true
+  );
+  return skills.sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+}
+
+export function skillUrl(id: string): string {
+  return `/skill/${id}`;
+}
+
 /**
  * Resolve a series' registry slugs to renderable parts {slug, title, position, isCurrent},
  * pulling each post's display title from the blog collection at build time (the registry in

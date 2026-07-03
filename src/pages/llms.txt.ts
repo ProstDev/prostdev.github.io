@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getPosts, getTags, getCategories, tagUrl, categoryUrl } from '@/lib/content';
+import { getPosts, getSkills, getTags, getCategories, tagUrl, categoryUrl } from '@/lib/content';
 import { VIDEOS, PLAYLISTS } from '@/data/videos';
 import { SITE } from '@/config';
 
@@ -9,6 +9,7 @@ import { SITE } from '@/config';
  */
 export const GET: APIRoute = async () => {
   const posts = await getPosts();
+  const skills = await getSkills();
   const categories = await getCategories();
   const tags = await getTags();
 
@@ -43,6 +44,20 @@ export const GET: APIRoute = async () => {
     lines.push(`- [${p.data.title}](${SITE.url}/post/${p.id}): ${p.data.description}`);
   }
   lines.push('');
+
+  // Claude Code skills — reusable AI-agent skills the author shares (not site build tooling).
+  if (skills.length) {
+    lines.push('## Claude Code skills');
+    lines.push('');
+    lines.push(
+      'Reusable Claude Code / AI-agent skills Alex Martinez uses and shares. Each has a machine-readable Markdown version (append `.md` to its URL).'
+    );
+    lines.push('');
+    for (const s of skills) {
+      lines.push(`- [${s.data.title}](${SITE.url}/skill/${s.id}): ${s.data.description}`);
+    }
+    lines.push('');
+  }
 
   // Topic map — categories (content type) + tags (subject), each an archive of related posts.
   lines.push('## Topics');

@@ -166,5 +166,35 @@ const transcripts = defineCollection({
     .passthrough(),
 });
 
-export const collections = { blog, transcripts };
+/**
+ * Shared library of Claude Code / AI-agent SKILLS the author uses — NOT an auto-mirror of the
+ * `.claude/` tooling that builds this site (that's a private submodule the build can't read).
+ * Each entry is a hand-authored MDX page in `src/content/skills/`, with the verbatim `SKILL.md`
+ * pasted into a fenced code block for readers to see + copy. See `/skills`.
+ *
+ * `tags` is FREE-FORM here (not the closed blog `TAGS` enum): AI-skill topics (Claude Code, MDX,
+ * AEO, automation) are a different vocabulary from the MuleSoft/DataWeave blog tags, and a closed
+ * enum would fail the build on every new tag — friction against the paste-in workflow. Promote to
+ * a closed `SKILL_TAGS` enum only if we later want tag-archive/filter pages.
+ */
+const skills = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/skills' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      /** Short hook shown under the title on the detail page. */
+      tagline: z.string().optional(),
+      difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
+      tags: z.array(z.string()).default([]),
+      heroImage: image().optional(),
+      /** Optional Icon.astro name rendered on the card/detail header. */
+      icon: z.string().optional(),
+      pubDate: z.coerce.date(),
+      updatedDate: z.coerce.date().optional(),
+      draft: z.boolean().default(false),
+    }),
+});
+
+export const collections = { blog, transcripts, skills };
 export { CATEGORIES, TAGS };

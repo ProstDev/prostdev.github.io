@@ -1,0 +1,35 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SkillCard from '@/components/SkillCard.astro';
+import { getSkills } from '@/lib/content';
+
+const skills = await getSkills();
+---
+<BaseLayout
+  title="Skills"
+  description="A shared library of the Claude Code / AI-agent skills I use — reusable prompts and workflows you can read, copy, and adapt. Each has a machine-readable Markdown version."
+>
+  <div class="py-10">
+    <header class="mb-10 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Skills</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-muted">
+        A shared library of the Claude Code / AI-agent skills I use — reusable prompts and
+        workflows you can read, copy, and adapt for your own agents. Each skill is
+        machine-readable — grab the markdown or
+        <a href="/llms.txt" class="text-accent hover:underline">llms.txt</a>.
+      </p>
+    </header>
+
+    {skills.length === 0 ? (
+      <p class="rounded-xl border border-dashed border-default p-10 text-center text-muted">
+        No skills yet — check back soon!
+      </p>
+    ) : (
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {skills.map((skill) => (
+          <SkillCard skill={skill} />
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
