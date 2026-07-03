@@ -2,12 +2,13 @@
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import { skillUrl } from '@/lib/content';
+import SkillCover from '@/components/SkillCover.astro';
 
 interface Props {
   skill: CollectionEntry<'skills'>;
 }
 const { skill } = Astro.props;
-const { title, description, tagline, difficulty, tags, heroImage } = skill.data;
+const { title, description, tagline, difficulty, tags, heroImage, icon } = skill.data;
 const url = skillUrl(skill.id);
 ---
 <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-default bg-surface-card transition-shadow hover:shadow-md">
@@ -15,7 +16,7 @@ const url = skillUrl(skill.id);
     {heroImage ? (
       <Image src={heroImage} alt={title} width={640} height={360} class="aspect-video w-full object-cover" />
     ) : (
-      <div class="aspect-video w-full bg-gradient-to-br from-brand-400 to-brand-700"></div>
+      <SkillCover icon={icon} class="aspect-video" />
     )}
   </a>
   <div class="flex flex-1 flex-col p-5">

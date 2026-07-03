@@ -1,0 +1,48 @@
+---
+/**
+ * Generated cover art for a skill card / header — a pure-CSS/SVG motif so it's theme-aware,
+ * crisp at any DPI, and free at build time (no raster OG PNG). Skills have no photo hero, so
+ * instead of a flat gradient we render the skill's own `icon` centered on a brand gradient with
+ * a subtle dot-grid overlay. Distinct per skill via the icon, consistent with the brand palette.
+ *
+ * The dot-grid is a `radial-gradient` tile (inline style so it survives without a Tailwind class).
+ * The icon glyph is oversized + low-opacity white so it reads as a watermark, not a foreground UI
+ * icon — the card's own title sits below it.
+ */
+import Icon from '@/components/Icon.astro';
+
+interface Props {
+  icon?: string;
+  /** `aspect-video` for the card grid; `aspect-[3/1]` etc. can be passed for a wide header. */
+  class?: string;
+}
+const { icon, class: className = 'aspect-video' } = Astro.props;
+
+// A 24px dot-grid of faint white dots — pure CSS, no asset.
+const dotGrid =
+  'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.14) 1.5px, transparent 0)';
+---
+<div
+  class:list={['relative w-full overflow-hidden bg-gradient-to-br from-brand-400 to-brand-700', className]}
+>
+  <!-- Dot-grid motif -->
+  <div
+    class="absolute inset-0"
+    style={`background-image:${dotGrid};background-size:24px 24px;`}
+    aria-hidden="true"
+  ></div>
+  <!-- Soft radial vignette so the centered glyph lifts off the grid -->
+  <div
+    class="absolute inset-0"
+    style="background:radial-gradient(circle at 50% 45%, rgba(255,255,255,0.16) 0%, transparent 55%);"
+    aria-hidden="true"
+  ></div>
+  <!-- Watermark glyph -->
+  <div class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+    {icon ? (
+      <Icon name={icon as any} class="h-20 w-20 text-white/85 drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]" />
+    ) : (
+      <Icon name="sparkles" class="h-20 w-20 text-white/85 drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]" />
+    )}
+  </div>
+</div>
