@@ -10,10 +10,13 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment, cancel in-progress runs on new pushes.
+# Serialize deploys: let an in-progress one FINISH, queue the next. Do NOT cancel —
+# cancelling a Pages deploy mid-flight wedges the `github-pages` environment queue, and the
+# next run then polls `deployment_queued` until it TIMES OUT (~10m). This bit us when a commit
+# + its submodule-pointer bump landed minutes apart. GitHub's own Pages starter uses `false`.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
