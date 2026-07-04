@@ -96,14 +96,12 @@ export function postUrl(id: string): string {
   return `/post/${id}`;
 }
 
-/** All non-draft (in prod) skills, newest first. Mirrors getPosts for the `skills` collection. */
+/** All non-draft (in prod) skills, ordered alphabetically by title. */
 export async function getSkills(): Promise<CollectionEntry<'skills'>[]> {
   const skills = await getCollection('skills', ({ data }) =>
     isProd ? data.draft !== true : true
   );
-  return skills.sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-  );
+  return skills.sort((a, b) => a.data.title.localeCompare(b.data.title));
 }
 
 export function skillUrl(id: string): string {

@@ -72,7 +72,13 @@ const jsonLd = [
               {difficulty}
             </span>
           )}
-          <span class="text-sm text-muted">{formatDate(pubDate)} · {readingTime(skill.body)}</span>
+          <span class="text-sm text-muted">
+            Added {formatDate(pubDate)}
+            {updatedDate && (updatedDate.valueOf() !== pubDate.valueOf()) && (
+              <> · Updated {formatDate(updatedDate)}</>
+            )}
+            {' · '}{readingTime(skill.body)}
+          </span>
         </div>
         <h1 class="flex items-center gap-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
           {icon && <Icon name={icon} class="h-8 w-8 text-accent" />}

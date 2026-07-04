@@ -1,0 +1,145 @@
+---
+title: 'add-faqs'
+description: 'A Claude Code skill that adds a FAQs section to a blog post for answer-engine optimization — grounded, never-fabricated Q&A that renders on the page, mirrors into a machine-readable endpoint, and emits FAQPage JSON-LD.'
+tagline: 'Add grounded, machine-readable Q&A to a post — a direct AEO win for AI answer engines, with zero fabricated facts.'
+difficulty: Intermediate
+tags: ['Claude Code', 'MDX', 'AEO', 'SEO', 'JSON-LD']
+icon: 'lightbulb'
+pubDate: 2026-07-03
+---
+
+> [!NOTE]
+> **AEO** = Answer Engine Optimization: writing content that AI assistants (ChatGPT, Perplexity,
+> Copilot, Gemini) can quote accurately. Well-phrased Q&A in the *visible* page text is one of the
+> most direct AEO wins there is.
+
+## What it does
+
+`add-faqs` is a Claude Code [skill](https://docs.claude.com/en/docs/claude-code/skills) that appends a
+FAQs section to the end of a blog post. It writes an optional `faqs` array in the post's frontmatter
+that does three things at once: renders a `## FAQs` disclosure section on the page, mirrors the Q&A
+into the post's machine-readable `.md` endpoint, and emits `FAQPage` JSON-LD for crawlers.
+
+The point is **making a post answer the questions readers (and AI) actually ask** — in the post's own
+words. The single hard rule is that every answer is *grounded in the post body*, never invented. If
+the post doesn't answer a question, the question gets dropped rather than fabricated.
+
+## When to use it
+
+Invoke it when you want to strengthen a post's AEO surface:
+
+- After finishing a post, to add the 3–6 questions a real reader would ask about it.
+- When you notice people (or an AI) misreading what a post says, and want an explicit Q&A to settle it.
+- As a light editorial pass on an older post that's ranking but not answering questions directly.
+
+## How it works
+
+The skill is a plain Markdown instruction file — no code to run. Claude reads the post, drafts Q&A
+strictly from what's there, and writes the frontmatter array; the site's components turn that into the
+rendered section, the `.md` mirror, and the JSON-LD. A few ideas in here that generalize to any
+"structured content" skill:
+
+- **Ground every claim in the source.** The answers may only restate what the post already says — no
+  outside facts, versions, or numbers. This is what keeps an AEO feature from quietly hallucinating.
+- **Constrain the shape to keep the machine output valid.** Answers are single paragraphs (inline
+  `code` and links allowed, but no lists, fences, or headings) so the `FAQPage` JSON-LD
+  `acceptedAnswer.text` stays clean.
+- **Know which signal actually pays off.** Google deprecated the FAQ rich result, and its AI reads the
+  *visible* page text, not the JSON-LD — so the rendered `## FAQs` section is the real win and the
+  JSON-LD is a bonus for non-Google engines. The skill says so plainly instead of cargo-culting
+  structured data.
+- **Watch the YAML escape trap.** Escaping the *outer* quote pair (`answer: \"…\"`) still parses as
+  valid YAML but renders visible backslashes — so the skill calls out escaping only *inner* quotes and
+  gives a grep to catch the mistake after a batch.
+
+## The skill definition
+
+Here's the actual `SKILL.md`, verbatim. It references a few ProstDev-specific components and paths —
+adapt those to your own site, but the grounding discipline and the JSON-LD shape carry over unchanged.
+
+````markdown title="SKILL.md"
+---
+name: add-faqs
+description: >-
+  Add a FAQs section to the end of a ProstDev blog post for AEO. Use when the user wants to add
+  or update frequently-asked questions / Q&A on a post (the "add FAQs", "FAQ section", "AEO Q&A"
+  ask). Writes an optional `faqs` frontmatter array — answers GROUNDED in the post body, never
+  fabricated — that renders a `## FAQs` section, mirrors into the `.md` endpoint, and emits
+  FAQPage JSON-LD. Verifies with a build.
+---
+
+# Add a FAQs section to a ProstDev post
+
+FAQs are an OPTIONAL `faqs` frontmatter array on a post's `.mdx`, rendered as a `## FAQs`
+disclosure section (by `Faqs.astro`), mirrored in the `.md`/llms endpoint, AND emitted as
+**`FAQPage` JSON-LD** — a machine-readable answer-engine signal (for ChatGPT / Perplexity /
+Copilot-style crawlers + the `.md`/`llms.txt` surface). NOTE: Google fully deprecated the FAQ rich
+result in May 2026, and its AI experiences (AI Overviews / AI Mode / Gemini) read the *visible page
+text* from the regular index, NOT the JSON-LD — so for Google/Gemini the win is the rendered `##
+FAQs` section, and the JSON-LD is the bonus for non-Google engines. Blog posts are the site's AEO
+surface, so explicit, well-phrased Q&A in the visible text is a direct AEO win. Same plumbing shape as reader notes
+(optional array → component OUTSIDE `.prose` → `.md` block), but EDITORIAL, not preserved Wix
+content. Full detail → `.claude/docs/content-authoring.md` (the FAQs convention). See [[add-post]]
+for the full post schema and [[add-comment]] for the sibling per-post editor (reader notes).
+
+## Steps
+
+1. **Identify the post + READ IT.** `src/content/blog/<slug>.mdx`. You must read the body — every
+   answer has to be grounded in what the post ACTUALLY says (next step). Append to an existing
+   `faqs:` block or create one after `tags:` (placement in frontmatter doesn't matter; convention is
+   after `readerNotes`/`tags`, before `draft`).
+
+2. **HARD RULE — answers are GROUNDED IN THE POST BODY, never fabricated.** Ask the question a real
+   reader would ask about this post, and answer it from what the post already states. Do NOT add
+   outside facts, version numbers, or claims the post doesn't make. If the post doesn't answer a
+   question you'd like to include, drop the question — don't invent an answer. **3–6 Q&A is plenty.**
+   Phrase questions naturally ("How do I…", "What's the difference between…", "Why does…") — that's
+   what AEO matches against.
+
+3. **Add the entries** (schema in `src/content.config.ts`):
+
+   ```yaml
+   faqs:
+     - question: "What is the difference between On-Error Propagate and On-Error Continue?"
+       answer: "On-Error Propagate re-throws the error to the parent flow; On-Error Continue handles it and lets the flow finish. The `try` scope examples above show each behavior."
+     - question: "Where can I read the official reference?"
+       answer: "See the MuleSoft docs at https://docs.mulesoft.com for the full error-handling reference."
+   ```
+
+   - Both `question` and `answer` are required strings.
+   - **`answer` is INLINE PROSE ONLY** — it may contain `` `code` `` chips and bare `https://…` URLs
+     (autolinked by the component, new tab + external icon, same as reader notes), but **NO block
+     elements**: no bulleted lists, no fenced code blocks, no headings. A clean single paragraph
+     keeps the `FAQPage` JSON-LD `acceptedAnswer.text` valid. Need to enumerate? Write it as a
+     sentence ("first X, then Y, finally Z"), not a list.
+
+4. **YAML safety.** `question:`/`answer:` are quoted YAML strings, so quote the value (`"…"`) and
+   escape an inner `"` as `\"`. A literal `:` mid-sentence is fine inside quotes. A raw `<` is fine
+   INSIDE a YAML string, but write XML/config tag names in backticks (`` `<provider>` ``) so they
+   render as a code chip rather than plain text.
+   - **Escape only the INNER quotes, never the OUTER pair.** `answer: "… \"STRICT\" …"` is correct;
+     `answer: \"…\"` (outer pair escaped) is the trap — YAML reads it as a PLAIN scalar starting with
+     a literal `\`, the build PASSES, and the page/JSON-LD render visible `\"…\"` backslashes. Grep
+     `grep -rn ': \\"' src/content/blog/*.mdx` to catch it (an outer escape always follows `: `).
+
+5. **Verify with a build.** `npm run build` from the repo root — a YAML/schema error names the file.
+   The build does NOT catch a render-quality defect that's still valid YAML (e.g. the outer-escape
+   trap above, or a stray block element) — so after a BATCH pass also grep the source: outer escapes
+   (`: \\"`), and confirm every question ends in `?`. Then optionally `npm run preview` and open
+   `/post/<slug>`:
+   - the `## FAQs` disclosures render after the body / reader notes, before the tags (both themes,
+     keyboard-operable, focus ring visible);
+   - view source → a `<script type="application/ld+json">` with `"@type":"FAQPage"` and a
+     `"@type":"Question"` per pair;
+   - `curl -s localhost:4321/post/<slug>.md` → the trailing `## FAQs` block (`### question` + answer).
+
+## Notes
+
+- The EDIT here is to a SITE file (`src/content/blog/<slug>.mdx`) — a one-commit change in the
+  PUBLIC repo, and only when the user explicitly asks. (Editing THIS skill is the internal
+  two-commit submodule case.)
+- A post with no `faqs` renders nothing — the section, JSON-LD, and `.md` block are all guarded on
+  `faqs.length`, so adding the field to one post never touches the others.
+- Infra shipped June 2026 with ZERO posts seeded — FAQs are added per-post on demand via this skill,
+  not batch-generated.
+````

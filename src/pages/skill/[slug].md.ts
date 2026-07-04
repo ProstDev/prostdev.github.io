@@ -9,7 +9,9 @@ export async function getStaticPaths() {
 
 export const GET: APIRoute = async ({ props }) => {
   const { skill } = props as { skill: Awaited<ReturnType<typeof getSkills>>[number] };
-  const { title, description, difficulty, tags, pubDate } = skill.data;
+  const { title, description, difficulty, tags, pubDate, updatedDate } = skill.data;
+  const updated =
+    updatedDate && updatedDate.valueOf() !== pubDate.valueOf() ? updatedDate : null;
 
   const frontmatter = [
     `# ${title}`,
@@ -18,7 +20,8 @@ export const GET: APIRoute = async ({ props }) => {
     '',
     difficulty ? `- **Difficulty:** ${difficulty}` : null,
     tags.length ? `- **Tags:** ${tags.join(', ')}` : null,
-    `- **Published:** ${formatDate(pubDate)}`,
+    `- **Added:** ${formatDate(pubDate)}`,
+    updated ? `- **Last modified:** ${formatDate(updated)}` : null,
     `- **Source:** ${SITE.url}/skill/${skill.id}`,
     '',
     '---',

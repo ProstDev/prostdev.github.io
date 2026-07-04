@@ -1,15 +1,16 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
-import { skillUrl } from '@/lib/content';
+import { skillUrl, formatDate } from '@/lib/content';
 import SkillCover from '@/components/SkillCover.astro';
 
 interface Props {
   skill: CollectionEntry<'skills'>;
 }
 const { skill } = Astro.props;
-const { title, description, tagline, difficulty, tags, heroImage, icon } = skill.data;
+const { title, description, tagline, difficulty, tags, heroImage, icon, pubDate, updatedDate } = skill.data;
 const url = skillUrl(skill.id);
+const updated = updatedDate && updatedDate.valueOf() !== pubDate.valueOf() ? updatedDate : null;
 ---
 <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-default bg-surface-card transition-shadow hover:shadow-md">
   <a href={url} class="block">
@@ -41,5 +42,8 @@ const url = skillUrl(skill.id);
         ))}
       </div>
     )}
+    <p class="mt-4 text-xs text-muted">
+      {updated ? <>Updated {formatDate(updated)}</> : <>Added {formatDate(pubDate)}</>}
+    </p>
   </div>
 </article>
