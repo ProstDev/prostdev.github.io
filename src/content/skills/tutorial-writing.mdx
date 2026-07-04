@@ -1,0 +1,167 @@
+---
+title: 'tutorial-writing'
+description: 'A skill for writing step-by-step technical tutorials and setup guides a reader can follow top-to-bottom and succeed on the first try — UI-fidelity, dependency-ordered steps, verify-it-worked checkpoints, and the accuracy discipline that keeps commands from going stale.'
+tagline: 'Numbered guides that work on the first try — no backtracking, no walls the draft didn''t warn about.'
+difficulty: Intermediate
+tags: ['Technical Writing', 'Tutorials', 'Content Creation', 'Claude Code']
+icon: 'book'
+pubDate: 2026-07-03
+---
+
+> [!NOTE]
+> This is the "can a reader *follow* it?" skill — for hands-on numbered guides specifically. Its
+> siblings are [`technical-content-structure`](/skill/technical-content-structure) (readability of
+> prose articles) and [`blog-seo-standards`](/skill/blog-seo-standards) (findability). A walkthrough
+> has failure modes an essay doesn't, so it gets its own checklist.
+
+## What it does
+
+`tutorial-writing` is a Claude Code [skill](https://docs.claude.com/en/docs/claude-code/skills) for
+the "how to connect / configure / set up X" genre. The single goal it optimizes for: **a reader who
+follows top-to-bottom and succeeds on the first try** — no backtracking, no guessing, no hitting a
+wall the draft never warned about.
+
+Most of these lessons are scar tissue from real setup guides that *almost* worked — the step whose
+value only appears two steps later, the "now add it" with no verb, the command with no success
+message so the reader can't tell if it worked.
+
+## When to use it
+
+- You're writing or revising a hands-on numbered walkthrough or getting-started guide.
+- An install/config guide exists but readers keep getting stuck partway.
+- You're documenting an OAuth/permission flow with scopes and want the table done right.
+
+## How it works
+
+It's a plain instruction file. The non-negotiables that carry most of the weight:
+
+- **The real UI is ground truth — mirror it exactly.** Use the actual field labels and button text,
+  in the order the form presents them. If a screenshot contradicts the draft, the draft is wrong.
+- **Front-load values the reader reuses**, and **order steps by real dependency** — resolve the
+  chicken-and-egg trap where a required field's value only appears in a later step.
+- **State the action before every code block** ("Run the command below, filling in your Client ID"),
+  and **show the expected output** (genericized with placeholders) so the reader knows it worked.
+- **Close each phase with a "verify it worked" checkpoint** so failures surface where they happened,
+  not three steps later.
+
+There's a whole section on **accuracy discipline** — ground every product specific (tool names,
+scopes, endpoints, versions) in a live source at write time, re-verify on pushback, and trace
+troubleshooting to the authoritative source instead of a plausible-sounding story. That's what keeps
+a tutorial from quietly rotting as the product changes. It also covers scope/permission tables
+(lead with the scope, flag state-changing ones, make silent defaults loud) and a couple of
+Markdown/CMS gotchas.
+
+## The skill definition
+
+Here's the actual `SKILL.md`, verbatim. The examples lean on CLI/OAuth setups, but the structure —
+UI-fidelity, dependency ordering, verify checkpoints, accuracy discipline — applies to any
+step-by-step guide.
+
+````markdown title="SKILL.md"
+---
+name: tutorial-writing
+description: >-
+  How to write step-by-step technical tutorials and setup/how-to guides a reader can follow
+  top-to-bottom and succeed on the FIRST try — UI-fidelity, dependency-ordered steps, front-loaded
+  values, scope/permission tables, "verify it worked" checkpoints, and the accuracy discipline that
+  keeps commands from going stale. Use when writing or revising a hands-on numbered walkthrough,
+  getting-started guide, or install/config how-to. For prose explainers see
+  [[technical-content-structure]]; for SEO/frontmatter [[blog-seo-standards]].
+---
+
+# Writing step-by-step tutorials
+
+Craft guidance for the "how to connect/configure/set up X" genre. The goal: a reader who follows
+top-to-bottom and **succeeds on the first try** — no backtracking, guessing, or hitting a wall the
+draft didn't warn about.
+
+## The non-negotiables
+
+1. **The real UI is ground truth — mirror it exactly.** Use the actual field labels, button text,
+   and option wording the reader sees ("App acts on behalf of a user," not "user mode"). Document
+   fields in the **order the form presents them**. If a screenshot contradicts the draft, the draft
+   is wrong — fix it to match, don't argue from docs.
+2. **Front-load values the reader reuses later.** If Step 5 reuses a port/name/ID chosen in Step 1,
+   state the concrete value in Step 1 and reuse it verbatim downstream. No scroll-up "what did I
+   pick?" or scroll-down "what's this for?" dance.
+3. **Order steps by real dependency, not by topic.** Watch for chicken-and-egg traps — a required
+   field that blocks Save but whose value only appears in a *later* step. Pull the prerequisite
+   earlier. Walk the flow as the reader: can each step be completed with only what they have so far?
+4. **Never write "the docs," "the UI," or "the settings" without a link or exact label.** Link the
+   specific page (deep-link if you can) or name the exact menu path (**Access Management → Connected
+   Apps → Create app**).
+5. **Every transition before an action must state the action.** "Now add it." before a code block
+   leaves the reader guessing *how*. Say the verb: "Run the command below, filling in your Client ID
+   and Secret." A code block is not self-explanatory.
+6. **Show the expected output after a command, genericized.** The success message ("Added HTTP MCP
+   server … to local config") tells the reader it worked. Replace machine-specific paths/IDs with
+   placeholders (`/Users/<you>/.claude.json`, `/path/to/your/project`) so it reads as a template.
+7. **Close each phase with a "verify it worked" checkpoint.** After a setup step give a way to confirm
+   success (`tool --version`, a status badge, a list command that returns rows) *before* moving on —
+   so failures surface where they happened, not three steps later.
+8. **Account for client/GUI variants of the same step.** The same action looks different across
+   surfaces (a terminal list vs. a VS Code panel; CLI output vs. a **⚠ Needs Auth → ✓ Connected**
+   badge). Add a short "Using the X? You'll see …" note so the GUI user isn't lost.
+
+## Accuracy discipline (the reputation rule)
+
+Readers run your commands and notice when something's wrong — so does the team that owns the product.
+
+- **Ground every product specific in a live source at write time** — tool names, scopes, endpoints,
+  plan/pricing, UI labels, versions. These drift silently. Fetch the live doc (`.md` page if it has
+  one); cite the human page.
+- **Use canonical product names**, and write them in full on every mention — check the current name
+  before shipping (products get renamed). Don't drop a qualifier ("the Platform," "the Builder") that
+  makes it ambiguous.
+- **Link a product mention to the right destination:** the product console when the intent is "log in
+  and do this," a docs page when it's "go read more." Don't point a "open the product" mention at docs.
+- **Re-verify on pushback.** If the user or a reviewer questions a fact — even one you stated
+  confidently — fetch again before defending it. Confident-but-stale is the cardinal sin.
+- **Trace troubleshooting to the authoritative source, not a plausible story.** A symptom can have a
+  misleading surface message (an "OAuth state mismatch" that's really an upstream `invalid_scope`; a
+  "JSON parse error" that's really a bare 401). And a verification command can itself false-positive
+  (a masked/empty value printing "present," a `&&` chaining off the wrong command) — confirm the check
+  measured what you think.
+
+## Structure that works
+
+- **Title:** outcome-oriented — "How to Connect X to Y," not "X Overview."
+- **One-line promise** up top: what they'll be able to do by the end, concretely.
+- **"What you'll need":** prerequisites as a checklist (accounts, installs, permissions, paid-plan
+  requirements) — with the *check* for each (`tool --version`).
+- **Disambiguation callout** when two similarly-named things exist — state plainly which one this
+  guide is about and how to tell them apart.
+- **Numbered steps** grouped into a few labeled phases (Create → Connect → Verify → Use).
+- **Reference tables** (scopes, endpoints, regions) pulled *out* of the prose so steps stay scannable
+  and the table updates independently.
+- **"Why this matters"** close (the durable point), an **FAQ** for predictable follow-ups (does it
+  cost money, is it the same as <other client>, why did a tool fail silently), and a **"things
+  change" footer** pointing at the canonical doc.
+
+## Permissions / scopes tables
+
+- **Lead with the scope/role**, then "what it unlocks," then the specific actions. One scope → many
+  capabilities, so scope-first avoids repeating it across task rows.
+- Note **hierarchy** ("Admin includes Viewer") so a reader who only sees the broader role isn't blocked.
+- Call out **state-changing** scopes explicitly ("grant deliberately"), and flag scopes from a
+  **different family** the main set won't cover.
+- Use the **human-readable picker label** in instructions (raw scope string parenthetically).
+- **Make silent defaults loud.** When a command applies a non-obvious default (e.g. registering at
+  *local*/this-project-only scope), say so, point at the proof in the output, and give the exact flag
+  to change it. Don't bury it as an aside.
+
+## Markdown / CMS gotchas
+
+- For ordered lists that survive an interrupting comment/admonition, use `1.` for **every** item and
+  let Markdown auto-number — a literal `2.`/`3.` after an HTML comment often resets the count.
+- Prefer fenced blocks for anything typed; show one copy-pasteable command, then explain its flags in
+  a bullet list beneath it.
+
+## Revision workflow
+
+1. Make the smallest edit that satisfies the ask; don't rewrite surrounding prose.
+2. After editing one step, **scan downstream** for now-stale references (a renumbered step, a "three
+   scopes" line that's now four, a "we'll do this in Step 2" that moved). Fix them in the same turn.
+3. If the change alters a product fact, **re-fetch the live doc** before saving.
+4. Surface an inconsistency you spot and offer to fix — don't silently leave it or change unrelated things.
+````

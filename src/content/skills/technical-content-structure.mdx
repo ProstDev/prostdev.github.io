@@ -1,0 +1,186 @@
+---
+title: 'technical-content-structure'
+description: 'A skill for the readability half of a technical post — reader-first framing, text chunking, the inverted pyramid, headline patterns, intro/conclusion anatomy, and using bold and lists sparingly — so a busy developer actually finishes reading instead of bouncing.'
+tagline: 'Make a dense article scannable: the structure rules that keep a reader to the end.'
+difficulty: Intermediate
+tags: ['Technical Writing', 'Content Creation', 'Readability', 'Claude Code']
+icon: 'file-text'
+pubDate: 2026-07-03
+---
+
+> [!NOTE]
+> This is the "will a human finish reading it?" skill. It's the sibling of
+> [`blog-seo-standards`](/skill/blog-seo-standards) (will search *find* it?) and
+> [`tutorial-writing`](/skill/tutorial-writing) (can a reader *follow* it?). I keep them separate on
+> purpose — three focused checklists beat one giant one.
+
+## What it does
+
+`technical-content-structure` is a Claude Code
+[skill](https://docs.claude.com/en/docs/claude-code/skills) for long-form technical content — blog
+posts, concept explainers, capability overviews. The audience is a technical, time-poor reader who
+opens a lot of tabs and closes most of them. The whole skill is about earning the read.
+
+The core idea is simple and a little brutal: **no one reads walls of text.** Twelve unbroken
+paragraphs and the reader skims three and leaves, even if the writing is good. So the skill is a set
+of rules for reader-first framing, chunking, and structure that keep the page scannable.
+
+## When to use it
+
+- You're drafting a prose article and it's starting to feel dense.
+- A draft reads fine sentence-by-sentence but is a grey wall on screen.
+- You want a voice / structure / scannability pass before publishing.
+
+## How it works
+
+It's a plain instruction file — no code. A few of the rules it leans on most:
+
+- **Center the reader, not the announcement.** Frame each section around what *they* get ("you," not
+  "we"), and keep the prose around a middle-school reading level — a paperback, not a spec sheet.
+- **Break the page up every few hundred words** and include two or more genuine visuals — a list,
+  code block, table, diagram, or screenshot — so no post reads as one long wall.
+- **Reach for a list only when the shape fits.** Parallel items or ordered steps → bullets; a short
+  or subtle set flows better as a sentence. Nonstop bullets tire a reader like nonstop prose.
+- **Put the payoff first (inverted pyramid).** Outcome up front, then detail in descending
+  importance, so a reader who stops after the opening still leaves with what matters.
+- **Open by covering the five W's** and close with a quick roadmap; each body section runs pain →
+  the change → proof → payoff.
+- **Links inline behind a meaningful label** — never a naked URL, except a line meant to be copied.
+- **Close on the *value*** (why it was worth their time) plus a Q&A pointer and CTAs — not a recap.
+
+It ends with a pre-publish checklist and an honest "when to set these aside" (academic rigor,
+narrative long-form).
+
+## The skill definition
+
+Here's the actual `SKILL.md`, verbatim. It cross-references my other two writing skills; the craft
+advice stands on its own for any technical blog.
+
+````markdown title="SKILL.md"
+---
+name: technical-content-structure
+description: >-
+  Readability + structure for long-form technical content — blog posts, concept explainers, and
+  capability overviews people actually finish reading. Use when drafting or revising a prose article
+  that feels dense, or for a scannability/voice/structure pass: reader-first framing, text chunking,
+  the inverted pyramid, headline patterns, intro/conclusion anatomy. For SEO/frontmatter facts see
+  [[blog-seo-standards]]; for numbered walkthroughs [[tutorial-writing]].
+---
+
+# Technical content structure
+
+Getting a hurried developer to reach the last paragraph. Your reader is technical and short on time:
+they want the takeaway quickly, a thing that actually runs, and a reason to believe you. This covers
+*readability*; getting found is [[blog-seo-standards]]'s job.
+
+## Center the reader
+
+- **Frame every section around what the reader gets, not what you shipped.** Open on the task they
+  can now finish, the annoyance that disappears, the minutes they save. Recast "our team built X" as
+  "here's how X gets Y done for you." A paragraph drowning in "we" is one to redo in the second person.
+- **Talk peer-to-peer, the way one engineer explains something to another** — not a sales pitch.
+  Plain and unfussy, a touch friendly, contractions welcome. Drop the hype words ("revolutionary,"
+  "seamless," "game-changing") and just demonstrate it.
+- **Keep the prose around a middle-school reading level** — closer to a paperback than a spec sheet.
+  Trim long words and sentences; a tricky idea lands better in simple language, so let the *concept*
+  carry the difficulty, not the sentence. Spell out what isn't obvious, skip what is, and link out
+  for background rather than rebuilding it inline.
+
+## Keep it skimmable
+
+Solid blocks of text get abandoned — face a dozen dense paragraphs and a reader samples a couple then
+bails. Break the page up with structure and whitespace.
+
+- **Paragraphs:** three or four sentences at most, one idea apiece. Past roughly six screen-lines, split.
+- **Something visual should interrupt the prose every few hundred words** — a subheading, list, table,
+  or image — giving the reader a fresh landmark to aim for. Include **two or more genuine visuals** (a
+  screenshot, diagram, code sample, or video) so the page never reads as one long wall.
+- **Reach for a list only when the shape fits.** Three-plus parallel items or ordered steps belong in
+  one; a short or subtle set flows better as a sentence. Nonstop bullets tire a reader like nonstop prose.
+- **Put code in fenced blocks, not inline:** any command past a few words, any JSON/YAML/config
+  snippet, and any back-and-forth example — all fenced, with a language tag for highlighting.
+- **Links go inline behind a meaningful label, never a naked URL** ("[the setup guide](…)", not the
+  raw address). The lone exception is a line the reader will literally *copy* — a command or a value
+  in a code block — where the URL itself is what they need.
+- **Go light on bold.** Emphasize **a word or two** — a term, a UI label, a sharp contrast — never a
+  full sentence (bolding everything emphasizes nothing) or the same word on repeat. Rule of thumb: past
+  ~5% of a paragraph bold, or a bold run over ~4 words, thin it out.
+
+## Put the payoff first (the inverted pyramid)
+
+People read the web the way they scan a newspaper: give them the outcome *up front*, then supporting
+detail in order of decreasing importance, so a reader who bails after the opening still walks away
+with what matters. Load the front of everything — a heading that says something, a topic-carrying
+first sentence per paragraph, the meaty words before the filler. Nielsen Norman Group's
+[inverted-pyramid](https://www.nngroup.com/articles/inverted-pyramid/) piece covers the why.
+
+## Show one clean route
+
+Take the reader down **a single** path, not through every possibility as you go. With several choices
+(regions, OSes, auth flavors), build the main flow around the common one and hand the rest to the
+canonical doc ("Running a different X? Substitute your Y — full list here"); a table nobody needs is
+clutter, not care. And never leave a half-described escape hatch — "if X breaks, fall back to Y" with
+no steps is filler; write the steps or drop the line. Whatever you defer, make sure the doc covers it.
+
+## Headlines that pull their weight
+
+Specific, outcome-first, keyword up front (length limits live in [[blog-seo-standards]]). Patterns
+that work: problem-to-solution ("From Three Dashboards to Three Questions"), a time hook ("41 APIs in
+90 Seconds"), a before-and-after ("Governance: From Aspiration to Enforcement"). Steer clear of vague
+feature roundups ("What You Can Do with X"), the worn-out "7 Ways to…", and questions you never answer.
+
+## Open by covering the five W's
+
+The first few lines should establish **who** it serves, **what** it's about, **when** it's relevant
+(a launch, a newly shipped feature), **where** the material comes from (link the docs behind it), and
+**why** it pays off — then **finish with a quick roadmap**: "we'll walk through X, Y, and Z." Slip in
+two things that quote well: a clean **definition** of any named concept ("X is a Y that does Z" — the
+line a snippet or AI overview lifts) and, when the work is yours, one **first-person** sentence of
+authority (E-E-A-T); the third person throws away a signal AI leans on.
+
+## Body — pain first, then the fix
+
+Run each section as **the problem** (a sentence or two of concrete friction) → **the change** (the
+fix, with an example) → **the proof** (a before/after table or image) → **the payoff** (a one-line
+takeaway). Open on why anyone should care before the mechanics, and quantify the win ("8 min → 90
+sec") instead of claiming it "makes things easier." Describing a chat-style interface? Write it as a
+real exchange (`You:` / `Assistant:` turns in a fenced block), not narration of what a reader *might*
+type — an actual transcript feels concrete.
+
+## Keep your labels consistent
+
+Once a post falls into a repeating pattern, **word that element identically every time** — the
+before/after pair, the takeaway line, the table's column headers. Labels that wander turn tidy
+structure into noise. Settle the template before section one; on a revision pass, hunt down every
+stray variant and align them at once.
+
+## Close on the value, then send them onward
+
+Finish with a genuine **Conclusion** on *why the post was worth their time* — the payoff — not a
+bulleted recap of everything above. Where it fits, add where to bring questions (a community, a Q&A
+site, social) and any fair call to action (a sign-up, a follow, a related product). End on two or
+three *concrete* next-step links, never a limp "Learn more."
+
+## When to set these aside
+
+The rules chase skimmability and conversion. Set them aside for work needing academic rigor (papers,
+deep specifications) or narrative long-form where the telling *is* the point. Default everything else
+to skimmable.
+
+## How to revise
+
+Change only what the request calls for; leave surrounding prose be; don't quietly reshape a voice or
+structure nobody asked you to touch. **Ripple check:** whenever you alter a claim, example, or
+framing, hunt for everything downstream that still assumes the old version (headings, captions, table
+rows, intro/outro summaries, an "as noted above"). A heading has to match whatever sits under it.
+
+## Pre-publish checklist
+
+- [ ] Reader-centered framing ("you," not "we"); roughly a middle-school reading level
+- [ ] No paragraph over four sentences; something visual every few hundred words; two-plus real visuals
+- [ ] Opening covers the five W's and ends with a quick roadmap
+- [ ] Every section leads with its point (inverted pyramid), pain before fix
+- [ ] Links inline behind real labels; lists used only where they fit
+- [ ] Conclusion lands on the value and points to a next step (not a recap)
+- [ ] SEO handled separately → [[blog-seo-standards]]
+````
