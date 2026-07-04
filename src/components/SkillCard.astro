@@ -8,14 +8,15 @@ interface Props {
   skill: CollectionEntry<'skills'>;
 }
 const { skill } = Astro.props;
-const { title, description, tagline, difficulty, tags, heroImage, icon, pubDate, updatedDate } = skill.data;
+const { title, displayName, description, tagline, difficulty, tags, heroImage, icon, pubDate, updatedDate } = skill.data;
+const heading = displayName ?? title;
 const url = skillUrl(skill.id);
 const updated = updatedDate && updatedDate.valueOf() !== pubDate.valueOf() ? updatedDate : null;
 ---
 <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-default bg-surface-card transition-shadow hover:shadow-md">
   <a href={url} class="block">
     {heroImage ? (
-      <Image src={heroImage} alt={title} width={640} height={360} class="aspect-video w-full object-cover" />
+      <Image src={heroImage} alt={heading} width={640} height={360} class="aspect-video w-full object-cover" />
     ) : (
       <SkillCover icon={icon} class="aspect-video" />
     )}
@@ -32,8 +33,11 @@ const updated = updatedDate && updatedDate.valueOf() !== pubDate.valueOf() ? upd
       </div>
     )}
     <h3 class="text-lg font-bold leading-snug">
-      <a href={url} class="text-default transition-colors group-hover:text-accent">{title}</a>
+      <a href={url} class="text-default transition-colors group-hover:text-accent">{heading}</a>
     </h3>
+    {displayName && (
+      <p class="mt-1 font-mono text-xs text-muted">{title}</p>
+    )}
     <p class="mt-2 line-clamp-3 flex-1 text-sm text-muted">{tagline ?? description}</p>
     {tags.length > 0 && (
       <div class="mt-4 flex flex-wrap gap-1.5">

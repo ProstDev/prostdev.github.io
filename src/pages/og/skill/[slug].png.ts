@@ -11,5 +11,5 @@ export async function getStaticPaths() {
 export const GET: APIRoute = ({ props }) => {
   const { skill } = props as { skill: Awaited<ReturnType<typeof getSkills>>[number] };
   const bg = loadPostHero(skill.filePath ?? '');
-  return renderCard(card({ title: skill.data.title, eyebrow: 'Skill', bg }));
+  return renderCard(card({ title: skill.data.displayName ?? skill.data.title, eyebrow: 'Skill', bg }));
 };

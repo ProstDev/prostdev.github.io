@@ -4,6 +4,10 @@ import SkillCard from '@/components/SkillCard.astro';
 import { getSkills } from '@/lib/content';
 
 const skills = await getSkills();
+
+// Filter chips = the union of every tag across all skills (skills carry a free-form `tags`
+// array, not a closed enum like blog categories), sorted alphabetically with "All" first.
+const tags = ['All', ...[...new Set(skills.flatMap((s) => s.data.tags))].sort((a, b) => a.localeCompare(b))];
 ---
 <BaseLayout
   title="Skills"
@@ -25,11 +29,49 @@ const skills = await getSkills();
         No skills yet — check back soon!
       </p>
     ) : (
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {skills.map((skill) => (
-          <SkillCard skill={skill} />
-        ))}
-      </div>
+      <>
+        <!-- Tag filters -->
+        {tags.length > 1 && (
+          <div class="mb-8 flex flex-wrap items-center gap-2">
+            <span class="text-sm font-semibold text-default">Tags:</span>
+            {tags.map((t) => (
+              <button
+                type="button"
+                data-tag={t}
+                class="tag-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+                data-active={t === 'All' ? 'true' : undefined}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div id="skill-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {skills.map((skill) => (
+            <div class="skill-item h-full" data-tags={skill.data.tags.join('|')}>
+              <SkillCard skill={skill} />
+            </div>
+          ))}
+        </div>
+      </>
     )}
   </div>
 </BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.tag-filter-btn');
+  const items = document.querySelectorAll<HTMLElement>('.skill-item');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      buttons.forEach((b) => b.removeAttribute('data-active'));
+      btn.setAttribute('data-active', 'true');
+      items.forEach((item) => {
+        const itemTags = (item.dataset.tags ?? '').split('|');
+        const show = tag === 'All' || itemTags.includes(tag ?? '');
+        item.classList.toggle('hidden', !show);
+      });
+    });
+  });
+</script>

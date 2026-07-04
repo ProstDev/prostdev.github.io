@@ -181,7 +181,15 @@ const skills = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/skills' }),
   schema: ({ image }) =>
     z.object({
+      /**
+       * Canonical, invocable skill name (kebab-case, e.g. `add-faqs`). Stays the source of truth
+       * for MACHINE surfaces (URL slug, `.md` endpoint heading, `llms.txt`) — AIs need the exact
+       * name they'd invoke. Humans see `displayName` on the cards / detail header instead.
+       */
       title: z.string(),
+      /** Human-friendly headline shown on the visible catalog card + detail page (e.g. "Add FAQs").
+       *  Falls back to `title` when absent. Never used on the machine-readable endpoints. */
+      displayName: z.string().optional(),
       description: z.string(),
       /** Short hook shown under the title on the detail page. */
       tagline: z.string().optional(),
