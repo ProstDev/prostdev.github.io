@@ -17,6 +17,15 @@
   --color-brand-800: #134f6f;
   --color-brand-900: #14425d;
 
+  /* Secondary accent — violet. Used ONLY as the far stop of cyan→violet gradient
+     washes (hero glow, section bands); it is NOT a text/interactive color, so it
+     never needs to clear a contrast ratio on its own. Echoes the purple in the
+     ACB / DataWeave video thumbnails. */
+  --color-violet-300: #a78bfa;
+  --color-violet-400: #8b6dff;
+  --color-violet-500: #7c5cff;
+  --color-violet-600: #6d3fed;
+
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
     Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', Menlo,
@@ -36,6 +45,15 @@
      fill + white text is only 3.46:1; brand-600 reaches 5.03:1). */
   --accent-strong: var(--color-brand-600);
   --accent-contrast: #ffffff;
+
+  /* Decorative cyan→violet gradients (light). These sit BEHIND content only and are
+     never a text/contrast surface, so low-opacity tints are safe. --hero-glow is a
+     soft radial bloom behind the hero; --band-wash is a faint diagonal sweep that
+     replaces flat --bg-subtle on the tone bands. */
+  --hero-glow: radial-gradient(60% 55% at 50% 0%,
+    rgb(41 171 226 / 0.16) 0%, rgb(124 92 255 / 0.12) 45%, transparent 78%);
+  --band-wash: linear-gradient(115deg,
+    rgb(41 171 226 / 0.07) 0%, var(--bg-subtle) 42%, rgb(124 92 255 / 0.07) 100%);
 
   /* Inline code chip (light). Accent-tinted fill + a visible accent border so an inline
      `var` clearly reads as code (the old --bg-subtle fill was ~invisible on --bg). Text
@@ -69,6 +87,13 @@
      solid-fill accent matches the regular accent. */
   --accent-strong: var(--color-brand-300);
   --accent-contrast: #07111a;
+
+  /* Decorative cyan→violet gradients (dark). Slightly stronger alpha than light — the
+     glow needs to register against the near-black --bg without washing it out. */
+  --hero-glow: radial-gradient(60% 55% at 50% 0%,
+    rgb(41 171 226 / 0.22) 0%, rgb(124 92 255 / 0.18) 45%, transparent 78%);
+  --band-wash: linear-gradient(115deg,
+    rgb(41 171 226 / 0.10) 0%, var(--bg-subtle) 42%, rgb(124 92 255 / 0.10) 100%);
 
   /* Inline code chip (dark). Deep accent-tinted fill + a brighter accent border. Text stays
      --text (#e8eef3 on #0e2230 ≈ 12:1, well past WCAG AA). */
@@ -104,6 +129,9 @@ body {
 /* Utility shortcuts mapped to semantic tokens */
 .bg-surface { background-color: var(--bg); }
 .bg-surface-subtle { background-color: var(--bg-subtle); }
+/* Tone band with a faint cyan→violet gradient wash (falls back to the flat subtle
+   fill under the gradient, so a browser without gradient support still gets a band). */
+.bg-band-wash { background-color: var(--bg-subtle); background-image: var(--band-wash); }
 .bg-surface-card { background-color: var(--bg-card); }
 .text-default { color: var(--text); }
 .text-muted { color: var(--text-muted); }

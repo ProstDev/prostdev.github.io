@@ -27,7 +27,8 @@ const playlists = primaryPlaylists();
   ]}
 >
   <!-- Hero -->
-  <section class="mx-auto w-full max-w-7xl px-4 pt-10 pb-6 text-center sm:px-6 sm:pt-14">
+  <section class="hero-section mx-auto w-full max-w-7xl px-4 pt-10 pb-6 text-center sm:px-6 sm:pt-14">
+    <div class="hero-glow" aria-hidden="true"></div>
     <h1 class="text-4xl font-extrabold tracking-tight sm:text-6xl">
       <span class="text-accent">ProstDev</span>
       <span class="text-muted"> | </span>
@@ -58,7 +59,7 @@ const playlists = primaryPlaylists();
   </section>
 
   <!-- Latest videos -->
-  <section class="bg-surface-subtle">
+  <section class="bg-band-wash">
     <div class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
       <h2 class="mb-6 flex items-center gap-2 text-2xl font-bold">📺 Latest videos</h2>
       <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -71,7 +72,7 @@ const playlists = primaryPlaylists();
   <AiFriendly />
 
   <!-- Playlists -->
-  <section class="bg-surface-subtle">
+  <section class="bg-band-wash">
     <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       <div class="mb-4 flex items-end justify-between gap-4">
         <div>
@@ -94,6 +95,25 @@ const playlists = primaryPlaylists();
 </BaseLayout>
 
 <style>
+  /* Hero: contain the decorative glow's negative z-index so it can't slip under
+     anything outside the hero, and establish the stacking context the featured-card
+     hover-scale (z-index:1) already relies on. */
+  .hero-section {
+    position: relative;
+    isolation: isolate;
+  }
+  /* Soft cyan→violet radial bloom behind the hero content. Bleeds slightly past the
+     section edges (negative inset) so the color feels ambient, not boxed. Purely
+     decorative — aria-hidden, sits at z-index:-1 beneath the H1/copy/cards. */
+  .hero-glow {
+    position: absolute;
+    inset: -3rem -1rem auto;
+    height: 120%;
+    z-index: -1;
+    background: var(--hero-glow);
+    pointer-events: none;
+  }
+
   /* Coordinated focus effect on the two featured hero videos.
      Desktop, mouse-only — hovering one grows it while the other shrinks. */
   @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
