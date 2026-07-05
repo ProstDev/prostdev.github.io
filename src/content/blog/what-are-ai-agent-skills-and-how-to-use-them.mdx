@@ -1,0 +1,163 @@
+---
+title: "AI Agent Skills: What They Are and How to Use Them"
+description: "A beginner's guide to AI agent skills: what a SKILL.md file is, how to set one up in Claude Code, and how to hand an AI an llms.txt to pick the skill it needs."
+pubDate: 2026-07-04
+category: Guides
+tags: [AI, Claude Code, Markdown]
+faqs:
+  - question: "What is an AI agent skill?"
+    answer: "A skill is a Markdown file called SKILL.md inside a folder. It has a short YAML header with a `name` and a `description`, followed by the instructions themselves written in Markdown. It saves a piece of information or a workflow so you (or your AI) don't have to re-explain it every time."
+  - question: "Where do skills go in Claude Code?"
+    answer: "Personal skills that follow you into every project live in `~/.claude/skills/<name>/SKILL.md`, and skills scoped to one project live in that project's `.claude/skills/<name>/SKILL.md`. Claude loads both automatically at startup."
+  - question: "How does the AI know which skill to use?"
+    answer: "When it's looking for a skill it reads only the folder names and the frontmatter (the `name` and `description`) of your skills, not the full body. It matches your request to a description and only then loads that skill's instructions. That's why a clear description that says what the skill does AND when to use it matters so much."
+  - question: "Can I use skills in an AI other than Claude Code?"
+    answer: "Yes. A SKILL.md is just a Markdown file, so it's reusable in any other AI agent. Tools that support the format load the folder directly, and for anything else you can paste the SKILL.md straight into the conversation as your instructions."
+  - question: "How do I let an AI scan the ProstDev skills for me?"
+    answer: "Give it the llms.txt URL (prostdev.com/llms.txt). It lists every published skill by name and description under a 'Claude Code skills' heading, so a browsing-capable AI can read the list, pick the one that fits your task, and grab that skill's `.md` version for the full instructions."
+---
+
+AI agent skills are pretty much pieces of information that you save in Markdown files. You can write whatever you want in them, or you can also let your own AI write them for you (or for itself) whenever some new information is needed. There are some standards that are good to follow on how to structure these files to keep your AI's context lower, and hopefully spend fewer tokens! But we'll talk about that in a bit.
+
+## First of all, what really are skills?
+
+So as I said before, they're just Markdown files inside folders with specific names on them. :-) The AI would either know which one to call, or you can also manually call it at any point in your session.
+
+> [!NOTE]
+> I'll be talking about my experience with Claude Code because that's what I normally use on my day to day, but skills are reusable in any other AI agent.
+
+So what is inside a `SKILL.md` file? It has two parts:
+
+1. A short YAML header (called *frontmatter*) that contains a `name` and a `description`.
+2. The instructions themselves, written in Markdown.
+
+The name has to match exactly the name of the folder that contains the skill for the AI to run it. The description has to be as useful and descriptive as possible so the AI knows when exactly to run this skill. Try to always answer what this skill does and when to use it, so the AI also knows when it's useful to use or not.
+
+This first part is important because when the AI is looking for skills, it either reads only the folder names to filter out the ones that don't fit, or goes and reads the frontmatter of all the available skills to figure out which one is needed and which one is not for the specific job it's trying to accomplish.
+
+Let's see an example. This is a simple skill:
+
+```markdown title="SKILL.md"
+---
+name: commit-message
+description: >-
+  Write a git commit message from the staged diff. Use when the user asks
+  to commit, write a commit message, or summarize staged changes.
+---
+
+# Write a commit message
+
+Read the staged diff, then write a commit message that:
+
+- Uses a concise, imperative subject line under 50 characters.
+- Leaves a blank line, then a body explaining *why*, not *what*.
+- References an issue number when the branch name contains one.
+```
+
+As you can see, the description says what the skill does (writes a git commit message from the staged diff) and when to use it (use when the user asks to commit, write a commit message, or summarize staged changes). After that is the actual skill's instructions to the AI on how you want it to write the commit message exactly.
+
+### Why the name and description matter so much
+
+Imagine if the skill was called `commit` and the description was just `write a commit`. Remember that the AI first reads only the frontmatter and not the full body of the skill, otherwise it would defeat the purpose of getting your context under control. So if it just sees "write a commit", it's not really sure what to do with that! Are you asking it to commit your changes? Are you asking it to write some code and commit? Do you want to review the files before the commit? It doesn't even specify that you just want it to write the *message* of the commit.
+
+Of course this skill would perform poorly on any AI. This is why the name and the description are so important. Otherwise your AI will have to end up reading all your skills (or none!) to try to figure out what you want, which will cost you more turns, more context, and more tokens.
+
+## Setting up your first skill in Claude Code
+
+Claude Code looks for skills in two places, and it loads both automatically when it starts up. The only real difference between them is *scope*:
+
+| Where | Path | Use it for |
+| --- | --- | --- |
+| **Personal** | `~/.claude/skills/<name>/SKILL.md` | Skills you want in *every* project. Your own habits and preferences. |
+| **Project** | `.claude/skills/<name>/SKILL.md` | Skills that only make sense in *this* codebase. Its conventions, its build steps. |
+
+Here's how you make your first personal skill:
+
+1. **Make the folder.** The folder name becomes the skill's name, so keep it short and use kebab-case (words joined with dashes):
+
+   ```bash
+   mkdir -p ~/.claude/skills/commit-message
+   ```
+
+2. **Create the `SKILL.md` inside it.** Open `~/.claude/skills/commit-message/SKILL.md` and paste in the example from above, or your own.
+
+3. **Keep the `name` and the folder in sync.** Remember, the `name` in the frontmatter has to match the folder name exactly, or the AI won't run it.
+
+4. **Write a description that says *when*.** "Use when the user asks to commit…" is way more useful to the AI than "a commit tool". The clearer the trigger, the more reliably the skill fires at the right moment (and only the right moment).
+
+5. **Restart Claude Code**, or start a new session. Skills get indexed when it starts up, so a brand-new skill gets picked up on the next launch.
+
+And that's the whole setup. There's no build step, no config file, no registering anything. The folder *is* the installation.
+
+### Calling a skill
+
+Once a skill is installed, there are two ways to trigger it:
+
+- **Let the AI decide.** Just describe your task like you normally would. If it matches the skill's description, the AI loads it and follows it on its own.
+- **Call it yourself by name.** Type `/commit-message` (a slash plus the skill's name) when you want to make sure that specific skill runs.
+
+## Using skills in other AIs
+
+Like I mentioned at the top, a `SKILL.md` is just Markdown with a small header, so there's nothing Claude-Code-specific about the file itself. That gives you two ways to use it anywhere else:
+
+- **If the tool supports the format**, point it at your skills folder and it loads them the same way: reading the names and descriptions first, and the full body only when it needs it. The [Claude Agent SDK](https://docs.claude.com/en/api/agent-sdk/overview) and the Claude desktop and web apps all understand skills, and more agent tools keep adopting the same `SKILL.md` convention.
+- **If the tool doesn't support skills natively**, you can still use the content. Just paste the body of the `SKILL.md` right into the conversation as your instructions. You lose the automatic matching, but you keep the workflow you wrote, which is most of the value anyway.
+
+So writing your workflow as a skill is never wasted effort, even for an AI that has never heard the word "skill". It's still a really good, reusable prompt.
+
+## Browsing the ProstDev Skills page
+
+The [Skills page](/skills) here on ProstDev is a shared library of the real skills I use with Claude Code. Each card is one skill. Here's how to get the most out of it:
+
+- **Read the description first**, exactly like the AI does. It tells you *when* the skill is meant to fire, which is the fastest way to know if it fits your workflow.
+- **Filter by tag** with the chips at the top (`Claude Code`, `MDX`, `AEO`, and so on) to narrow the grid down to a topic.
+- **Open a skill** to read my own explanation of it, plus the complete `SKILL.md` in a code block you can copy. Grab it, drop it into `~/.claude/skills/<name>/`, and tweak the parts that are specific to your own setup.
+
+Every skill page is also machine-readable. Add `.md` to the end of any skill URL, like [`/skill/save-session.md`](/skill/save-session.md), and you get the raw Markdown with none of the page around it. That plain version is exactly what you'd hand to an AI.
+
+## Point your AI at llms.txt and let it pick the skill
+
+Here's where it gets really handy. You don't have to read the whole library yourself and decide which skill an AI needs. You can let the AI do that, the same way it already picks between its *own* skills.
+
+The site publishes an [llms.txt](/llms.txt) file. This is a small, growing web standard (you can read about it at [llmstxt.org](https://llmstxt.org)): a single Markdown index of a site, full of links, written specifically for AI crawlers. ProstDev's `llms.txt` has a section that looks like this:
+
+```markdown title="llms.txt (excerpt)"
+## Claude Code skills
+
+Reusable Claude Code / AI-agent skills Alex Martinez uses and shares.
+Each has a machine-readable Markdown version (append `.md` to its URL).
+
+- [save-session](https://www.prostdev.com/skill/save-session): End-of-session routine…
+- [add-faqs](https://www.prostdev.com/skill/add-faqs): Add an FAQ section to a post…
+- [blog-seo-standards](https://www.prostdev.com/skill/blog-seo-standards): SEO + AEO standards…
+```
+
+Notice this is the exact same shape as a skill's own frontmatter: a name and a one-line description of when to use it. That's not a coincidence, it's the same idea one level up. So the flow is:
+
+1. **Give a browsing-capable AI the URL** `https://www.prostdev.com/llms.txt` along with your task. For example, "I'm about to wrap up a coding session, is there a skill for that?"
+2. **The AI scans the list of names and descriptions** and matches your task to a skill, just like Claude Code matches your request to a local skill.
+3. **It grabs the full instructions** by adding `.md` to that skill's URL (`/skill/save-session.md`) and follows them.
+
+You've basically handed the AI a menu it can read and order from by itself. And because it's reading descriptions first, it only pulls the full text of the one skill it actually needs, which (you guessed it) keeps your context lower and your tokens down.
+
+## A few tips to get more out of skills
+
+- **Spend your effort on the description.** It's both the trigger and the summary the AI scans. Phrase it as "use this when…". A vague description means the skill never fires when you want it to.
+- **Keep each skill small and focused.** One job per skill. A skill that tries to do everything matches nothing cleanly.
+- **Let skills call other skills.** You can chain small skills into a bigger workflow instead of writing one giant file. One "orchestrator" skill can call several focused ones in order, so a big job stays easy to maintain.
+- **Check them into your repo.** A project skill in `.claude/skills/` travels with the code, so your whole team and every future session get the same behavior for free.
+- **Refresh them when they go stale.** Skills drift as your tools change. Updating one is usually a quick edit to the body, not a rewrite.
+
+> [!TIP]
+> Not sure your `SKILL.md` follows the conventions? I keep a skill for exactly that: [`claude-md-and-folder-standards`](/skill/claude-md-and-folder-standards). Point Claude Code at it and ask it to check a skill you just wrote, and it'll verify the name and description, the folder layout, the size, and the rest against the standards, so your config stays lean.
+
+## Wrapping up
+
+Skills turn your best prompts into permanent, reusable pieces of information your AI can reach for on its own. A skill is just a folder with a `SKILL.md` inside: a `name`, a "use this when…" `description`, and some Markdown instructions. Drop it in `~/.claude/skills/` for Claude Code, paste it into any other AI that doesn't read the format natively, or publish it so other people can copy it. And because a skill's frontmatter and an `llms.txt` index both describe *when* to use each skill in one line, you can hand an AI an `llms.txt` and let it browse and pick the right skill by itself.
+
+Start with one skill for the thing you re-type the most. Once you see the AI reach for it without you asking, you'll want to write ten more!
+
+Need a head start? Browse the real skills I use with Claude Code, copy the `SKILL.md`, and make it yours.
+
+> [!BUTTON]
+> [Explore the ProstDev Skills library](/skills)
