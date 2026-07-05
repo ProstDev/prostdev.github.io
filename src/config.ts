@@ -16,10 +16,10 @@ export const NAV: { label: string; href: string }[] = [
   { label: 'Home', href: '/' },
   { label: 'Blog', href: '/blog' },
   { label: 'Skills', href: '/skills' },
+  { label: 'Videos', href: '/videos' },
   { label: 'New to Mule', href: '/mulesoft-from-start' },
   { label: 'Learn ACB', href: '/learn-acb' },
   { label: 'MuleSoft + AI', href: '/mulesoft-ai' },
-  { label: 'Videos', href: '/videos' },
 ];
 
 export const SOCIAL = {
