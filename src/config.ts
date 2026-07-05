@@ -13,7 +13,6 @@ export const SITE = {
 
 /** Primary navigation. `match` is used to highlight the active link. */
 export const NAV: { label: string; href: string }[] = [
-  { label: 'Home', href: '/' },
   { label: 'Blog', href: '/blog' },
   { label: 'Skills', href: '/skills' },
   { label: 'Videos', href: '/videos' },
