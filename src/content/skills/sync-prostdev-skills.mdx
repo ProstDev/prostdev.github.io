@@ -38,9 +38,9 @@ verdict per skill. A few ideas here generalize to any "reconcile a fork against 
   flow both ways instead of only trickling down.
 - **Three explicit buckets force a decision.** Every skill lands in *Pull in*, *Nothing* (ours is
   already a superset — don't regress to the ancestor), or *Give back*. No skill is left in limbo.
-- **Judge new skills against the actual repos.** A new upstream skill is adopted only if it fits a
-  real workflow here — content/SEO skills are explicitly ruled out for a pure code project, so the
-  catalog doesn't fill with irrelevant tooling.
+- **Judge new skills against the actual project.** A new upstream skill is adopted only if it fits a
+  real workflow there. The public set is mixed — some skills are content/SEO, some are coding — so
+  each one is judged on whether it applies, and the catalog doesn't fill with irrelevant tooling.
 - **Surface the diff before changing anything.** It presents findings and lets the human pick;
   nothing is edited silently.
 - **Carry a dated baseline.** A "last full pass" snapshot records the prior verdict per skill, so
@@ -71,11 +71,11 @@ improvements worth giving back. This skill is the recurring two-way check.
 2. **Diff the name-matches.** For each skill whose name matches one of ours, `WebFetch` its page
    (`https://prostdev.com/skill/<name>`) and compare its body against our version in `skills/<name>/`.
    Note anything upstream has that ours lacks, and vice-versa.
-3. **Judge the new names.** For skills we don't have, decide relevance to **these repos**: a Shopify
-   booking app + two portals + shared config. They are **code repos with no public content surface** —
-   blog/SEO/content-authoring skills (e.g. `add-faqs`, `blog-seo-standards`,
-   `technical-content-structure`, `tutorial-writing`) do **not** apply. Adopt one only if it fits an
-   actual workflow here.
+3. **Judge the new names.** For skills we don't have, decide relevance to **this project**. The
+   public set is mixed — some are coding skills, some are content/SEO (e.g. `add-faqs`,
+   `blog-seo-standards`, `technical-content-structure`, `tutorial-writing`) — so judge each one on
+   its own merits: a code repo with no public content surface won't want the content/SEO skills,
+   while a content-heavy repo will. Adopt one only if it fits an actual workflow here.
 4. **Report a verdict per skill**, in three buckets:
    - *Pull in* — a genuine upstream improvement or a relevant new skill → adopt it (see Constraints).
    - *Nothing* — ours is already equal or a superset (don't regress to the ancestor).
@@ -92,7 +92,8 @@ Re-verify each pass — this is a snapshot, upstream moves.
   `claude-md-and-folder-standards` instead of inlining them). Nothing to pull.
 - `claude-md-and-folder-standards` — **ours is a superset** (adds `settings.json` hygiene, richer
   model-override rule with the fork/cache-bust rationale, an Anti-Patterns list). Nothing to pull.
-- The other four listed skills were all blog/SEO — out of scope.
+- The other four listed skills were all content/SEO — judge them against your project's scope
+  (out of scope for a pure code repo, in scope for a content-heavy one).
 - **Worth upstreaming from us:** the three superset chunks above, generalized. Caveat: our
   `save-session` says *never write to MEMORY.md* (our setup bans file-based memory); on a stock
   install MEMORY.md **is** the memory system, so strip that line before contributing.
