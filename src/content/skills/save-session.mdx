@@ -12,8 +12,8 @@ pubDate: 2026-07-03
 > [!IMPORTANT]
 > **Pairs with [`claude-md-and-folder-standards`](/skill/claude-md-and-folder-standards).** `save-session` decides
 > *what* to keep; `claude-md-and-folder-standards` decides *where* it goes and *how much*. Install both — the
-> save routine restates that skill's rules (line caps, the decision table, token awareness) so the
-> "commit what we learned" step can't quietly undo your config hygiene.
+> save routine *invokes* that skill as the single source of truth for line caps, the decision table,
+> and token awareness, so the "commit what we learned" step can't quietly undo your config hygiene.
 
 ## What it does
 
@@ -53,8 +53,9 @@ A few ideas in here that generalize to any "persist knowledge" skill:
   where it'll actually be useful.
 - **Make "nothing useful" a valid outcome.** The skill explicitly allows the agent to do nothing and
   say so — which stops it from inventing filler just to feel productive.
-- **Carry the cost constraints forward.** It restates the line cap and the token-per-turn framing so
-  the save step can't quietly undo the config hygiene.
+- **Carry the cost constraints forward — by reference, not by copy.** It invokes the standards skill
+  as the single source of truth for the line cap and token-per-turn framing, so the save step can't
+  quietly undo the config hygiene *and* the rules can't drift out of sync.
 
 ## The skill definition
 
@@ -70,6 +71,13 @@ description: End-of-session routine. Saves learnings to .claude files following 
 # End-of-Session Save
 
 Review everything from this session and persist what's useful for future sessions.
+
+## Scope: every repo/context the session touched
+
+- Route each learning to wherever it belongs, not just the primary working directory. Multi-repo
+  and monorepo sessions are common — a fact learned here may belong in another repo's docs.
+- Before concluding "nothing to save" for a given repo, check it for a now-stale doc or a
+  convention this session introduced.
 
 ## What to Save
 
@@ -88,16 +96,12 @@ Review everything from this session and persist what's useful for future session
 | Deterministic automation (must always run) | `.claude/hooks/` + settings.json |
 | Nothing useful learned | Do nothing. Say so. |
 
-## Constraints (from claude-md-and-folder-standards)
+## Constraints
 
-- CLAUDE.md must stay under 200 lines total. Count before and after.
-- Only add what Claude would get WRONG without. No obvious/inferrable content.
-- No duplicating README, package.json, tsconfig, or other existing files.
-- No self-evident advice. No "just in case" entries.
-- Prefer skills over bloating CLAUDE.md. If it's specialized, make it a skill.
-- Skills: 50-80 lines ideal, 120 max. Kebab-case folder name. Include frontmatter.
-- Use terse imperative bullets, not prose paragraphs.
-- Every line costs ~2-4 tokens per turn — treat CLAUDE.md like expensive real estate.
+- **Invoke the `claude-md-and-folder-standards` skill and apply it as the single source of truth**
+  for sizing and placement rules — don't restate them here (an inlined copy drifts).
+- Highlights only: CLAUDE.md ≤200 lines; skills ≤120; add only what Claude would get WRONG
+  without; no duplicating existing files; terse imperative bullets.
 
 ## Do NOT
 
