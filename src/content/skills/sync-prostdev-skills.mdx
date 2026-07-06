@@ -79,8 +79,8 @@ improvements worth giving back. This skill is the recurring two-way check.
 4. **Report a verdict per skill**, in three buckets:
    - *Pull in* — a genuine upstream improvement or a relevant new skill → adopt it (see Constraints).
    - *Nothing* — ours is already equal or a superset (don't regress to the ancestor).
-   - *Give back* — general, non-CleaningPal knowledge in our version that upstream lacks; draft a
-     de-CleaningPal'd snippet the user can send them (we can't edit their site).
+   - *Give back* — general, project-agnostic knowledge in our version that upstream lacks; draft a
+     generalized snippet the user can send them (we can't edit their site).
 5. **Don't change anything without surfacing the diff first.** Present findings; let the user pick.
 
 ## Findings baseline (last full pass: 2026-07)
@@ -101,6 +101,6 @@ Re-verify each pass — this is a snapshot, upstream moves.
 
 - Any edit to a shared skill / `CLAUDE.md` / `.claude/` file follows the
   `claude-md-and-folder-standards` skill.
-- Shared skills are edited in the **standalone `cleaningpal-claude-shared` clone**, then propagated —
+- Shared skills are edited in the **standalone shared-config clone**, then propagated —
   see the `shared-claude-config` skill. Never edit a consumer's detached `.claude/` checkout.
 ````
