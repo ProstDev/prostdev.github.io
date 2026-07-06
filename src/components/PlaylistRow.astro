@@ -34,12 +34,64 @@ const rowId = `row-${playlist.id}`;
       )}
     </div>
 
-    <div class="relative">
+    <div class="group/carousel relative">
+      <button
+        type="button"
+        data-carousel-prev
+        aria-controls={rowId}
+        aria-label={`Scroll ${playlist.title} left`}
+        title="Scroll left"
+        class="absolute left-0 top-[calc(50%-2rem)] z-10 hidden h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text)] shadow-md transition-colors hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)] hover:text-[var(--accent-contrast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] disabled:pointer-events-none disabled:opacity-0 sm:flex"
+      >
+        <Icon name="chevron-left" />
+      </button>
       <div id={rowId} class="no-scrollbar flex snap-x gap-4 overflow-x-auto scroll-smooth pb-2">
         {videos.map((v) => (
           <div class="snap-start"><VideoCard video={v} compact /></div>
         ))}
       </div>
+      <button
+        type="button"
+        data-carousel-next
+        aria-controls={rowId}
+        aria-label={`Scroll ${playlist.title} right`}
+        title="Scroll right"
+        class="absolute right-0 top-[calc(50%-2rem)] z-10 hidden h-11 w-11 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text)] shadow-md transition-colors hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)] hover:text-[var(--accent-contrast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] disabled:pointer-events-none disabled:opacity-0 sm:flex"
+      >
+        <Icon name="chevron-right" />
+      </button>
     </div>
   </section>
 )}
+
+<script>
+  function initCarousels() {
+    document.querySelectorAll<HTMLElement>('[data-carousel-prev], [data-carousel-next]').forEach((btn) => {
+      const id = btn.getAttribute('aria-controls');
+      const track = id ? document.getElementById(id) : null;
+      if (!track) return;
+      const dir = btn.hasAttribute('data-carousel-next') ? 1 : -1;
+      btn.addEventListener('click', () => {
+        track.scrollBy({ left: dir * Math.round(track.clientWidth * 0.85), behavior: 'smooth' });
+      });
+    });
+
+    document.querySelectorAll<HTMLElement>('.no-scrollbar[id^="row-"]').forEach((track) => {
+      const wrap = track.parentElement;
+      if (!wrap) return;
+      const prev = wrap.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+      const next = wrap.querySelector<HTMLButtonElement>('[data-carousel-next]');
+      const update = () => {
+        const max = track.scrollWidth - track.clientWidth;
+        const overflows = max > 1;
+        if (prev) prev.disabled = !overflows || track.scrollLeft <= 1;
+        if (next) next.disabled = !overflows || track.scrollLeft >= max - 1;
+      };
+      track.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    });
+  }
+  initCarousels();
+  document.addEventListener('astro:page-load', initCarousels);
+</script>
