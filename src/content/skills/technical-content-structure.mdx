@@ -7,6 +7,7 @@ difficulty: Intermediate
 tags: ['Technical Writing', 'Content Creation', 'Readability', 'Claude Code']
 icon: 'file-text'
 pubDate: 2026-07-03
+updatedDate: 2026-07-07
 ---
 
 > [!NOTE]
@@ -64,8 +65,9 @@ description: >-
   Readability + structure for long-form technical content — blog posts, concept explainers, and
   capability overviews people actually finish reading. Use when drafting or revising a prose article
   that feels dense, or for a scannability/voice/structure pass: reader-first framing, text chunking,
-  the inverted pyramid, headline patterns, intro/conclusion anatomy. For SEO/frontmatter facts see
-  [[blog-seo-standards]]; for numbered walkthroughs [[tutorial-writing]].
+  the inverted pyramid, headline patterns, intro/conclusion anatomy, and calibrating content depth to
+  the reader (runnable specifics for developers, trade-offs and rationale for architects). For
+  SEO/frontmatter facts see [[blog-seo-standards]]; for numbered walkthroughs [[tutorial-writing]].
 ---
 
 # Technical content structure
@@ -148,6 +150,26 @@ sec") instead of claiming it "makes things easier." Describing a chat-style inte
 real exchange (`You:` / `Assistant:` turns in a fenced block), not narration of what a reader *might*
 type — an actual transcript feels concrete.
 
+## Match the depth to who's reading: developers vs. architects
+
+A technical piece earns its reader's time differently depending on who they are, and the two audiences judge it on opposite things. Decide up front whether you're writing for the person who will *build* the thing or the person who decides *whether* it should be built, then pressure-test the draft against that reader's bar.
+
+**For developers, abstract prose is dead weight** — they came for something they can run.
+
+- A section that stays conceptual with no code, API call, or command is one they scroll straight past. Ground each one in a snippet that actually executes.
+- "Check the docs" is a dead end unless you name the exact page, class, or method — point at the precise thing, not the manual.
+- When the topic touches data operations, cover the platform's limits, batch/bulk handling, and the error paths; leaving those out reads as inexperience and costs you trust.
+- Don't sketch a pattern only in the abstract — show the real implementation (the class, the component, the endpoint) underneath it.
+- Cut vague instructions like "call the appropriate method" or "handle errors as needed"; name the method and the specific error type instead.
+
+**For architects, the *why* carries as much weight as the *what*** — they're weighing a decision, not copying steps.
+
+- A flat recommendation with no trade-offs is half an answer. Say when the alternative is the better call, too.
+- Give the reasoning behind a design, not just the build order — the rationale is the part they read for.
+- For any integration or system-design pattern, address data volume, the sync-versus-async choice, and what happens when it fails; skip those three and the piece feels shallow.
+- "This scales well" is an empty claim without a number or a named breaking point behind it.
+- Recommending one option means comparing it to the realistic alternatives — name the competitors and why you passed on them. A recommendation with no rivals on the page is an assertion, not a decision.
+
 ## Keep your labels consistent
 
 Once a post falls into a repeating pattern, **word that element identically every time** — the
@@ -181,6 +203,7 @@ rows, intro/outro summaries, an "as noted above"). A heading has to match whatev
 - [ ] No paragraph over four sentences; something visual every few hundred words; two-plus real visuals
 - [ ] Opening covers the five W's and ends with a quick roadmap
 - [ ] Every section leads with its point (inverted pyramid), pain before fix
+- [ ] Depth matches the reader — runnable code + specifics for developers, trade-offs + rationale for architects
 - [ ] Links inline behind real labels; lists used only where they fit
 - [ ] Conclusion lands on the value and points to a next step (not a recap)
 - [ ] SEO handled separately → [[blog-seo-standards]]
