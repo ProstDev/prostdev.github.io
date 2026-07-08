@@ -25,4 +25,5 @@ export const SOCIAL = {
   youtube: 'https://www.youtube.com/@prostdev',
   github: 'https://github.com/prostdev',
   linkedin: 'https://www.linkedin.com/company/prostdev',
+  vscode: 'https://marketplace.visualstudio.com/publishers/ProstDev',
 };
