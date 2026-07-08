@@ -1,0 +1,144 @@
+---
+title: '3 AIs Design API-Led Connectivity in MuleSoft: Claude vs CurieTech vs MuleSoft Vibes'
+description: >-
+  Round 2 of AI Showdown: MuleSoft Edition. I gave Claude, CurieTech AI, and
+  MuleSoft Vibes the same prompt — build a 3-layer API-led network for Customers
+  + Orders — and scored the results on rigor, completeness, and versions.
+pubDate: 2026-07-14
+category: Opinion
+tags: [MuleSoft, API, RAML, APIKit, AI, Claude Code, CurieTech AI, MUnit, DataWeave]
+youtubeId: qB6x64yt5m4
+heroImage: ../../assets/blog/ai-showdown-3-ais-design-api-led-connectivity-in-mulesoft.png
+---
+
+Three AIs. One MuleSoft architect brief. Zero human code.
+
+I handed **Claude**, **CurieTech AI**, and **MuleSoft Vibes** the exact same prompt — *design a 3-layer API-led connectivity network for a Customers + Orders domain* — and let each one build the whole thing on its own. Then I scored the results the way I'd review a real submission: contract-first design, business rules, error handling, tests, and version hygiene.
+
+This is Round 2 of **AI Showdown: MuleSoft Edition (2026) 🥊**. Round 1 pitted two AIs against DataWeave puzzles; this time the task is a full API-led topology, and there's a third contestant in the ring.
+
+Every solution is in the GitHub repo: 🔗 [github.com/alexandramartinez/ai-showdown-api-led](https://github.com/alexandramartinez/ai-showdown-api-led)
+
+## TL;DR
+
+All three built the three layers (Experience → Process → System) and implemented **all 11 operations**. The differences were in the engineering discipline underneath:
+
+- **Claude** (Opus 4.8, MAX effort) was the **most disciplined build** — contract-first RAML, a parent reactor POM, and the *only* solution whose data survives a restart. Its weak spot: the oldest runtime of the three.
+- **CurieTech AI** was the **most complete and granular** — five apps split per entity, the most tests (41 MUnit cases), the richest error handling, and a dedicated status endpoint. Its weak spot: version drift across those five apps with no central POM.
+- **MuleSoft Vibes** (Sonnet) was a **fast, runnable demo** on the freshest connectors — but no API specs, no APIkit, no tests, no error handler, no docs, and writes don't persist.
+- **None** of the three added a security layer, and **none** used the true latest Mule runtime.
+
+## The brief
+
+The prompt asked each AI to *think like a MuleSoft architect* and build an API-led connectivity example with all three layers for a Customers + Orders domain. The ground rules:
+
+- **Three layers**: Experience, Process, System.
+- **Mock and seed test data in the System layer**, as if it were wired to a real database (no actual DB connection yet).
+- **At least 3 APIs** (one per layer) — split further if it makes architectural sense, but don't build one giant do-everything API and don't repeat code.
+- **Use the latest** Mule, Maven, and DataWeave versions.
+
+And the 11 operations the network had to cover:
+
+1. List all customers
+2. Get one customer's details
+3. Get a customer's orders
+4. Get one order's details
+5. Create a customer
+6. Edit a customer
+7. Delete a customer **only if they have no orders**
+8. Create an order attached to a customer
+9. Edit an existing order
+10. **Cancel** an order (a status change, *not* a delete)
+11. Delete an order
+
+Two of those are business-rule traps on purpose: #7 (block the delete when orders exist) and #10 (cancel ≠ delete).
+
+## The contestants
+
+- 🟦 **Claude** — Opus 4.8, MAX effort
+- 🟨 **CurieTech AI** — model undisclosed
+- 🟩 **MuleSoft Vibes** — Sonnet (effort unknown)
+
+> [!NOTE]
+> These aren't necessarily comparable tiers of compute — the models and effort levels differ, and one vendor doesn't disclose its model. Read this as "what each tool produced from the same brief," not a controlled benchmark.
+
+## The scorecard
+
+| Dimension | 🟦 Claude | 🟨 CurieTech | 🟩 MuleSoft Vibes |
+|---|---|---|---|
+| **Apps** | 4 (1 exp · 1 prc · 2 sys) | 5 (1 exp · 2 prc · 2 sys) | 4 (1 exp · 1 prc · 2 sys) |
+| **All 3 layers** | Yes | Yes | Yes |
+| **Parent/reactor POM** | Yes | No | No |
+| **Contract-first (RAML)** | Yes, all apps | Yes, all apps | No specs |
+| **APIkit** | Yes | Yes | Hand-rolled HTTP listeners |
+| **11 operations** | 11/11 functional | 11/11 functional | 11/11 coded, writes don't persist |
+| **Business rules (#7, #10)** | Both correct | Both correct | Both correct (on read-only data) |
+| **Security layer** | None | None | None |
+| **Error handling** | Global handlers, all apps | Global handlers + 502 gateway | None |
+| **Data persistence** | Across requests **and restarts** | In-memory (lost on restart) | Doesn't persist |
+| **MUnit tests** | 18 | 41 | 0 |
+| **Docs / rationale** | Plan + READMEs | READMEs per app | None |
+| **Version consistency** | Centralized | Drift across apps | Consistent |
+
+## 🟦 Claude: the most disciplined build
+
+Claude produced four apps and, crucially, wired them together with a **parent reactor POM** so every app inherits the same dependency versions from one place. That's the single move that separates "four Maven projects in a folder" from "a governed project."
+
+It went **contract-first**: RAML 1.0 specs for every app, scaffolded with APIkit, with all 11 operations defined in the spec *and* implemented. Error handling is a global handler in all four apps covering 400/404/409, plus a 500 trait in the spec.
+
+The standout: Claude added the **File connector** to the System layer, so seeded data actually **persists across restarts**. It's the only one of the three where you can `POST` a customer, restart the app, `GET` it back, and it's still there. Both business-rule traps are handled — a 409 when you try to delete a customer with orders, and a status flip to `CANCELLED` for cancel-vs-delete.
+
+The catch: it shipped on **Mule 4.9.0**, the oldest runtime of the three, with the oldest plugin versions to match. Rock-solid, slightly behind.
+
+## 🟨 CurieTech AI: the most complete and granular
+
+CurieTech went the furthest on topology — **five apps**, splitting both the Process and System layers per entity (customers vs. orders). That granularity paid off in coverage: **41 MUnit tests** (more than double Claude's), the richest error handling of the three (including proper **502 gateway** semantics between layers), and the cleanest take on the cancel rule — a dedicated `PATCH /orders/{id}/status` endpoint instead of overloading a `PUT`.
+
+It also nailed the seed-data detail that tests the business rules: 8 seed orders across 5 customers, with one customer (`CUST-005`) deliberately left order-free so you can actually exercise the "delete only if no orders" path.
+
+The catch: with five independent apps and **no parent POM**, versions drifted. The runtime ranged from 4.9.3 to 4.11.3 across apps, and APIkit/MUnit/HTTP-connector versions were similarly spread. Data lives in **ObjectStore**, so it persists across requests but is lost on restart. Feature-complete and well-tested — just missing the central version governance a parent POM gives you for free.
+
+## 🟩 MuleSoft Vibes: a fast, runnable demo
+
+MuleSoft Vibes produced something that runs and uses the **freshest connectors** — it was the only contestant on the current HTTP connector (1.11.3) — with **consistent versions** across its four apps.
+
+But it skipped most of what makes API-led *API-led*: **no RAML specs, no APIkit** (hand-rolled HTTP listeners instead), **no MUnit tests, no global error handler, and no docs**. The operations are all coded and return the right status codes, but the data is read-only — a `GET` right after a `POST` returns a 404 for the record you just "created," because nothing actually persists.
+
+The business-rule logic is correct on paper; it just runs against data that never changes. Great for a quick "look, it works" demo — not something you'd hand to a team.
+
+## The version reality check
+
+The brief said "use the latest." Nobody fully did — and it's a useful reminder that AIs anchor to whatever versions dominated their training data, not to what shipped last week.
+
+| Component | 🟦 Claude | 🟨 CurieTech | 🟩 Vibes | Latest GA |
+|---|---|---|---|---|
+| Mule runtime | 4.9.0 | 4.9.3–4.11.3 | 4.11.2 | 4.12.0 |
+| HTTP connector | 1.10.3 | 1.10.4–1.11.1 | 1.11.3 | 1.11.3 |
+| mule-maven-plugin | 4.3.0 | 4.5.3 | 4.7.0 | 4.10.0 |
+| APIkit | 1.11.3 | 1.10.4–1.11.12 | — | 1.12.1 |
+| MUnit | 3.4.0 | 3.6.3 | — | 3.7.1 |
+| Java | 17 | 17 | 17 | 17 |
+
+All three picked **real, released versions** and correctly used **Java 17** — no hallucinated version numbers, which is genuinely reassuring. But none reached **Mule 4.12.0**, and the plugin versions trailed further behind than the runtimes did. If you're using an AI to scaffold a project, pin your versions yourself.
+
+## The gap all three left
+
+Every contestant skipped a **security layer** entirely — no client-ID enforcement, no policies, nothing gating the Experience API. The brief didn't explicitly ask for it, but "think like a MuleSoft architect" arguably should have surfaced it. It's the clearest example of AIs doing exactly what's asked and no more: none of them pushed back with "you probably also want auth here."
+
+## So who wins?
+
+Depends on what you're optimizing for:
+
+- **Want a foundation to build on?** 🟦 **Claude.** The parent POM and real persistence mean you can hand this to a team and extend it without fighting version chaos.
+- **Want the most coverage and granularity out of the box?** 🟨 **CurieTech AI.** More tests, more error handling, a cleaner status endpoint — just add a parent POM and reconcile versions.
+- **Want a quick runnable demo to show the shape of API-led?** 🟩 **MuleSoft Vibes.** Fastest to something that runs, as long as you don't need it to remember anything.
+
+The meta-takeaway: all three are genuinely useful scaffolding tools, and all three need a human architect to close the same gaps — security, version pinning, and (for two of them) persistence. AI gets you to a working three-layer network fast. It doesn't yet get you to production.
+
+## What's next?
+
+**AI Showdown: MuleSoft Edition (2026)** is an ongoing series comparing AI coding tools on the same MuleSoft and DataWeave challenges. Round 1 was DataWeave puzzles; this was API-led architecture.
+
+🎯 What should the next round test — and which AI should join the ring? Drop a comment on YouTube or reply to this post.
+
+🔔 Subscribe so you don't miss the next round: [youtube.com/prostdev](https://www.youtube.com/prostdev)

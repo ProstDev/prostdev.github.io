@@ -186,6 +186,26 @@ export const PLAYLISTS: Playlist[] = [
 
 export const VIDEOS: Video[] = [
   {
+    youtubeId: 'qB6x64yt5m4',
+    slug: 'ai-showdown-api-led-claude-curietech-vibes',
+    title: '3 AIs, 1 MuleSoft Prompt — Who Codes Like an Architect?',
+    description:
+      'Three AI tools get the exact same MuleSoft architect brief — build a 3-layer API-led network for Customers + Orders, 11 operations. Claude, CurieTech AI, and MuleSoft Vibes go head-to-head on rigor, completeness, persistence, tests, and versions.',
+    playlists: ['ai-showdown'],
+    duration: '15:21',
+    publishedAt: '2026-07-14',
+    links: [
+      {
+        label: 'GitHub repo — all 3 solutions + the shared prompt',
+        url: 'https://github.com/alexandramartinez/ai-showdown-api-led',
+      },
+      {
+        label: 'Read the article',
+        url: 'https://prostdev.com/post/ai-showdown-3-ais-design-api-led-connectivity-in-mulesoft',
+      },
+    ],
+  },
+  {
     youtubeId: 'C0QB4Z1LwxM',
     slug: 'claude-code-vs-curietech-advent-of-code-dataweave',
     title:
@@ -1279,6 +1299,7 @@ export const VIDEOS: Video[] = [
  * instead. When you publish a video, add its slug to the TOP of this list.
  */
 export const LATEST_SLUGS: string[] = [
+  'ai-showdown-api-led-claude-curietech-vibes', // API-led architecture (AI Showdown, Round 2)
   'claude-code-vs-curietech-advent-of-code-dataweave', // Advent of Code (AI Showdown)
   'handling-404-errors-acb-choice-raise-error', // Learn ACB — Part 5
   'acb-full-crud-mysql-docker-debugging', // Learn ACB — Part 4

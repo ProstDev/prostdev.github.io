@@ -168,6 +168,14 @@ export const SERIES: Series[] = [
       'the-power-of-curl-part-ii',
     ],
   },
+  {
+    id: 'ai-showdown-mulesoft',
+    title: 'AI Showdown: MuleSoft Edition (2026)',
+    posts: [
+      'claude-code-vs-curietech-dataweave',
+      'ai-showdown-3-ais-design-api-led-connectivity-in-mulesoft',
+    ],
+  },
 ];
 
 /** The series a post belongs to, or undefined if it isn't part of one. */
