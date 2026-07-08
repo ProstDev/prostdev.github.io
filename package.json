@@ -14,6 +14,7 @@
     "check-dw-version": "node scripts/check-dataweave-version.mjs",
     "sync-youtube": "node scripts/sync-youtube-metadata.mjs",
     "youtube-analytics": "node scripts/youtube-analytics.mjs",
+    "analyze-video": "node scripts/analyze-video.mjs",
     "astro": "astro"
   },
   "dependencies": {
