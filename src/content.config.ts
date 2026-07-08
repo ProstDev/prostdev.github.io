@@ -86,6 +86,34 @@ const TAGS = [
   'Visual Studio Code',
 ] as const;
 
+/**
+ * Canonical tag vocabulary for the SKILLS collection — a SEPARATE list from the blog `TAGS`
+ * (AI-skill topics like Claude Code / MDX / AEO are a different vocabulary from MuleSoft/DataWeave).
+ * Like `TAGS`, it's a z.enum, so an un-approved/mistyped skill tag FAILS the build (content sync)
+ * naming the offending file — this is what keeps skill-tag sprawl from creeping back. To introduce
+ * a NEW tag, add it here first, then use it. Keep alphabetized (case-insensitive); preserve
+ * brand/acronym casing (CLAUDE.md, JSON-LD, MDX, SEO, AEO…). See the `add-skill` skill.
+ */
+const SKILL_TAGS = [
+  'AEO',
+  'Claude Code',
+  'CLAUDE.md',
+  'Configuration',
+  'Content Creation',
+  'Context',
+  'Conventional Commits',
+  'Git',
+  'JSON-LD',
+  'Maintenance',
+  'MDX',
+  'Readability',
+  'SEO',
+  'Skills',
+  'Technical Writing',
+  'Tutorials',
+  'Workflow',
+] as const;
+
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
   schema: ({ image }) =>
@@ -172,10 +200,9 @@ const transcripts = defineCollection({
  * Each entry is a hand-authored MDX page in `src/content/skills/`, with the verbatim `SKILL.md`
  * pasted into a fenced code block for readers to see + copy. See `/skills`.
  *
- * `tags` is FREE-FORM here (not the closed blog `TAGS` enum): AI-skill topics (Claude Code, MDX,
- * AEO, automation) are a different vocabulary from the MuleSoft/DataWeave blog tags, and a closed
- * enum would fail the build on every new tag — friction against the paste-in workflow. Promote to
- * a closed `SKILL_TAGS` enum only if we later want tag-archive/filter pages.
+ * `tags` is a z.enum over `SKILL_TAGS` (a SEPARATE vocabulary from the blog `TAGS` — AI-skill
+ * topics like Claude Code / MDX / AEO, not MuleSoft/DataWeave). Like the blog, an un-approved tag
+ * fails the build naming the file; add new tags to `SKILL_TAGS` first.
  */
 const skills = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/skills' }),
@@ -194,7 +221,7 @@ const skills = defineCollection({
       /** Short hook shown under the title on the detail page. */
       tagline: z.string().optional(),
       difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
-      tags: z.array(z.string()).default([]),
+      tags: z.array(z.enum(SKILL_TAGS)).default([]),
       heroImage: image().optional(),
       /** Optional Icon.astro name rendered on the card/detail header. */
       icon: z.string().optional(),
@@ -205,4 +232,4 @@ const skills = defineCollection({
 });
 
 export const collections = { blog, transcripts, skills };
-export { CATEGORIES, TAGS };
+export { CATEGORIES, TAGS, SKILL_TAGS };
