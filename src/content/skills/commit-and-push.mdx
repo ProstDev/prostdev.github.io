@@ -1,0 +1,81 @@
+---
+title: 'commit-and-push'
+displayName: 'Commit and Push'
+description: 'A Claude Code skill that commits the currently staged changes (if any) and pushes — shipping already-made local commits even when there is nothing new to commit. Stages nothing.'
+tagline: '"Ship it" in one skill — commit the staged diff if there is one, then push whatever is ahead.'
+difficulty: Beginner
+tags: ['Claude Code', 'Git', 'Conventional Commits', 'Skills']
+icon: 'rocket'
+pubDate: 2026-07-08
+---
+
+> [!NOTE]
+> **Pairs with [`commit`](/skill/commit).** [`commit`](/skill/commit) stops at the commit; this one
+> does the same commit *and* pushes — and it pushes even when there's nothing new to commit, so it
+> also ships earlier local commits. Install both and pick per invocation.
+
+## What it does
+
+`commit-and-push` is a Claude Code [skill](https://docs.claude.com/en/docs/claude-code/skills) that
+commits your **already-staged** changes (if any) and then pushes. Like [`commit`](/skill/commit), it
+never stages anything for you — but instead of stopping at the commit, it runs `git push`, setting
+the upstream if the branch doesn't have one yet.
+
+The key behavior: it pushes **even when nothing is staged**. So if you already have local commits
+sitting ahead of the remote, "ship it" flushes them out without needing a fresh change.
+
+## When to use it
+
+- "Ship it" — you've staged what you want and you're ready to publish it in one step.
+- You have earlier local commits that never got pushed and just want them on the remote.
+- You want the conventional-commit message written from the diff *and* the push handled together.
+
+## How it works
+
+It's a short Markdown file — frontmatter plus plain-English steps; no code. Claude runs the git
+commands with its normal tools. The design mirrors [`commit`](/skill/commit) and adds a push:
+
+- **Commit rules are borrowed, not restated.** When something is staged, it commits following the
+  message rules in [`commit`](/skill/commit) (conventional `type: summary`, staged-only, no `-a`) —
+  one source of truth for the message convention.
+- **Nothing staged ≠ nothing to do.** It skips the commit but still pushes, because the point is to
+  get the branch to the remote — including commits made earlier.
+- **Upstream is handled.** No upstream branch → `git push -u origin HEAD`.
+- **Same destructive guardrails.** No staging, no amend, no rebase, no force-push, no branch
+  switching, no PR — just commit (maybe) and push.
+- **Haiku + forked context** (`model: haiku`, `context: fork`) keep it fast and cheap.
+
+## The skill definition
+
+Here's the actual `SKILL.md`, verbatim — copy it and drop it in your project's skills directory.
+
+````markdown title="SKILL.md"
+---
+name: commit-and-push
+description: Commit whatever is currently staged (if anything) and push. Use when the user says "commit and push", "ship it", or similar. Pushes even when there's nothing new to commit, so it also ships already-made local commits. Does not stage anything. For commit-only, use commit.
+model: haiku
+context: fork
+---
+
+# Commit and Push
+
+Commit the currently staged changes (if any), then push. Do not `git add`, do not stage untracked
+or unstaged files.
+
+## Steps
+
+1. `git diff --cached --stat` — check what's staged.
+   - **Something staged:** commit it, following the message rules in the [commit](../commit/SKILL.md)
+     skill (`type: summary`, staged only, no `-a`).
+   - **Nothing staged:** skip committing — do NOT stage anything. Continue to push anyway (there may
+     be earlier local commits to ship).
+2. `git push`. If the branch has no upstream, `git push -u origin HEAD`.
+3. Report what happened: the commit hash + message if one was made (or "nothing to commit"), and the
+   push result — including "already up to date" if nothing was pushed.
+
+## Don't
+
+- Don't stage anything (`git add`, `git commit -a`, `git commit <path>`).
+- Don't amend, rebase, or force-push.
+- Don't touch other branches or open a PR.
+````

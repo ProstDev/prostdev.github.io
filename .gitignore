@@ -19,3 +19,4 @@ pnpm-debug.log*
 # gist-recovery scratch (regenerable; see scripts/recover-gists.mjs)
 gist-cache.json
 gist-recovery-proposals.json
+.vscode/settings.json
