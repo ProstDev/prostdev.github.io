@@ -20,3 +20,6 @@ pnpm-debug.log*
 gist-cache.json
 gist-recovery-proposals.json
 .vscode/settings.json
+
+# whisper.cpp model cache (downloaded on first `npm run transcribe`)
+scripts/.whisper-models/
