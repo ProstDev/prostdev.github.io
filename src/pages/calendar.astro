@@ -1,0 +1,129 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import { SITE } from '@/config';
+import { formatDate, upcomingCalendarItems } from '@/lib/content';
+
+// The public feed URL. `webcal://` triggers a subscribe prompt in Apple Calendar / Outlook;
+// Google uses its own add-by-URL deep link below.
+const feedHttps = `${SITE.url}/calendar.ics`;
+const feedWebcal = feedHttps.replace(/^https?:\/\//, 'webcal://');
+const googleAddUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(feedHttps)}`;
+
+// Upcoming = the exact same set the .ics feed emits (shared helper): future videos +
+// standalone articles, companions folded into their video. Soonest first.
+const upcoming = await upcomingCalendarItems();
+---
+<BaseLayout
+  title="Content calendar"
+  description="Subscribe to the ProstDev content calendar and never miss a new MuleSoft video or article — upcoming content appears in Google Calendar, Apple Calendar, or Outlook automatically."
+>
+  <div class="mx-auto max-w-2xl py-16">
+    <div class="text-center">
+      <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-default text-accent">
+        <Icon name="calendar" class="h-7 w-7" />
+      </div>
+      <h1 class="mt-5 text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Content calendar</h1>
+      <p class="mx-auto mt-4 max-w-lg text-muted">
+        Subscribe once and every scheduled ProstDev video and article shows up in your
+        calendar automatically — no need to check back. 📅
+      </p>
+    </div>
+
+    <!-- Subscribe options -->
+    <div class="mt-10 flex flex-col items-center gap-3">
+      <a
+        href={googleAddUrl}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 font-semibold text-[color:var(--accent-contrast)] transition-transform hover:scale-[1.02]"
+      >
+        <Icon name="calendar" class="h-5 w-5" /> Add to Google Calendar
+      </a>
+      <a
+        href={feedWebcal}
+        class="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-lg border border-default bg-surface-card px-6 py-3 font-semibold text-default transition-colors hover:bg-[color:var(--bg-subtle)]"
+      >
+        <Icon name="calendar" class="h-5 w-5 text-muted" /> Add to Apple Calendar / Outlook
+      </a>
+
+      <!-- Copyable URL for any other calendar app -->
+      <div class="mt-4 w-full max-w-sm">
+        <label for="feed-url" class="text-xs font-semibold uppercase tracking-wide text-muted">Or paste this URL into any calendar app</label>
+        <div class="mt-2 flex items-stretch gap-2" data-copy-feed data-url={feedHttps}>
+          <input
+            id="feed-url"
+            type="text"
+            readonly
+            value={feedHttps}
+            class="min-w-0 flex-1 rounded-lg border border-default bg-surface-card px-3 py-2 text-sm text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+          />
+          <button
+            type="button"
+            data-copy-btn
+            aria-label="Copy calendar URL"
+            title="Copy calendar URL"
+            class="inline-flex h-auto w-11 shrink-0 items-center justify-center rounded-lg border border-default bg-surface-card text-accent transition-colors hover:bg-[color:var(--bg-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+          >
+            <span data-copy-idle><Icon name="copy" class="h-4 w-4" /></span>
+            <span data-copy-done class="hidden text-green-500"><Icon name="check" class="h-4 w-4" /></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- What's coming -->
+    <div class="mt-14 border-t border-default pt-10">
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-muted">Coming up</h2>
+      {upcoming.length ? (
+        <ul class="mt-4 space-y-3">
+          {upcoming.map((item) => (
+            <li class="flex items-baseline gap-3 rounded-lg border border-default bg-surface-card px-4 py-3">
+              <time datetime={item.date.toISOString()} class="shrink-0 text-sm font-semibold text-accent">
+                {formatDate(item.date)}
+              </time>
+              <div class="min-w-0">
+                <a href={item.url} target={item.kind === 'video' ? '_blank' : undefined} rel={item.kind === 'video' ? 'noopener' : undefined} class="text-default hover:text-accent">
+                  {item.kind === 'video' ? '🎥' : '📄'} {item.title}
+                </a>
+                {item.companion && (
+                  <a href={item.companion.url} class="mt-1 flex items-center gap-1.5 text-xs text-muted hover:text-accent">
+                    <Icon name="file-text" class="h-3.5 w-3.5 shrink-0" />
+                    <span class="min-w-0 truncate">{item.companion.title}</span>
+                  </a>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-4 text-muted">Nothing scheduled right now — subscribe above and new videos & articles will appear here and in your calendar as they're planned.</p>
+      )}
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll<HTMLElement>('[data-copy-feed]').forEach((root) => {
+      const url = root.dataset.url!;
+      const btn = root.querySelector<HTMLButtonElement>('[data-copy-btn]')!;
+      const idle = root.querySelector<HTMLElement>('[data-copy-idle]')!;
+      const done = root.querySelector<HTMLElement>('[data-copy-done]')!;
+      const input = root.querySelector<HTMLInputElement>('input')!;
+
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+        } catch {
+          input.select();
+          document.execCommand('copy');
+        }
+        idle.classList.add('hidden');
+        done.classList.remove('hidden');
+        setTimeout(() => {
+          idle.classList.remove('hidden');
+          done.classList.add('hidden');
+        }, 2000);
+      });
+    });
+  </script>
+</BaseLayout>

@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { CATEGORIES, TAGS } from '@/content.config';
 import type { Series } from '@/data/series';
+import { VIDEOS, watchUrl } from '@/data/videos';
 
 const isProd = import.meta.env.PROD;
 
@@ -160,6 +161,83 @@ export function formatDate(date: Date): string {
     // live site, regardless of the build machine's timezone.
     timeZone: 'UTC',
   });
+}
+
+/**
+ * One entry in the content calendar (the .ics feed + the /calendar page consume this).
+ * `companion` is set on a video whose article ships alongside it, carrying that article's
+ * title + URL so the event can link straight to it — without emitting a second, near-
+ * duplicate entry.
+ */
+export interface CalendarItem {
+  kind: 'video' | 'article';
+  title: string;
+  description: string;
+  /** When it publishes (the scheduling instant). */
+  date: Date;
+  /** Whether `date` carried a time (timed event) or was a bare YYYY-MM-DD (all-day). */
+  dateOnly: boolean;
+  /** Where the event points: the YouTube watch page for videos, the post URL for articles. */
+  url: string;
+  /** For a video: the companion article publishing with it (title + on-site URL), if any. */
+  companion?: { title: string; url: string };
+}
+
+/**
+ * Upcoming content for the calendar — the deliberate INVERSE of the prod publish gates:
+ * `getPosts()` and `publishedVideos()` HIDE future-dated content, but a calendar wants
+ * exactly that future set. So this reads the RAW blog collection + RAW VIDEOS array and
+ * keeps only entries whose publish instant is still ahead of `now`.
+ *
+ * Scope (decided with Alex, July 2026): every upcoming VIDEO, plus every upcoming ARTICLE
+ * that has NO companion video. A post carrying a `youtubeId` is a companion — it's folded
+ * into its video's entry (as `companion`) instead of getting its own, so a video + its
+ * write-up don't show as two near-identical events on the same day. Sorted soonest-first.
+ */
+export async function upcomingCalendarItems(now: Date = new Date()): Promise<CalendarItem[]> {
+  // Raw collection — NOT getPosts() (which gates out the future we want here).
+  const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+
+  // Map youtubeId -> the scheduled companion post's title + URL, so a video entry can
+  // link straight to its write-up.
+  const companionByVideoId = new Map<string, { title: string; url: string }>();
+  for (const p of posts) {
+    if (p.data.youtubeId && p.data.pubDate > now) {
+      companionByVideoId.set(p.data.youtubeId, { title: p.data.title, url: postUrl(p.id) });
+    }
+  }
+
+  const items: CalendarItem[] = [];
+
+  for (const v of VIDEOS) {
+    if (!v.publishedAt || new Date(v.publishedAt) <= now) continue;
+    items.push({
+      kind: 'video',
+      title: v.title,
+      description: v.description,
+      date: new Date(v.publishedAt),
+      dateOnly: /^\d{4}-\d{2}-\d{2}$/.test(v.publishedAt),
+      url: watchUrl(v.youtubeId),
+      companion: companionByVideoId.get(v.youtubeId),
+    });
+  }
+
+  for (const p of posts) {
+    if (p.data.pubDate <= now) continue;
+    if (p.data.youtubeId) continue; // companion — folded into its video's entry above
+    items.push({
+      kind: 'article',
+      title: p.data.title,
+      description: p.data.description,
+      date: p.data.pubDate,
+      // z.coerce.date() drops the original string, so we infer all-day from the instant:
+      // a bare YYYY-MM-DD post lands at UTC midnight; a timed ISO datetime won't.
+      dateOnly: p.data.pubDate.getUTCHours() === 0 && p.data.pubDate.getUTCMinutes() === 0,
+      url: postUrl(p.id),
+    });
+  }
+
+  return items.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
 /** Rough reading time from raw markdown body. */
