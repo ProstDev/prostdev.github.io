@@ -238,6 +238,7 @@ export const VIDEOS: Video[] = [
       'Putting Cursor AI together with Anypoint Code Builder to see whether an AI editor can actually build a working MuleSoft app.',
     playlists: ['mulesoft-ai-2025'],
     duration: '27:22',
+    publishedAt: '2025-04-07',
     links: [
       {
         label: 'GitHub repo — Mule best practice template',
@@ -254,6 +255,7 @@ export const VIDEOS: Video[] = [
       'Asking Cursor AI to rebuild a MuleSoft project following best practices — and seeing where it falls short without guidance.',
     playlists: ['mulesoft-ai-2025'],
     duration: '13:28',
+    publishedAt: '2025-04-08',
     links: [
       {
         label: 'GitHub repo — Mule best practice template',
@@ -269,6 +271,7 @@ export const VIDEOS: Video[] = [
       'Using Cursor rules to teach the AI MuleSoft best practices — and the big jump in code quality that results.',
     playlists: ['mulesoft-ai-2025'],
     duration: '30:31',
+    publishedAt: '2025-04-09',
     links: [
       {
         label: 'Cursor rules MDC file (gist)',
@@ -288,6 +291,7 @@ export const VIDEOS: Video[] = [
       'Throwing real-world DataWeave transformation challenges at CurieTech AI to see how it handles practical MuleSoft problems.',
     playlists: ['mulesoft-ai-2025'],
     duration: '20:56',
+    publishedAt: '2025-04-10',
     links: [
       {
         label: 'Challenge 1 — DataWeave Programming Challenge 4',
@@ -307,6 +311,7 @@ export const VIDEOS: Video[] = [
       'Testing whether CurieTech AI can identify and generate the fastest-performing DataWeave solution among the options.',
     playlists: ['mulesoft-ai-2025'],
     duration: '06:09',
+    publishedAt: '2025-04-22',
     links: [
       {
         label: 'Blog post — DataWeave map/filter vs reduce: which is faster?',
@@ -322,6 +327,7 @@ export const VIDEOS: Video[] = [
       'A head-to-head comparison of Cursor AI and CurieTech AI generating MUnit tests for a MuleSoft application.',
     playlists: ['mulesoft-ai-2025'],
     duration: '18:26',
+    publishedAt: '2025-05-03',
     links: [
       {
         label: 'GitHub repo — MUnit test results from CurieTech AI',
@@ -332,12 +338,12 @@ export const VIDEOS: Video[] = [
   {
     youtubeId: 'vguu_u0OQNE',
     slug: 'curietech-ai-mulesoft-best-practices-github-pr',
-    title:
-      'CurieTech AI Wrote My MuleSoft Best Practices — AND Opened a GitHub Pull Request!',
+    title: 'CurieTech AI Wrote My MuleSoft Best Practices — AND Opened a GitHub Pull Request! 😱',
     description:
       'CurieTech AI documents MuleSoft best practices and goes a step further by opening a GitHub pull request on its own.',
     playlists: ['mulesoft-ai-2025'],
     duration: '07:12',
+    publishedAt: '2025-05-12',
     links: [
       {
         label: 'GitHub repo — with the generated pull request',
@@ -358,6 +364,7 @@ export const VIDEOS: Video[] = [
       "Exploring CurieTech AI's Code Insights across a single repo, multiple repos, and its code review lens for MuleSoft projects.",
     playlists: ['mulesoft-ai-2025'],
     duration: '10:24',
+    publishedAt: '2025-05-15',
     links: [
       {
         label: 'GitHub repo — test repo with PR',
@@ -372,12 +379,12 @@ export const VIDEOS: Video[] = [
   {
     youtubeId: 'U8KChXTgABw',
     slug: 'generate-oas-raml-specs-curietech-ai-api-spec-generator',
-    title:
-      "Generate OAS & RAML Specifications Instantly with CurieTech AI's API Spec Generator Agent",
+    title: 'Generate OAS & RAML Specifications Instantly with CurieTech AI’s API Spec Generator Agent',
     description:
       "Using CurieTech AI's API Spec Generator agent to instantly produce OAS and RAML specifications for a MuleSoft API.",
     playlists: ['mulesoft-ai-2025'],
     duration: '09:33',
+    publishedAt: '2025-05-20',
   },
   {
     youtubeId: 'dlODB4cjXyU',
@@ -387,6 +394,7 @@ export const VIDEOS: Video[] = [
       "An honest look at why Studio developers should give Anypoint Code Builder a try — what's better, what's different, and what to expect.",
     playlists: ['learn-acb'],
     duration: '11:56',
+    publishedAt: '2025-06-30',
     links: [
       { label: 'Git — downloads', url: 'https://git-scm.com/downloads' },
       { label: 'Visual Studio Code', url: 'https://code.visualstudio.com/' },
@@ -402,6 +410,7 @@ export const VIDEOS: Video[] = [
       'Install Anypoint Code Builder in VS Code and build your first "Hello World" Mule app from scratch.',
     playlists: ['learn-acb'],
     duration: '25:54',
+    publishedAt: '2025-07-07',
   },
   {
     youtubeId: 'cki1MOLC1CE',
@@ -412,6 +421,7 @@ export const VIDEOS: Video[] = [
       'Design a REST API spec using OpenAPI inside Anypoint Code Builder and publish it to Exchange.',
     playlists: ['learn-acb'],
     duration: '15:40',
+    publishedAt: '2025-07-14',
   },
   {
     youtubeId: 'SIcxoyL5NtY',
@@ -422,6 +432,7 @@ export const VIDEOS: Video[] = [
       'Scaffold a Mule project from your published OpenAPI spec in Anypoint Code Builder, then tour the generated flows in both XML and UI views and run it locally.',
     playlists: ['learn-acb'],
     duration: '11:07',
+    publishedAt: '2025-07-21',
   },
   {
     youtubeId: '5xgb0bbzWBs',
@@ -431,6 +442,7 @@ export const VIDEOS: Video[] = [
       'A correction to an earlier video — you actually CAN import a JAR into ACB. Export a deployable archive from Studio, then import it as a fresh ACB project.',
     playlists: ['learn-acb'],
     duration: '06:02',
+    publishedAt: '2025-07-23',
   },
   {
     youtubeId: 'uV_ncdIoJQI',
@@ -440,6 +452,7 @@ export const VIDEOS: Video[] = [
       'Start implementing your scaffolded API in ACB: spin up a MySQL database in Docker and build the GET-all-tasks flow with DataWeave-generated SQL.',
     playlists: ['learn-acb'],
     duration: '26:06',
+    publishedAt: '2025-07-28',
     links: [
       {
         label: 'GitHub repo — todo-api-impl',
@@ -476,6 +489,7 @@ export const VIDEOS: Video[] = [
       'Build a complete CRUD REST API in Anypoint Code Builder backed by MySQL running in Docker, then debug it locally.',
     playlists: ['learn-acb'],
     duration: '36:42',
+    publishedAt: '2025-08-04',
     links: [
       {
         label: 'GitHub repo — todo-api-impl',
@@ -492,6 +506,7 @@ export const VIDEOS: Video[] = [
       'Add robust error handling to your ACB API: use the Choice router and Raise Error to return clean 404 responses when a resource is not found.',
     playlists: ['learn-acb'],
     duration: '11:49',
+    publishedAt: '2025-09-02',
     links: [
       {
         label: 'GitHub repo — todo-api-impl',
@@ -507,6 +522,7 @@ export const VIDEOS: Video[] = [
       'Let CurieTech AI generate an OpenAPI (OAS) spec for a To-Do Task Management API, then refine it in API Designer.',
     playlists: ['curietech'],
     duration: '10:06',
+    publishedAt: '2025-06-04',
     links: [
       {
         label: 'GitHub repo — todo-app-mule-curietechai',
@@ -523,6 +539,7 @@ export const VIDEOS: Video[] = [
       'CurieTech AI implements the full CRUD REST API in Anypoint Code Builder, wiring up the flows, MySQL database connector, and externalized properties.',
     playlists: ['curietech'],
     duration: '23:29',
+    publishedAt: '2025-06-04',
     links: [
       {
         label: 'GitHub repo — todo-app-mule-curietechai',
@@ -539,6 +556,7 @@ export const VIDEOS: Video[] = [
       'Run and debug the To-Do CRUD API locally — fixing SQL syntax with parameterized queries, the auto-increment ID, and the update flow using ACB breakpoints and Postman.',
     playlists: ['curietech'],
     duration: '16:58',
+    publishedAt: '2025-06-04',
     links: [
       {
         label: 'GitHub repo — todo-app-mule-curietechai',
@@ -554,6 +572,7 @@ export const VIDEOS: Video[] = [
       "Use CurieTech AI's MUnit Test Generator to create passing tests for each flow, then merge the pull requests and push coverage toward 100%.",
     playlists: ['curietech'],
     duration: '19:39',
+    publishedAt: '2025-06-04',
     links: [
       {
         label: 'GitHub repo — todo-app-mule-curietechai',
@@ -570,6 +589,7 @@ export const VIDEOS: Video[] = [
       'Build a working YouTube MCP server with MuleSoft and CurieTech AI in about 10 minutes.',
     playlists: ['mulesoft-ai-2025'],
     duration: '25:20',
+    publishedAt: '2025-06-19',
     links: [
       {
         label: 'GitHub repo — full code + setup instructions',
@@ -585,6 +605,7 @@ export const VIDEOS: Video[] = [
       'Kick off the beginner series by planning what we will build and learn across the MuleSoft from Start guide.',
     playlists: ['mulesoft-from-start'],
     duration: '38:02',
+    publishedAt: '2023-05-11',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -600,6 +621,7 @@ export const VIDEOS: Video[] = [
       'A high-level overview of what MuleSoft is, the Anypoint Platform, and how the pieces fit together.',
     playlists: ['mulesoft-from-start'],
     duration: '34:47',
+    publishedAt: '2023-05-18',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -616,6 +638,7 @@ export const VIDEOS: Video[] = [
       'Understand APIs and the API-led connectivity approach that underpins MuleSoft integration design.',
     playlists: ['mulesoft-from-start'],
     duration: '35:39',
+    publishedAt: '2023-06-08',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -631,7 +654,8 @@ export const VIDEOS: Video[] = [
     description:
       'Design a blog REST API from scratch — write down the requirements, then build the API specification in Anypoint Platform Design Center.',
     playlists: ['mulesoft-from-start'],
-    duration: '—',
+    duration: '42:45',
+    publishedAt: '2023-06-15',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -647,7 +671,8 @@ export const VIDEOS: Video[] = [
     description:
       'Finish the API specification, test it with the mocking service, publish it to Exchange, and scaffold the implementation in Anypoint Studio with APIkit.',
     playlists: ['mulesoft-from-start'],
-    duration: '—',
+    duration: '27:44',
+    publishedAt: '2023-06-29',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -663,7 +688,8 @@ export const VIDEOS: Video[] = [
     description:
       'Implement the API in Anypoint Studio — global elements, per-environment property files, and an Object Store-backed flow for the articles resource.',
     playlists: ['mulesoft-from-start'],
-    duration: '—',
+    duration: '37:04',
+    publishedAt: '2023-07-06',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -679,7 +705,8 @@ export const VIDEOS: Video[] = [
     description:
       'Refactor the Mule app into per-resource config files and subflows, then step through it with the Anypoint Studio debugger, breakpoints, and the DataWeave Playground.',
     playlists: ['mulesoft-from-start'],
-    duration: '—',
+    duration: '39:49',
+    publishedAt: '2023-07-25',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -695,7 +722,8 @@ export const VIDEOS: Video[] = [
     description:
       'Deploy the finished Mule application to CloudHub from Anypoint Studio, set the environment property, and test the live API and Object Store in Runtime Manager.',
     playlists: ['mulesoft-from-start'],
-    duration: '—',
+    duration: '14:08',
+    publishedAt: '2023-07-27',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -711,7 +739,8 @@ export const VIDEOS: Video[] = [
     description:
       'Wire up a CI/CD pipeline with GitHub Actions and connect the deployed app to API Manager with API autodiscovery to secure it with a basic authentication policy.',
     playlists: ['mulesoft-from-start'],
-    duration: '—',
+    duration: '27:55',
+    publishedAt: '2023-10-05',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -727,7 +756,8 @@ export const VIDEOS: Video[] = [
     description:
       'Wrap up the series by testing the Mule application with MUnit — writing tests manually and exploring how to add them to a CI/CD pipeline.',
     playlists: ['mulesoft-from-start'],
-    duration: '—',
+    duration: '54:48',
+    publishedAt: '2023-10-13',
     links: [
       {
         label: 'GitHub repo — mulesoft-from-start',
@@ -743,6 +773,8 @@ export const VIDEOS: Video[] = [
     description:
       'Set up your first CI/CD pipeline with GitHub Actions to build and deploy a Mule application to CloudHub — split into build and deploy jobs, with Anypoint Platform credentials stored as GitHub repository secrets.',
     playlists: ['cicd-github-actions'],
+    duration: '7:05',
+    publishedAt: '2023-03-14',
     links: [
       {
         label: 'ProstDev article — Part 1',
@@ -758,6 +790,8 @@ export const VIDEOS: Video[] = [
     description:
       'Extend the CI/CD pipeline to decrypt secure properties at deploy time — store the decryption key as a GitHub secret, pass it through the Maven command, and wire it to the secure.key property in the pom.xml.',
     playlists: ['cicd-github-actions'],
+    duration: '6:41',
+    publishedAt: '2023-03-14',
     links: [
       {
         label: 'ProstDev article — Part 2',
@@ -773,6 +807,8 @@ export const VIDEOS: Video[] = [
     description:
       'Add a test job that runs your MUnit tests in the CI/CD pipeline — set up Nexus Enterprise credentials as GitHub secrets and a .maven/settings.xml so the build can resolve the MuleSoft EE repository.',
     playlists: ['cicd-github-actions'],
+    duration: '7:41',
+    publishedAt: '2023-03-14',
     links: [
       {
         label: 'ProstDev article — Part 3',
@@ -788,6 +824,8 @@ export const VIDEOS: Video[] = [
     description:
       'Enforce a minimum MUnit coverage percentage in the pipeline — configure failBuild and required coverage in the pom.xml, and upload the MUnit coverage reports as workflow artifacts.',
     playlists: ['cicd-github-actions'],
+    duration: '6:56',
+    publishedAt: '2023-05-02',
     links: [
       {
         label: 'ProstDev article — Part 4',
@@ -807,6 +845,8 @@ export const VIDEOS: Video[] = [
     description:
       'Authenticate the pipeline with a Connected App instead of a username/password so it works with MFA-enabled Enterprise accounts — create the app and scopes in Access Management, then wire its client ID and secret through GitHub secrets and the pom.xml.',
     playlists: ['cicd-github-actions'],
+    duration: '6:50',
+    publishedAt: '2023-05-16',
     links: [
       {
         label: 'ProstDev article — Part 5',
@@ -822,6 +862,8 @@ export const VIDEOS: Video[] = [
     description:
       'Deploy a Mule application to CloudHub 2.0 with GitHub Actions — configure the pom.xml for CloudHub 2.0, publish to Exchange, and authenticate with a Connected App via a Maven settings.xml.',
     playlists: ['cicd-github-actions'],
+    duration: '19:00',
+    publishedAt: '2024-05-07',
     links: [
       {
         label: 'ProstDev article — Part 6',
@@ -841,6 +883,8 @@ export const VIDEOS: Video[] = [
     description:
       'Set up everything Salesforce Data Cloud needs before the MuleSoft integration — create the Connected App with CDP scopes, enable the username/password OAuth flow, configure the Ingestion API and its schema, and deploy a Data Stream.',
     playlists: ['datacloud-mulesoft'],
+    duration: '11:01',
+    publishedAt: '2024-02-07',
     links: [
       {
         label: 'ProstDev article — Part 1',
@@ -860,6 +904,8 @@ export const VIDEOS: Video[] = [
     description:
       'No MuleSoft experience needed — download the prebuilt integration JAR and deploy it to CloudHub 2.0 from Runtime Manager, set the Salesforce/CDP credentials as protected properties, and grab the public endpoint URL.',
     playlists: ['datacloud-mulesoft'],
+    duration: '10:29',
+    publishedAt: '2024-02-13',
     links: [
       {
         label: 'ProstDev article — Part 2',
@@ -879,6 +925,8 @@ export const VIDEOS: Video[] = [
     description:
       'Use the provided Postman collection to call the integration — generate a Data Cloud schema, run SOQL queries, and insert and delete records in Salesforce Data Cloud through the deployed Mule app.',
     playlists: ['datacloud-mulesoft'],
+    duration: '11:30',
+    publishedAt: '2024-02-20',
     links: [
       {
         label: 'ProstDev article — Part 3',
@@ -898,6 +946,8 @@ export const VIDEOS: Video[] = [
     description:
       'Lock down the public endpoint with a basic authentication policy in API Manager — no code required. Create the API instance, upgrade to the autodiscovery-enabled JAR, apply the policy, and update the Postman collection with credentials.',
     playlists: ['datacloud-mulesoft'],
+    duration: '9:32',
+    publishedAt: '2024-02-28',
     links: [
       {
         label: 'ProstDev article — Part 4',
@@ -917,6 +967,8 @@ export const VIDEOS: Video[] = [
     description:
       'When a Data Cloud connector operation is missing, do the auth by hand: authenticate to Salesforce first, exchange that token for a Data Cloud token, then call the Data Cloud API — built and debugged in Anypoint Code Builder.',
     playlists: ['datacloud-mulesoft'],
+    duration: '17:33',
+    publishedAt: '2024-07-24',
     links: [
       {
         label: 'GitHub repo — data-cloud-auth',
@@ -932,6 +984,8 @@ export const VIDEOS: Video[] = [
     description:
       'Get past the 200-record streaming limit by inserting data into Salesforce Data Cloud with the bulk operations — covering the updates made to the integration since Part 3.',
     playlists: ['datacloud-mulesoft'],
+    duration: '8:48',
+    publishedAt: '2024-07-30',
     links: [
       {
         label: 'ProstDev article — Part 5',
@@ -951,6 +1005,8 @@ export const VIDEOS: Video[] = [
     description:
       'Sum the numbers within each paragraph of a text input, then return the largest paragraph total — all in DataWeave. Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '2:08',
+    publishedAt: '2023-02-22',
     links: [
       {
         label: 'Read the article',
@@ -969,6 +1025,8 @@ export const VIDEOS: Video[] = [
     description:
       'Score a series of Rock Paper Scissors rounds in DataWeave — 0 for a loss, 3 for a draw, 6 for a win — and total it out of 30. Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '2:17',
+    publishedAt: '2023-02-28',
     links: [
       {
         label: 'Read the article',
@@ -988,6 +1046,8 @@ export const VIDEOS: Video[] = [
     description:
       'Identify which phrases are palindromes (ignoring case, spaces, and punctuation), then sum the character counts of those phrases using the DataWeave Strings module. Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '2:27',
+    publishedAt: '2023-03-07',
     links: [
       {
         label: 'Read the article',
@@ -1006,6 +1066,8 @@ export const VIDEOS: Video[] = [
     description:
       'Model and solve the Tower of Hanoi puzzle in DataWeave across multiple scenarios — moving disks between dynamically named towers without hard-coding their names. Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '5:12',
+    publishedAt: '2023-03-21',
     links: [
       {
         label: 'Read the article',
@@ -1029,6 +1091,8 @@ export const VIDEOS: Video[] = [
     description:
       'Reverse the word order of each phrase in DataWeave while leaving punctuation marks fixed in their original positions. Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '2:49',
+    publishedAt: '2023-04-18',
     links: [
       {
         label: 'Read the article',
@@ -1048,6 +1112,8 @@ export const VIDEOS: Video[] = [
     description:
       'Write a tail-recursive DataWeave function to factorial each positive number in a list (regular recursion hits the limit), sum the results, then slice out specific digit positions as a number. Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '2:13',
+    publishedAt: '2023-05-16',
     links: [
       {
         label: 'Read the article',
@@ -1066,6 +1132,8 @@ export const VIDEOS: Video[] = [
     description:
       'Uppercase every value in a nested JSON structure in DataWeave — except the values under any "this" field — which the right built-in function makes simple. Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '2:36',
+    publishedAt: '2023-06-13',
     links: [
       {
         label: 'Read the article',
@@ -1084,6 +1152,8 @@ export const VIDEOS: Video[] = [
     description:
       'Repeatedly sum the digits of a set of numbers in DataWeave until a single-digit result remains (the digital root). Clues and full solutions are in the companion article.',
     playlists: ['dataweave-challenges'],
+    duration: '1:41',
+    publishedAt: '2023-07-11',
     links: [
       {
         label: 'Read the article',
@@ -1103,6 +1173,8 @@ export const VIDEOS: Video[] = [
     description:
       'A quick side-by-side of printing "Hello World" in Java, Python, and Mule — in under 30 seconds.',
     playlists: ['getting-to-the-point'],
+    duration: '0:29',
+    publishedAt: '2020-12-03',
   },
   {
     youtubeId: 'IsTkTXgH1Lk',
@@ -1112,6 +1184,8 @@ export const VIDEOS: Video[] = [
     description:
       'Three different ways to concatenate objects in DataWeave 2.0, explained in under 30 seconds.',
     playlists: ['getting-to-the-point'],
+    duration: '0:27',
+    publishedAt: '2021-01-04',
   },
   {
     youtubeId: 'db90-xE4fgU',
@@ -1121,6 +1195,8 @@ export const VIDEOS: Video[] = [
     description:
       'Extract just the digits from a string in DataWeave 2.0 by combining flatten, scan, and joinBy — in under 30 seconds.',
     playlists: ['getting-to-the-point'],
+    duration: '0:26',
+    publishedAt: '2021-01-11',
   },
   {
     youtubeId: 'j0uGZsdgLjg',
@@ -1130,6 +1206,8 @@ export const VIDEOS: Video[] = [
     description:
       'Use match / case to branch on literal values in DataWeave 2.0, explained in under 30 seconds.',
     playlists: ['getting-to-the-point'],
+    duration: '0:32',
+    publishedAt: '2021-01-26',
   },
   {
     youtubeId: 'MAZC_pLl-2c',
@@ -1139,6 +1217,8 @@ export const VIDEOS: Video[] = [
     description:
       'Get the years, months, and days between two dates in DataWeave 2.0 with the between function from the Periods module — in under 30 seconds.',
     playlists: ['getting-to-the-point'],
+    duration: '0:32',
+    publishedAt: '2021-03-20',
   },
   {
     youtubeId: 's0k7z6VoDuI',
@@ -1214,7 +1294,7 @@ export const VIDEOS: Video[] = [
   {
     youtubeId: 'xCPb678hDAo',
     slug: 'exposing-dataweave-map-filter-vs-reduce-which-is-faster',
-    title: 'Exposing DataWeave: Map+Filter vs. Reduce — which is faster?',
+    title: 'Exposing DataWeave: Map+Filter vs. Reduce - which is faster?',
     description:
       'A hands-on comparison of three DataWeave 2.0 approaches to the same map-then-filter problem — map+filter, filter+map, and a single-pass reduce — benchmarked over 10,000 items. The surprising result: reduce is by far the slowest, so time your approaches before assuming.',
     playlists: ['other-videos'],
@@ -1272,6 +1352,7 @@ export const VIDEOS: Video[] = [
       'A from-scratch explanation of what an API is: the implementation (the body), the request and response, and the four aspects every API has — inputs, operations, outputs, and data types — wrapped up with a simple diagram you can refer back to.',
     playlists: ['other-videos'],
     duration: '5:05',
+    publishedAt: '2021-03-28',
     links: [
       {
         label: 'Read the article',
