@@ -193,6 +193,23 @@ export const PLAYLISTS: Playlist[] = [
 
 export const VIDEOS: Video[] = [
   {
+    youtubeId: 'C0QB4Z1LwxM',
+    slug: 'claude-code-vs-curietech-advent-of-code-dataweave',
+    title:
+      'Claude Code vs CurieTech AI: Solving Advent of Code 2025 Days 1 & 2 in DataWeave (MuleSoft)',
+    description:
+      'Two AI coding tools go head-to-head solving Advent of Code 2025 in DataWeave. Who writes cleaner, faster MuleSoft transformations — Claude Code or CurieTech AI?',
+    playlists: ['ai-showdown'],
+    duration: '26:45',
+    publishedAt: '2026-05-28',
+    links: [
+      {
+        label: 'GitHub repo — all solutions + Playground links',
+        url: 'https://github.com/alexandramartinez/adventofcode-2025',
+      },
+    ],
+  },
+  {
     youtubeId: 'qB6x64yt5m4',
     slug: 'ai-showdown-api-led-claude-curietech-vibes',
     title: '3 AIs, 1 MuleSoft Prompt — Who Codes Like an Architect?',
@@ -210,23 +227,6 @@ export const VIDEOS: Video[] = [
       {
         label: 'Read the article',
         url: 'https://prostdev.com/post/ai-showdown-3-ais-design-api-led-connectivity-in-mulesoft',
-      },
-    ],
-  },
-  {
-    youtubeId: 'C0QB4Z1LwxM',
-    slug: 'claude-code-vs-curietech-advent-of-code-dataweave',
-    title:
-      'Claude Code vs CurieTech AI: Solving Advent of Code 2025 Days 1 & 2 in DataWeave (MuleSoft)',
-    description:
-      'Two AI coding tools go head-to-head solving Advent of Code 2025 in DataWeave. Who writes cleaner, faster MuleSoft transformations — Claude Code or CurieTech AI?',
-    playlists: ['ai-showdown'],
-    duration: '26:45',
-    publishedAt: '2026-05-28',
-    links: [
-      {
-        label: 'GitHub repo — all solutions + Playground links',
-        url: 'https://github.com/alexandramartinez/adventofcode-2025',
       },
     ],
   },
@@ -1141,6 +1141,22 @@ export const VIDEOS: Video[] = [
     playlists: ['getting-to-the-point'],
   },
   {
+    youtubeId: 's0k7z6VoDuI',
+    slug: 'enable-mulesoft-vibes-in-vs-code',
+    title: 'How to Enable MuleSoft Vibes in VS Code (Agentforce, 100% Free)',
+    description:
+      'Enable MuleSoft Vibes (the AI assistant) in VS Code from scratch, 100% free — install the Anypoint Extension Pack, spin up a free Salesforce Developer org, turn on Agentforce + Einstein, connect it to Anypoint Platform, and get Vibes live in the editor.',
+    playlists: ['other-videos'],
+    duration: '3:56',
+    publishedAt: '2026-07-21T11:35:00Z', // 7:30am Toronto (EDT, UTC−4) + 5 min — reveals after the YouTube drop
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/enable-mulesoft-vibes-in-vs-code',
+      },
+    ],
+  },
+  {
     youtubeId: '0VgIRB3JfZM',
     slug: 'array-of-strings-and-keys-filtering-dataweave',
     title:
@@ -1307,6 +1323,7 @@ export const VIDEOS: Video[] = [
  * instead. When you publish a video, add its slug to the TOP of this list.
  */
 export const LATEST_SLUGS: string[] = [
+  'enable-mulesoft-vibes-in-vs-code', // MuleSoft Vibes in VS Code setup guide (standalone)
   'ai-showdown-api-led-claude-curietech-vibes', // API-led architecture (AI Showdown, Round 2)
   'claude-code-vs-curietech-advent-of-code-dataweave', // Advent of Code (AI Showdown)
   'handling-404-errors-acb-choice-raise-error', // Learn ACB — Part 5
