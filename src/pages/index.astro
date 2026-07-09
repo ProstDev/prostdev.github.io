@@ -4,13 +4,16 @@ import LiteYouTube from '@/components/LiteYouTube.astro';
 import VideoCard from '@/components/VideoCard.astro';
 import PlaylistRow from '@/components/PlaylistRow.astro';
 import AiFriendly from '@/components/AiFriendly.astro';
+import PostCard from '@/components/PostCard.astro';
 import Icon from '@/components/Icon.astro';
 import { SITE, SOCIAL } from '@/config';
+import { getPosts } from '@/lib/content';
 import { videosInPlaylist, latestVideos, featuredVideos, primaryPlaylists, sectionHref } from '@/data/videos';
 
 const latest = latestVideos(6);
 const featured = featuredVideos();
 const playlists = primaryPlaylists();
+const latestPosts = (await getPosts()).slice(0, 3);
 ---
 <BaseLayout
   title="Learn MuleSoft: Video Tutorials, DataWeave & ACB"
@@ -61,7 +64,12 @@ const playlists = primaryPlaylists();
   <!-- Latest videos -->
   <section class="bg-band-wash">
     <div class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-      <h2 class="mb-6 flex items-center gap-2 text-2xl font-bold">📺 Latest videos</h2>
+      <div class="mb-6 flex items-end justify-between gap-4">
+        <h2 class="flex items-center gap-2 text-2xl font-bold">📺 Latest videos</h2>
+        <a href="/videos" class="shrink-0 text-sm font-medium text-accent hover:underline">
+          Browse all videos →
+        </a>
+      </div>
       <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
         {latest.map((v) => <VideoCard video={v} />)}
       </div>
@@ -92,6 +100,24 @@ const playlists = primaryPlaylists();
       ))}
     </div>
   </section>
+
+  <!-- Latest from the blog -->
+  {latestPosts.length > 0 && (
+    <section class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+      <div class="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">✍️ Latest from the blog</h2>
+          <p class="text-muted">SEO- and AI-friendly deep dives that pair with the videos.</p>
+        </div>
+        <a href="/blog" class="shrink-0 text-sm font-medium text-accent hover:underline">
+          Read the blog →
+        </a>
+      </div>
+      <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+        {latestPosts.map((post) => <PostCard post={post} />)}
+      </div>
+    </section>
+  )}
 </BaseLayout>
 
 <style>
