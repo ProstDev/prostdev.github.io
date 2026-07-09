@@ -87,26 +87,17 @@ const upcoming = await upcomingCalendarItems();
                 {formatDate(item.date)}
               </time>
               <div class="min-w-0">
-                <a
-                  href={item.url}
-                  target={item.kind === 'video' ? '_blank' : undefined}
-                  rel={item.kind === 'video' ? 'noopener' : undefined}
-                  class="text-[var(--text)] transition-colors hover:text-[var(--accent)]"
-                >
+                <span class="text-[var(--text)]">
                   <span aria-hidden="true">{item.kind === 'video' ? '🎥' : '📄'}</span>
                   <span class="sr-only">{item.kind === 'video' ? 'Video:' : 'Article:'}</span>
                   {item.title}
-                  {item.kind === 'video' && <span class="sr-only"> (opens on YouTube in a new tab)</span>}
-                </a>
+                </span>
                 {item.companion && (
-                  <a
-                    href={item.companion.url}
-                    class="mt-1 flex items-center gap-1.5 text-xs text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
-                  >
+                  <span class="mt-1 flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
                     <Icon name="file-text" class="h-3.5 w-3.5 shrink-0" />
                     <span class="sr-only">Companion article: </span>
                     <span class="min-w-0 truncate">{item.companion.title}</span>
-                  </a>
+                  </span>
                 )}
               </div>
             </li>
