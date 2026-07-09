@@ -99,10 +99,11 @@ Just go in with the right expectation: budget real time for the *recovery* phase
 
 I packaged everything I trusted into a separate open-source repo so you don't have to rediscover any of this. In short, it has:
 
-- **The extractor.** A small, dependency-free Node script that reads a Wix post's raw server HTML and converts it to clean Markdown verbatim, pulls the full-res original images, and reads the title, author, and dates from the page. There's a one-post command and a batch driver for a whole blog.
-- **The playbook.** A plain-English rundown of every trap above (the summarizer mistake, each thing Wix renders client-side, the tables and lists that come out wrong, the Astro/MDX build gotchas) with how to spot and fix each one.
+- **The extractor.** A small, dependency-free Node script that reads a Wix post's raw server HTML and converts it to clean Markdown verbatim, pulls the full-res original images, and reads the title, author, and dates from the page. There's a one-post command and a batch driver that migrates a whole blog.
+- **A QA linter.** After extraction it scans the output and prints exactly which posts are missing something (an empty image alt, a "paste this in:" line with no code after it, a flattened table, an MDX build trap), so you're not hunting blind for the gaps.
+- **The playbook.** A plain-English rundown of every trap above (the summarizer mistake, each thing Wix renders client-side, the tables and lists that come out wrong, the Astro/MDX build gotchas) with how to spot and fix each one. There's a version written for an AI pair too, so if you're migrating with Claude Code or Cursor it follows the same never-fabricate discipline.
 
-It does the honest, lossless part and is explicit about what no script can recover, so you know exactly where the by-hand work starts.
+It does the honest, lossless part, tells you where the gaps are, and is explicit about what no script can recover, so you know exactly where the by-hand work starts.
 
 > [!BUTTON]
 > [Go to the GitHub repo](https://github.com/alexandramartinez/wix-to-astro)
