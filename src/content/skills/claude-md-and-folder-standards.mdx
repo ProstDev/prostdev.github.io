@@ -114,6 +114,12 @@ included; it lives *outside* `.claude/`, but these rules still apply to it — *
   turn (downgrading whatever task invoked the skill) and a mid-turn model switch busts the prompt
   cache both ways. Judgment-heavy or high-stakes skills (prod migrations, shared-config edits,
   session summaries) always inherit.
+- **Pick the tier by task SHAPE, not just "cheaper":** `haiku` = mechanical AND terminal (runs at
+  the turn's end — a commit, a final formatting pass). `sonnet` = high-VOLUME batch that still
+  carries light editorial judgment (a playlist-scale copy-edit Haiku would flatten). `inherit` =
+  rare (savings ≈ 0) OR judgment-heavy. A mid-turn (non-terminal) skill stays `inherit` even when
+  mechanical — the cache-bust outweighs the token saving. The real routing wins are subagents (own
+  context, no cache cost).
 
 ## settings.json Rules
 
