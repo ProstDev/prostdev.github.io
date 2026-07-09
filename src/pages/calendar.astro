@@ -8,7 +8,9 @@ import { formatDate, upcomingCalendarItems } from '@/lib/content';
 // Google uses its own add-by-URL deep link below.
 const feedHttps = `${SITE.url}/calendar.ics`;
 const feedWebcal = feedHttps.replace(/^https?:\/\//, 'webcal://');
-const googleAddUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(feedHttps)}`;
+// Google's add-by-URL only SUBSCRIBES when the cid carries the `webcal://` scheme; an
+// `https://` cid gets refused (or imported as a one-off event), so reuse feedWebcal here.
+const googleAddUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(feedWebcal)}`;
 
 // Upcoming = the exact same set the .ics feed emits (shared helper): future videos +
 // standalone articles, companions folded into their video. Soonest first.
