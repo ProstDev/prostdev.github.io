@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
-import { VIDEOS, getPlaylist, thumbnail } from '@/data/videos';
+import { publishedVideos, getPlaylist, thumbnail } from '@/data/videos';
 import { bareImageCard, renderCard, fetchRemoteImage } from '@/lib/og-image';
 
 export async function getStaticPaths() {
-  return VIDEOS.map((video) => ({ params: { slug: video.slug }, props: { video } }));
+  return publishedVideos().map((video) => ({ params: { slug: video.slug }, props: { video } }));
 }
 
 /**

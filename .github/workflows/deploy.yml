@@ -4,6 +4,16 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # SCHEDULED REBUILD — powers content scheduling. A static build freezes "now" at build
+  # time, so a post with a future `pubDate` (src/lib/content.ts) or a video with a future
+  # `publishedAt` (src/data/videos.ts) stays hidden until a build runs past that instant.
+  # This cron re-runs the SAME build+deploy every 15 min so scheduled content reveals itself
+  # AUTOMATICALLY — no manual step at publish time. Set the gate to your YouTube publish time
+  # (or a few minutes after) and the site reveals the post + video together, after the video
+  # is live. Caveat: GitHub cron is UTC and often runs several minutes LATE (never early), so
+  # the gate guarantees "at or after" your time — exactly the "after YouTube" requirement.
+  schedule:
+    - cron: '*/15 * * * *'
 
 permissions:
   contents: read
@@ -21,16 +31,56 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      # Gate for the deploy job. 'true' on every push / manual run; on a SCHEDULED run only
+      # when the freshly-built site actually differs from what's live (see the guard step).
+      should_deploy: ${{ steps.guard.outputs.should_deploy }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install, build, and upload
         uses: withastro/action@v4
         # withastro/action runs `npm ci && npm run build` (which also runs
-        # `pagefind --site dist`) and uploads ./dist as the Pages artifact.
+        # `pagefind --site dist`) and uploads ./dist as the Pages artifact. It leaves
+        # ./dist in the workspace, so the guard below can inspect the built sitemap.
+      - name: Decide whether the scheduled build is worth deploying
+        id: guard
+        # The cron fires every 15 min, but a scheduled reveal only ever ADDS a page (a due
+        # post's /post/<slug>/ + its video's /video/<slug>/). So on a cron run we build,
+        # then compare THIS build's sitemap URL set to the LIVE one: identical => nothing is
+        # due => skip the redeploy (keeps the Pages deployment history clean). Any push or
+        # manual run always deploys. FAIL-OPEN: if the live sitemap can't be read (network,
+        # first deploy, format change) we deploy — a missed reveal is worse than a no-op deploy.
+        # Only reads our own sitemap as DATA (piped to grep); no untrusted input hits the shell.
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "Not a scheduled run — always deploy."
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          built=$(grep -o '<loc>[^<]*</loc>' dist/sitemap-0.xml 2>/dev/null | sort -u)
+          if [ -z "$built" ]; then
+            echo "No built sitemap found — deploy to be safe."
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          live=$(curl -sf --max-time 30 https://prostdev.com/sitemap-0.xml | grep -o '<loc>[^<]*</loc>' | sort -u)
+          if [ -z "$live" ]; then
+            echo "Could not read live sitemap — deploy to be safe."
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$built" = "$live" ]; then
+            echo "Built site matches live — nothing due, skipping deploy."
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Built site differs from live — deploying."
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+          fi
 
   deploy:
     needs: build
+    if: needs.build.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -53,7 +53,14 @@ export interface Video {
   playlists: string[];
   /** e.g. "26:45" — shown on cards. */
   duration?: string;
-  /** ISO date (YYYY-MM-DD) — used for ordering/JSON-LD when present. */
+  /**
+   * ISO date (YYYY-MM-DD) or full datetime ('2026-07-21T18:00:00Z') — used for ordering/JSON-LD
+   * when present, AND as the SCHEDULING gate: a `publishedAt` in the FUTURE hides the video in
+   * prod (no /video page, OG, .md, llms, section-page listing, pager, or homepage-latest slot)
+   * until a build runs at/after that instant. See `isVideoPublished` + the cron rebuild in
+   * .github/workflows/deploy.yml. Set it to your YouTube publish time so the site reveals the
+   * video only AFTER it's live on YouTube. A video with no `publishedAt` is always shown.
+   */
   publishedAt?: string;
   /** External resources for the video (GitHub repo, Playground links, docs). */
   links?: { label: string; url: string }[];
@@ -193,7 +200,8 @@ export const VIDEOS: Video[] = [
       'Three AI tools get the exact same MuleSoft architect brief — build a 3-layer API-led network for Customers + Orders, 11 operations. Claude, CurieTech AI, and MuleSoft Vibes go head-to-head on rigor, completeness, persistence, tests, and versions.',
     playlists: ['ai-showdown'],
     duration: '15:21',
-    publishedAt: '2026-07-14',
+    publishedAt: '2026-07-14T11:35:00Z', // 7:30am Toronto (EDT, UTC−4) + 5 min — reveals after the YouTube drop
+
     links: [
       {
         label: 'GitHub repo — all 3 solutions + the shared prompt',
@@ -1310,6 +1318,26 @@ export const LATEST_SLUGS: string[] = [
 
 // ---- Derived helpers -------------------------------------------------------
 
+const isProd = import.meta.env.PROD;
+
+/**
+ * SCHEDULING gate (twin of the blog `pubDate` gate in src/lib/content.ts): in prod, a video
+ * whose `publishedAt` is in the FUTURE is treated as not-yet-published and hidden everywhere
+ * that reads the catalog through `publishedVideos()`/`getVideo()`. A video with no `publishedAt`
+ * is always shown. In DEV nothing is gated, so scheduled videos preview locally. Set
+ * `publishedAt` to your YouTube publish instant and let the cron rebuild reveal it after the
+ * video goes live on YouTube (see .github/workflows/deploy.yml).
+ */
+export function isVideoPublished(v: Video, now: Date = new Date()): boolean {
+  if (!isProd || !v.publishedAt) return true;
+  return new Date(v.publishedAt) <= now;
+}
+
+/** The catalog a build should expose — every video minus the ones still scheduled (prod only). */
+export function publishedVideos(): Video[] {
+  return VIDEOS.filter((v) => isVideoPublished(v));
+}
+
 /** Homepage "latest" videos, newest-first, in LATEST_SLUGS order. */
 export function latestVideos(limit = LATEST_SLUGS.length): Video[] {
   return LATEST_SLUGS.slice(0, limit)
@@ -1407,7 +1435,7 @@ export function sectionHref(p: Playlist): string | undefined {
 }
 
 export function getVideo(slug: string): Video | undefined {
-  return VIDEOS.find((v) => v.slug === slug);
+  return VIDEOS.find((v) => v.slug === slug && isVideoPublished(v));
 }
 
 /**
@@ -1415,12 +1443,12 @@ export function getVideo(slug: string): Video | undefined {
  * embedded video to its /video/<slug> page (which carries the transcript).
  */
 export function getVideoByYoutubeId(youtubeId: string): Video | undefined {
-  return VIDEOS.find((v) => v.youtubeId === youtubeId);
+  return VIDEOS.find((v) => v.youtubeId === youtubeId && isVideoPublished(v));
 }
 
-/** Videos belonging to a playlist, in catalog order. */
+/** Videos belonging to a playlist, in catalog order (scheduled ones hidden in prod). */
 export function videosInPlaylist(playlistId: string): Video[] {
-  return VIDEOS.filter((v) => v.playlists.includes(playlistId));
+  return VIDEOS.filter((v) => v.playlists.includes(playlistId) && isVideoPublished(v));
 }
 
 /**

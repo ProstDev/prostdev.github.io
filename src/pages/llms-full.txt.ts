@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getPosts, getSkills, formatDate } from '@/lib/content';
-import { VIDEOS, getPlaylist, watchUrl } from '@/data/videos';
+import { publishedVideos, getPlaylist, watchUrl } from '@/data/videos';
 import { getTranscript } from '@/lib/transcripts';
 import { SITE } from '@/config';
 
@@ -53,7 +53,7 @@ export const GET: APIRoute = async () => {
   // Video transcripts
   out.push('# Video Transcripts');
   out.push('');
-  for (const v of VIDEOS) {
+  for (const v of publishedVideos()) {
     const transcript = await getTranscript(v.youtubeId);
     if (!transcript) continue;
     const pl = getPlaylist(v.playlists[0]);

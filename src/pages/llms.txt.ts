@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getPosts, getSkills, getTags, getCategories, tagUrl, categoryUrl } from '@/lib/content';
-import { VIDEOS, PLAYLISTS } from '@/data/videos';
+import { PLAYLISTS, videosInPlaylist } from '@/data/videos';
 import { SITE } from '@/config';
 
 /**
@@ -27,7 +27,7 @@ export const GET: APIRoute = async () => {
   lines.push('## Video series');
   lines.push('');
   for (const pl of PLAYLISTS) {
-    const vids = VIDEOS.filter((v) => v.playlists.includes(pl.id));
+    const vids = videosInPlaylist(pl.id); // gated: scheduled videos excluded in prod
     if (!vids.length) continue;
     lines.push(`### ${pl.title}`);
     lines.push('');

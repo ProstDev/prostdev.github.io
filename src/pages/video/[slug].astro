@@ -6,12 +6,13 @@ import DocActions from '@/components/DocActions.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
 import ReportIssue from '@/components/ReportIssue.astro';
 import Icon from '@/components/Icon.astro';
-import { VIDEOS, getPlaylist, watchUrl, videosInPlaylist, playlistNeighbors, thumbnail } from '@/data/videos';
+import { publishedVideos, getPlaylist, watchUrl, videosInPlaylist, playlistNeighbors, thumbnail } from '@/data/videos';
 import { getTranscript } from '@/lib/transcripts';
 import { SITE } from '@/config';
 
 export async function getStaticPaths() {
-  return VIDEOS.map((video) => ({ params: { slug: video.slug }, props: { video } }));
+  // publishedVideos() (not the raw VIDEOS array) so a scheduled video builds no page until due.
+  return publishedVideos().map((video) => ({ params: { slug: video.slug }, props: { video } }));
 }
 
 const { video } = Astro.props;

@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
-import { VIDEOS, getPlaylist, watchUrl, type Video } from '@/data/videos';
+import { publishedVideos, getPlaylist, watchUrl, type Video } from '@/data/videos';
 import { getTranscript } from '@/lib/transcripts';
 import { SITE } from '@/config';
 
 export async function getStaticPaths() {
-  return VIDEOS.map((video) => ({ params: { slug: video.slug }, props: { video } }));
+  return publishedVideos().map((video) => ({ params: { slug: video.slug }, props: { video } }));
 }
 
 export const GET: APIRoute = async ({ props }) => {

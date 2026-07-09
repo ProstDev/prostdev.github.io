@@ -4,10 +4,22 @@ import type { Series } from '@/data/series';
 
 const isProd = import.meta.env.PROD;
 
-/** All non-draft (in prod) blog posts, newest first. */
+/**
+ * All blog posts a build should expose, newest first.
+ *
+ * PROD gate = two levers:
+ *   - `draft: true`        → "not ready", never built.
+ *   - `pubDate` in the FUTURE → SCHEDULED: committed & pushed now, but produces no page,
+ *     no RSS/llms/sitemap entry until a build runs AT OR AFTER that instant. `pubDate` is
+ *     `z.coerce.date()`, so a full ISO datetime works ('2026-07-21T18:00:00Z'), not just a
+ *     bare date. Pair with the cron rebuild in .github/workflows/deploy.yml so the reveal
+ *     happens automatically (see the video twin gate `isVideoPublished` in src/data/videos.ts).
+ * In DEV (`npm run dev`) nothing is gated, so you can preview scheduled/draft posts locally.
+ */
 export async function getPosts(): Promise<CollectionEntry<'blog'>[]> {
+  const now = new Date();
   const posts = await getCollection('blog', ({ data }) =>
-    isProd ? data.draft !== true : true
+    isProd ? data.draft !== true && data.pubDate <= now : true
   );
   return posts.sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
