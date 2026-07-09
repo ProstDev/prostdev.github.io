@@ -95,6 +95,7 @@ const TAGS = [
  * brand/acronym casing (CLAUDE.md, JSON-LD, MDX, SEO, AEO…). See the `add-skill` skill.
  */
 const SKILL_TAGS = [
+  'Accessibility',
   'AEO',
   'Claude Code',
   'CLAUDE.md',
@@ -105,7 +106,6 @@ const SKILL_TAGS = [
   'Maintenance',
   'MDX',
   'SEO',
-  'Skills',
   'Technical Writing',
   'Tutorials',
   'Workflow',
