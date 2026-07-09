@@ -1357,9 +1357,12 @@ export function publishedVideos(): Video[] {
 
 /** Homepage "latest" videos, newest-first, in LATEST_SLUGS order. */
 export function latestVideos(limit = LATEST_SLUGS.length): Video[] {
-  return LATEST_SLUGS.slice(0, limit)
-    .map((slug) => getVideo(slug))
-    .filter((v): v is Video => Boolean(v));
+  // Filter BEFORE slicing: scheduled (future-dated) videos near the top of the
+  // list must be skipped over — not counted against the limit — or a scheduled
+  // pick leaves a hole in the grid (e.g. 2 scheduled → only 4 of 6 tiles fill).
+  return LATEST_SLUGS.map((slug) => getVideo(slug))
+    .filter((v): v is Video => Boolean(v))
+    .slice(0, limit);
 }
 
 /**
