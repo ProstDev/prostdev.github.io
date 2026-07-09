@@ -26,7 +26,7 @@ const upcoming = await upcomingCalendarItems();
       <h1 class="mt-5 text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Content calendar</h1>
       <p class="mx-auto mt-4 max-w-lg text-muted">
         Subscribe once and every scheduled ProstDev video and article shows up in your
-        calendar automatically — no need to check back. 📅
+        calendar automatically — no need to check back. <span aria-hidden="true">📅</span>
       </p>
     </div>
 
@@ -36,7 +36,7 @@ const upcoming = await upcomingCalendarItems();
         href={googleAddUrl}
         target="_blank"
         rel="noopener"
-        class="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 font-semibold text-[color:var(--accent-contrast)] transition-transform hover:scale-[1.02]"
+        class="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-lg bg-[var(--accent-strong)] px-6 py-3 font-semibold text-[color:var(--accent-contrast)] transition-transform hover:scale-[1.02]"
       >
         <Icon name="calendar" class="h-5 w-5" /> Add to Google Calendar
       </a>
@@ -48,27 +48,29 @@ const upcoming = await upcomingCalendarItems();
       </a>
 
       <!-- Copyable URL for any other calendar app -->
-      <div class="mt-4 w-full max-w-sm">
+      <div class="mt-4 w-full max-w-sm" data-copy-feed data-url={feedHttps}>
         <label for="feed-url" class="text-xs font-semibold uppercase tracking-wide text-muted">Or paste this URL into any calendar app</label>
-        <div class="mt-2 flex items-stretch gap-2" data-copy-feed data-url={feedHttps}>
+        <div class="mt-2 flex items-stretch gap-2">
           <input
             id="feed-url"
             type="text"
             readonly
             value={feedHttps}
-            class="min-w-0 flex-1 rounded-lg border border-default bg-surface-card px-3 py-2 text-sm text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            aria-label="Calendar feed URL"
+            class="min-w-0 flex-1 rounded-lg border border-default bg-surface-card px-3 py-2 text-sm text-[var(--text-muted)]"
           />
           <button
             type="button"
             data-copy-btn
             aria-label="Copy calendar URL"
             title="Copy calendar URL"
-            class="inline-flex h-auto w-11 shrink-0 items-center justify-center rounded-lg border border-default bg-surface-card text-accent transition-colors hover:bg-[color:var(--bg-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-default bg-surface-card text-[var(--accent)] transition-colors hover:bg-[color:var(--bg-subtle)]"
           >
             <span data-copy-idle><Icon name="copy" class="h-4 w-4" /></span>
             <span data-copy-done class="hidden text-green-500"><Icon name="check" class="h-4 w-4" /></span>
           </button>
         </div>
+        <p data-copy-status role="status" aria-live="polite" class="sr-only"></p>
       </div>
     </div>
 
@@ -83,12 +85,24 @@ const upcoming = await upcomingCalendarItems();
                 {formatDate(item.date)}
               </time>
               <div class="min-w-0">
-                <a href={item.url} target={item.kind === 'video' ? '_blank' : undefined} rel={item.kind === 'video' ? 'noopener' : undefined} class="text-default hover:text-accent">
-                  {item.kind === 'video' ? '🎥' : '📄'} {item.title}
+                <a
+                  href={item.url}
+                  target={item.kind === 'video' ? '_blank' : undefined}
+                  rel={item.kind === 'video' ? 'noopener' : undefined}
+                  class="text-[var(--text)] transition-colors hover:text-[var(--accent)]"
+                >
+                  <span aria-hidden="true">{item.kind === 'video' ? '🎥' : '📄'}</span>
+                  <span class="sr-only">{item.kind === 'video' ? 'Video:' : 'Article:'}</span>
+                  {item.title}
+                  {item.kind === 'video' && <span class="sr-only"> (opens on YouTube in a new tab)</span>}
                 </a>
                 {item.companion && (
-                  <a href={item.companion.url} class="mt-1 flex items-center gap-1.5 text-xs text-muted hover:text-accent">
+                  <a
+                    href={item.companion.url}
+                    class="mt-1 flex items-center gap-1.5 text-xs text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
+                  >
                     <Icon name="file-text" class="h-3.5 w-3.5 shrink-0" />
+                    <span class="sr-only">Companion article: </span>
                     <span class="min-w-0 truncate">{item.companion.title}</span>
                   </a>
                 )}
@@ -108,6 +122,7 @@ const upcoming = await upcomingCalendarItems();
       const btn = root.querySelector<HTMLButtonElement>('[data-copy-btn]')!;
       const idle = root.querySelector<HTMLElement>('[data-copy-idle]')!;
       const done = root.querySelector<HTMLElement>('[data-copy-done]')!;
+      const status = root.querySelector<HTMLElement>('[data-copy-status]')!;
       const input = root.querySelector<HTMLInputElement>('input')!;
 
       btn.addEventListener('click', async () => {
@@ -119,9 +134,11 @@ const upcoming = await upcomingCalendarItems();
         }
         idle.classList.add('hidden');
         done.classList.remove('hidden');
+        status.textContent = 'Calendar URL copied to clipboard';
         setTimeout(() => {
           idle.classList.remove('hidden');
           done.classList.add('hidden');
+          status.textContent = '';
         }, 2000);
       });
     });
