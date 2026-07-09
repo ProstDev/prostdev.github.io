@@ -1,0 +1,110 @@
+---
+title: "Migrating a Blog From Wix to Astro: What Breaks"
+description: "Moving 138 posts from Wix to Astro: the code, images, videos, and tables the export silently drops, and how I recovered every piece without fabricating a thing."
+pubDate: 2026-07-09
+category: Guides
+tags: [Astro, Claude Code, Markdown]
+heroImage: ../../assets/blog/migrating-a-blog-from-wix-to-astro.png
+faqs:
+  - question: "Why does content go missing when you migrate from Wix to Astro?"
+    answer: "Wix renders a big part of each post in the reader's browser instead of in the server HTML. A migration script only sees the server HTML, so anything client-side (code snippets, the video embed, inline images, galleries, buttons, and reader comments) is never downloaded and silently disappears, with no error to warn you."
+  - question: "Why shouldn't I use an AI summarizer to convert my Wix posts?"
+    answer: "A summarizer paraphrases your prose and drops every code block, which for a tutorial blog means losing the whole point of the post. The reliable approach is to read the raw server HTML directly and convert the real tags to Markdown, which is lossless and keeps your exact words, links, and fenced code."
+  - question: "What kinds of content did the Wix export drop or mangle?"
+    answer: "Dropped entirely: code snippets (GitHub Gist embeds), the companion YouTube video, inline images, image galleries, buttons, and reader comments. Mangled: tables flattened into loose paragraphs, nested lists collapsed, bold text glued to neighboring words, and doubled quote marks on blockquotes."
+  - question: "Is moving from Wix to Astro worth it?"
+    answer: "It depends on what you use Wix for. If you run a shop, take bookings or payments, or need a full no-code CMS, Wix earns its fee and you should probably stay. But if you pay monthly and your content is mostly writing with no commerce, then yes: you get free hosting, a faster site, full ownership, and content that search engines and AI can read through the `.md` and `llms.txt` versions. Just budget real time for recovering the dropped content, not only the export."
+---
+
+So I moved this whole blog off Wix. All 138 posts now live on a free static [Astro](https://astro.build/) site hosted on GitHub Pages, no monthly bill, and I own every byte of the content. If you're thinking about the same jump, here's the thing nobody warns you about: a Wix to Astro migration that finishes without a single error can still be quietly missing half your content.
+
+I learned that the expensive way. This post walks through what the export drops, why it drops it, and how I got it all back, so you can skip the part where you migrate the same catalog twice.
+
+## TL;DR
+
+This is a field report, not a step-by-step tutorial. Wix silently drops a lot on export (code snippets, images, the video, galleries, buttons, comments, and it mangles tables and nested lists), all with no error to warn you. Below is what breaks, why, and how I recovered every piece without fabricating anything. If you just want the tools, the extractor and the full playbook are open-source: **[github.com/alexandramartinez/wix-to-astro](https://github.com/alexandramartinez/wix-to-astro)**.
+
+> [!NOTE]
+> I did this migration with Claude Code as my pair. Everything below is what actually happened on my posts, not a theory. The recovery scripts and the full playbook are in a separate repo, linked at the end.
+
+## What "migrating from Wix to Astro" actually means
+
+A Wix to Astro migration is really two jobs, not one. The obvious job is moving your posts into a new format: Wix renders your blog, Astro builds static pages from Markdown (or MDX) files. The hidden job is *recovering the content the move leaves behind*, because Wix keeps a surprising amount of your post outside the HTML a migration script can see.
+
+Get the first job right and the site builds. Miss the second and you ship a blog that looks complete and is missing code snippets, images, and videos. That second job is where all my time went, so that's most of what this post is about.
+
+## The first mistake: letting an AI summarize your posts
+
+My very first attempt fetched each post through an AI summarizer to turn the page into Markdown. It felt clever. It was a disaster.
+
+A summarizer paraphrases your prose and **silently drops every code block**. For a MuleSoft tutorial blog, that's the entire point of the post gone. I didn't catch it until I'd run the whole catalog through, and I had to redo the migration from scratch.
+
+Here's the fix, and it's the single most important lesson I can give you: don't summarize, *read the raw server HTML directly*. A small deterministic script that pulls the page and converts the real HTML tags to Markdown is lossless. It keeps your exact words, your links, your fenced code, all of it. Boring beats clever here.
+
+> [!WARNING]
+> A migration that runs without errors is not the same as a migration that's complete. Wix renders a big chunk of your post in the browser, so it was never in the HTML your script downloaded. No error fires because nothing knew that content was supposed to be there.
+
+## What Wix renders client-side (so it was never in the HTML)
+
+This is the core insight, and it explains almost every gap I hit. Some of your post lives in the server HTML, and some of it Wix only assembles in the reader's browser. A migration script sees the first kind and is completely blind to the second.
+
+Here's what turned out to be client-side, and therefore missing after a clean export:
+
+- **Code snippets.** On Wix these were GitHub Gist embeds, little iframes that fill in on load. The code is never in the server HTML, so every snippet vanished. The tell on a live post is a line like "paste this in:" with nothing after it.
+- **The companion YouTube video.** Wix rendered it as a client-side player widget. Gone, leaving an orphaned "Prefer video? Watch it here" line pointing at nothing.
+- **Inline images.** These came through as a special Wix image block a first-pass regex never matched. Across my catalog that was 1080 images spread over 114 posts, all missing on the first real pass.
+- **Image galleries and buttons.** Multi-image carousels and styled call-to-action buttons (like a "Solve on the Playground" link) are the same story: client-rendered, so dropped.
+- **Reader comments.** Wix loads the comment thread in the browser too, so none of it was in the HTML. Some of those comments were genuinely useful (a reader posting a cleaner DataWeave solution, say), and I didn't want to lose them.
+
+None of these threw an error. They just weren't there, and you only notice when you actually read the migrated post.
+
+## What migrated, but came out wrong
+
+A second, sneakier category: content that made it across but got mangled on the way, because the HTML-to-Markdown step didn't handle the shape Wix used.
+
+- **Tables flattened into loose paragraphs.** A two-column table became alternating one-line paragraphs, so the rows and columns were just gone as structure. The converter had no rule for `<table>`, so each cell leaked out on its own.
+- **Nested lists collapsed.** Wix nests a sub-list *inside* its parent list item, and a naive match merged the parent with its first child and lost the indentation.
+- **Bold text glued to neighbors.** Wix likes to tuck the spacing inside the emphasis, so you'd get `**Pick this **option` with the bold swallowing the space, or one bold word split into two runs.
+- **Doubled quote marks on blockquotes.** The typography styling adds its own curly quotes, and the migrated text already had the author's quotes, so quotes showed up twice.
+
+These are all fixable, but you have to *know to look*. A build passes fine with a flattened table in it.
+
+## Recovering it all without fabricating anything
+
+Here's the rule I held to the whole way through, and I'd push you to do the same: **never invent the missing content.** Every recovered code snippet came verbatim from the live rendered page or from my own source files, never from guessing what the code "probably" was. When a match was fuzzy (which dropped snippet belongs in which gap), I confirmed it by hand instead of letting a script auto-place it.
+
+That discipline is what makes the migrated post trustworthy. A tutorial with a plausible-but-wrong code block is worse than one with an honest "code was here" gap, because the reader can't tell it's wrong. So when in doubt, I left a visible hole and came back to it rather than filling it with a fabrication.
+
+The reader comments were the purest version of this rule. Unlike code or images, there's nothing to auto-recover, no script can bring them back, so I copied the handful of genuinely-useful ones straight off the live page, word for word, and preserved them as attributed notes under the post. The rest I let go. No paraphrasing, no inventing a helpful-sounding reply that nobody actually wrote.
+
+## The upgrade the move unlocked
+
+The migration wasn't just damage control. Moving to my own Astro site let me fix things Wix never let me touch.
+
+The big one was accessibility. When I pulled the inline images across, 93% of them had no alt text at all, 977 empty out of 1047. That's a real problem for screen-reader users and for image search. So I went through and wrote genuine alt text by actually looking at each image, not keyword-stuffing, just describing what's in the shot.
+
+The other win is for AI. Every post on the new site has a plain-text `.md` version and feeds an `llms.txt`, so an answer engine can read the real content instead of scraping a JavaScript-heavy page. My old Wix blog was basically invisible to that whole world. Now the content is built to be quoted.
+
+## Should you do it?
+
+First, to be fair to Wix: it's genuinely good at a lot of things. If you're running a shop, selling services or subscription plans, taking bookings, managing events, or you want a full CMS with a visual editor and no code, Wix handles all of that out of the box, and handles it well. The payment, scheduling, and store tooling alone can be worth the monthly fee.
+
+But if you're *just* hosting a website, mostly writing, and not accepting payments or running any of that commerce machinery, then you're paying every month for a lot of features you don't use, and getting a slower, less portable site than you could have for free. That's exactly the case where I'd make the move.
+
+So: if you're paying Wix monthly and your content is mostly writing, yes, I think it's worth it. You get free hosting, a faster site, full ownership, and content that both search engines and AI can actually read.
+
+Just go in with the right expectation: budget real time for the *recovery* phase, not only the export. The export is the easy 20%. Getting your code, images, videos, and tables back, verbatim and complete, is the other 80%, and it's the part that decides whether readers trust the result.
+
+## What's in the repo
+
+I packaged everything I trusted into a separate open-source repo so you don't have to rediscover any of this. In short, it has:
+
+- **The extractor.** A small, dependency-free Node script that reads a Wix post's raw server HTML and converts it to clean Markdown verbatim, pulls the full-res original images, and reads the title, author, and dates from the page. There's a one-post command and a batch driver for a whole blog.
+- **The playbook.** A plain-English rundown of every trap above (the summarizer mistake, each thing Wix renders client-side, the tables and lists that come out wrong, the Astro/MDX build gotchas) with how to spot and fix each one.
+
+It does the honest, lossless part and is explicit about what no script can recover, so you know exactly where the by-hand work starts.
+
+> [!BUTTON]
+> [Go to the GitHub repo](https://github.com/alexandramartinez/wix-to-astro)
+
+If you hit a Wix quirk I didn't cover, I'd genuinely like to hear about it. Come find me on [YouTube](https://www.youtube.com/@prostdev) or wherever you found this post, and happy migrating. :-)

@@ -27,6 +27,7 @@ const TAGS = [
   'Anypoint Studio',
   'API',
   'APIKit',
+  'Astro',
   'AsyncAPI',
   'AWS',
   'Azure DevOps',
