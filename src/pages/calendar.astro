@@ -87,6 +87,7 @@ const upcoming = await upcomingCalendarItems();
                 {formatDate(item.date)}
               </time>
               <div class="min-w-0">
+                {/* Plain text, NOT a link: these items are future-dated and unpublished, so their URLs 404 until the pubDate arrives. */}
                 <span class="text-[var(--text)]">
                   <span aria-hidden="true">{item.kind === 'video' ? '🎥' : '📄'}</span>
                   <span class="sr-only">{item.kind === 'video' ? 'Video:' : 'Article:'}</span>
