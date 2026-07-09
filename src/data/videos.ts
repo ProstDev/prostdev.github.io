@@ -1316,7 +1316,7 @@ export const VIDEOS: Video[] = [
       'Pass JVM or command-line arguments to the Mule Runtime inside Anypoint Code Builder by editing the "Mule Runtime: Default Arguments" setting — useful for env-separated properties files and for passing a secure/encryption key to a Mule app with secured properties.',
     playlists: ['other-videos'],
     duration: '5:18',
-    publishedAt: '2024-02-02',
+    publishedAt: '2024-02-03',
     links: [
       {
         label: 'Read the article',

@@ -34,6 +34,17 @@ import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VIDEOS_TS = join(ROOT, 'src/data/videos.ts');
+
+// Load a repo-root .env if present (Node ≥20.6 native — no dotenv dep). An already-set
+// YOUTUBE_API_KEY WINS: loadEnvFile does NOT override process.env, so this is safe in CI
+// (the key arrives via `env:`) and for `export YOUTUBE_API_KEY=…`. A missing .env is fine —
+// that's the export-only path. See .env.example for the template.
+try {
+  process.loadEnvFile(join(ROOT, '.env'));
+} catch (err) {
+  if (err?.code !== 'ENOENT') console.error(`sync-youtube-metadata: could not read .env — ${err.message}`);
+}
+
 const API = 'https://www.googleapis.com/youtube/v3';
 const UA = 'prostdev-youtube-sync (+https://prostdev.com)';
 const HANDLE = 'prostdev'; // the channel @handle — mirrors `youtube:` in src/config.ts
