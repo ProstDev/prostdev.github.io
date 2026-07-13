@@ -34,6 +34,7 @@ import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VIDEOS_TS = join(ROOT, 'src/data/videos.ts');
+const DISCOVER_IGNORE_TS = join(ROOT, 'src/data/youtube-discover-ignore.ts');
 
 // Load a repo-root .env if present (Node ≥20.6 native — no dotenv dep). An already-set
 // YOUTUBE_API_KEY WINS: loadEnvFile does NOT override process.env, so this is safe in CI
@@ -128,6 +129,27 @@ function parseField(block, name) {
   return m ? m[1] : null;
 }
 
+// Uploads DELIBERATELY excluded from the catalog (livestreams, meetups, #Codetober, Shorts,
+// podcasts) — see src/data/youtube-discover-ignore.ts. Subtracted from --discover so only
+// genuinely new uploads surface. A missing file is fine (nothing to ignore); regex-parsed the
+// same way as the catalog since there's no TS loader under bare node.
+function readDiscoverIgnore() {
+  let src;
+  try {
+    src = readFileSync(DISCOVER_IGNORE_TS, 'utf8');
+  } catch (err) {
+    if (err?.code === 'ENOENT') return new Set();
+    throw err;
+  }
+  const start = src.indexOf('DISCOVER_IGNORE_IDS');
+  const body = start === -1 ? src : src.slice(start);
+  const ids = new Set();
+  const re = /'([A-Za-z0-9_-]{11})'/g;
+  let m;
+  while ((m = re.exec(body))) ids.add(m[1]);
+  return ids;
+}
+
 // ---- parsers ----
 // ISO-8601 video length → total seconds. Rejects multi-day (P#D…) and all-zero so a
 // garbage value is never reported as a fill.
@@ -208,11 +230,16 @@ async function discover(key, knownIds) {
 }
 
 // ---- diff (pure) ----
-function computeDiff(catalog, apiMap) {
+// A catalog publishedAt strictly in the future = a SCHEDULED premiere. YouTube's API doesn't
+// return a not-yet-public video, so `apiMap` won't have it — that's expected, NOT a dead embed.
+// `now` is injected (not read inside) so this stays a pure function and the caller owns the clock.
+function computeDiff(catalog, apiMap, now = new Date()) {
   const findings = [];
   for (const v of catalog) {
     const item = apiMap.get(v.youtubeId);
     if (!item) {
+      const publishTime = v.publishedAt ? new Date(v.publishedAt).getTime() : NaN;
+      if (Number.isFinite(publishTime) && publishTime > now.getTime()) continue; // scheduled premiere
       findings.push({ kind: 'missing_from_api', youtubeId: v.youtubeId, slug: v.slug });
       continue;
     }
@@ -299,7 +326,10 @@ try {
   const scope = ONLY.size ? catalog.filter((v) => ONLY.has(v.youtubeId)) : catalog;
   const apiMap = await fetchVideos(scope.map((v) => v.youtubeId), key);
   const findings = computeDiff(scope, apiMap);
-  const newVids = DISCOVER ? await discover(key, knownIds) : [];
+  // Treat the deliberately-excluded back-catalog as "already known" so discover() skips it —
+  // only GENUINELY new uploads surface as a nudge.
+  const discoverKnown = new Set([...knownIds, ...readDiscoverIgnore()]);
+  const newVids = DISCOVER ? await discover(key, discoverKnown) : [];
 
   const counts = {
     fill: findings.filter((f) => f.kind.endsWith('_fill')).length,
