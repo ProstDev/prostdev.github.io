@@ -7,6 +7,7 @@ import TableOfContents from '@/components/TableOfContents.astro';
 import ReportIssue from '@/components/ReportIssue.astro';
 import Icon from '@/components/Icon.astro';
 import { publishedVideos, getPlaylist, watchUrl, videosInPlaylist, playlistNeighbors, thumbnail } from '@/data/videos';
+import { sectionHref } from '@/data/sections';
 import { getTranscript } from '@/lib/transcripts';
 import { SITE } from '@/config';
 
@@ -27,6 +28,10 @@ if (transcript) {
 }
 
 const primaryPlaylist = getPlaylist(video.playlists[0]);
+// Breadcrumb link: the section page that RENDERS this playlist (its owning section),
+// which may differ from the playlist's own slug — e.g. a secondary block. Undefined
+// if no section renders it, in which case the crumb degrades to plain text.
+const primaryPlaylistHref = primaryPlaylist ? sectionHref(primaryPlaylist) : undefined;
 const related = primaryPlaylist
   ? videosInPlaylist(primaryPlaylist.id).filter((v) => v.slug !== video.slug).slice(0, 4)
   : [];
@@ -87,7 +92,9 @@ const headings = [...baseHeadings, ...transcriptHeadings.filter((h) => h.depth =
     <article data-pagefind-body class="min-w-0">
       <nav class="mb-4 text-sm text-muted" aria-label="Breadcrumb">
         <a href="/" class="hover:text-accent">Home</a> ›
-        {primaryPlaylist && <><a href={`/${primaryPlaylist.slug}`} class="hover:text-accent">{primaryPlaylist.title}</a> › </>}
+        {primaryPlaylist && (primaryPlaylistHref
+          ? <><a href={primaryPlaylistHref} class="hover:text-accent">{primaryPlaylist.title}</a> › </>
+          : <>{primaryPlaylist.title} › </>)}
         <span class="text-default">Video</span>
       </nav>
 

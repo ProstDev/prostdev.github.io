@@ -8,7 +8,8 @@ import PostCard from '@/components/PostCard.astro';
 import Icon from '@/components/Icon.astro';
 import { SITE, SOCIAL } from '@/config';
 import { getPosts } from '@/lib/content';
-import { videosInPlaylist, latestVideos, featuredVideos, primaryPlaylists, sectionHref } from '@/data/videos';
+import { videosInPlaylist, latestVideos, featuredVideos, primaryPlaylists } from '@/data/videos';
+import { sectionHref } from '@/data/sections';
 
 const latest = latestVideos(6);
 const featured = featuredVideos();

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { publishedVideos, getPlaylist, thumbnail } from '@/data/videos';
+import { publishedVideos, getPlaylist, thumbnail, type Video } from '@/data/videos';
 import { bareImageCard, renderCard, fetchRemoteImage } from '@/lib/og-image';
 
 export async function getStaticPaths() {
@@ -13,7 +13,7 @@ export async function getStaticPaths() {
  * thumbnail can't be fetched.
  */
 export const GET: APIRoute = async ({ props }) => {
-  const { video } = props as { video: (typeof VIDEOS)[number] };
+  const { video } = props as { video: Video };
   // maxres can be missing on some videos; fall back to the always-present hq thumbnail.
   const bg =
     (await fetchRemoteImage(thumbnail(video.youtubeId, 'max'))) ??

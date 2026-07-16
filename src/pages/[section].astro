@@ -1,0 +1,41 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaylistGrid from '@/components/PlaylistGrid.astro';
+import { SECTIONS, resolveBlock, type Section } from '@/data/sections';
+
+export function getStaticPaths() {
+  return SECTIONS.map((section) => ({
+    params: { section: section.slug },
+    props: { section },
+  }));
+}
+
+interface Props {
+  section: Section;
+}
+
+const { section } = Astro.props;
+
+// Resolve each block's playlist + videos (throws with a named error on a bad id).
+const blocks = section.blocks.map(resolveBlock);
+
+// <title>: explicit SEO override, else the first block's playlist title (the <h1>).
+// Description mirrors the first block's playlist description.
+const [lead] = blocks;
+const title = section.seoTitle ?? lead.playlist.title;
+const description = lead.playlist.description;
+---
+
+<BaseLayout title={title} description={description}>
+  {
+    blocks.map((block, i) =>
+      i === 0 ? (
+        <PlaylistGrid playlist={block.playlist} videos={block.videos} hook={block.hook} as="h1" />
+      ) : (
+        <div class="border-t border-default">
+          <PlaylistGrid playlist={block.playlist} videos={block.videos} hook={block.hook} as="h2" />
+        </div>
+      ),
+    )
+  }
+</BaseLayout>

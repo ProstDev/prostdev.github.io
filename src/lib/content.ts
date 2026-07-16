@@ -1,7 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { CATEGORIES, TAGS } from '@/content.config';
 import type { Series } from '@/data/series';
-import { VIDEOS, watchUrl } from '@/data/videos';
+import { VIDEOS, watchUrl, isScheduled } from '@/data/videos';
 
 const isProd = import.meta.env.PROD;
 
@@ -210,7 +210,10 @@ export async function upcomingCalendarItems(now: Date = new Date()): Promise<Cal
   const items: CalendarItem[] = [];
 
   for (const v of VIDEOS) {
-    if (!v.publishedAt || new Date(v.publishedAt) <= now) continue;
+    // Same scheduling FACT as the prod publish gate — via the shared seam, so the two can't
+    // drift. The calendar wants the INVERSE of what a prod build shows: keep only the scheduled
+    // (future-dated) videos, and (unlike isVideoPublished) regardless of prod/dev.
+    if (!isScheduled(v, now)) continue;
     items.push({
       kind: 'video',
       title: v.title,

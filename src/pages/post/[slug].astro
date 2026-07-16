@@ -17,6 +17,7 @@ import { getPosts, formatDate, readingTime, categoryUrl, getSeriesParts } from '
 import { getSeriesForPost } from '@/data/series';
 import { getVideoByYoutubeId } from '@/data/videos';
 import { getTranscript } from '@/lib/transcripts';
+import { buildBreadcrumbList, byline } from '@/lib/jsonld';
 import { SITE } from '@/config';
 
 export async function getStaticPaths() {
@@ -57,21 +58,15 @@ const jsonLd = [
     description,
     datePublished: pubDate.toISOString(),
     dateModified: (updatedDate ?? pubDate).toISOString(),
-    author: { '@type': 'Person', name: author },
-    publisher: { '@type': 'Organization', name: SITE.name },
+    ...byline(author),
     mainEntityOfPage: url,
     articleSection: category,
     keywords: tags.join(', '),
   },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
-      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE.url}/blog` },
-      { '@type': 'ListItem', position: 3, name: title, item: url },
-    ],
-  },
+  buildBreadcrumbList([
+    { name: 'Blog', url: `${SITE.url}/blog` },
+    { name: title, url },
+  ]),
   // FAQPage JSON-LD — an answer-engine signal for non-Google crawlers (ChatGPT/Perplexity/Copilot);
   // emitted only when the post carries `faqs`. (Google deprecated the FAQ rich result in May 2026,
   // and Gemini/AI Overviews ground on the visible <Faqs> text, not this schema.) Answers are grounded

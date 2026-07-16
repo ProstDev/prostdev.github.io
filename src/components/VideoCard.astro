@@ -6,8 +6,14 @@ interface Props {
   video: Video;
   /** Compact variant used in horizontal playlist rows. */
   compact?: boolean;
+  /**
+   * Heading level for the title — set it ONE below the enclosing section's heading so the
+   * document outline doesn't skip a level (WCAG 1.3.1). Defaults to h3, correct under an h2
+   * section heading (homepage / secondary playlist blocks).
+   */
+  as?: 'h2' | 'h3' | 'h4';
 }
-const { video, compact = false } = Astro.props;
+const { video, compact = false, as: Heading = 'h3' } = Astro.props;
 const href = `/video/${video.slug}`;
 ---
 <article class:list={['group', compact ? 'w-64 shrink-0' : '']}>
@@ -33,8 +39,8 @@ const href = `/video/${video.slug}`;
         </span>
       )}
     </div>
-    <h3 class:list={['mt-3 font-semibold leading-snug text-default transition-colors group-hover:text-accent', compact ? 'text-sm line-clamp-2' : 'line-clamp-2']}>
+    <Heading class:list={['mt-3 font-semibold leading-snug text-default transition-colors group-hover:text-accent', compact ? 'text-sm line-clamp-2' : 'line-clamp-2']}>
       {video.title}
-    </h3>
+    </Heading>
   </a>
 </article>

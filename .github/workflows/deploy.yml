@@ -29,7 +29,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Gate the whole pipeline on the unit suite (catalog scheduling gate, calendar, .md/JSON-LD
+  # builders). build `needs: test`, so a red suite blocks the build+deploy on EVERY trigger —
+  # push, manual, and the 15-min scheduled rebuild (a failing suite must never auto-ship).
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     outputs:
       # Gate for the deploy job. 'true' on every push / manual run; on a SCHEDULED run only

@@ -110,7 +110,7 @@ export const PLAYLISTS: Playlist[] = [
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos
     // (listed after the primary series). Its /curietech section page is still reachable
-    // (the /videos row heading links to it via sectionHref) — see SECTION_PAGE_SLUGS.
+    // (the /videos row heading links to it via sectionHref) — see SECTIONS in sections.ts.
     id: 'curietech',
     slug: 'curietech',
     title: 'From Zero to API with MuleSoft, CurieTech AI & Anypoint Code Builder (2025)',
@@ -123,7 +123,7 @@ export const PLAYLISTS: Playlist[] = [
   },
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
-    // Has a /cicd-github-actions section page (in SECTION_PAGE_SLUGS) so its videos'
+    // Has a /cicd-github-actions section page (in SECTIONS, sections.ts) so its videos'
     // breadcrumbs resolve — reachable but NOT in the nav.
     id: 'cicd-github-actions',
     slug: 'cicd-github-actions',
@@ -137,7 +137,7 @@ export const PLAYLISTS: Playlist[] = [
   },
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
-    // Has a /datacloud-mulesoft section page (in SECTION_PAGE_SLUGS) so its videos'
+    // Has a /datacloud-mulesoft section page (in SECTIONS, sections.ts) so its videos'
     // breadcrumbs resolve — reachable but NOT in the nav.
     id: 'datacloud-mulesoft',
     slug: 'datacloud-mulesoft',
@@ -151,7 +151,7 @@ export const PLAYLISTS: Playlist[] = [
   },
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
-    // Has a /dataweave-challenges section page (in SECTION_PAGE_SLUGS) so its videos'
+    // Has a /dataweave-challenges section page (in SECTIONS, sections.ts) so its videos'
     // breadcrumbs resolve — reachable but NOT in the nav.
     id: 'dataweave-challenges',
     slug: 'dataweave-challenges',
@@ -165,7 +165,7 @@ export const PLAYLISTS: Playlist[] = [
   },
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
-    // Has a /getting-to-the-point section page (in SECTION_PAGE_SLUGS) so its videos'
+    // Has a /getting-to-the-point section page (in SECTIONS, sections.ts) so its videos'
     // breadcrumbs resolve — reachable but NOT in the nav.
     id: 'getting-to-the-point',
     slug: 'getting-to-the-point',
@@ -180,7 +180,7 @@ export const PLAYLISTS: Playlist[] = [
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
     // A catch-all home for genuine one-off videos that don't belong to any multi-part
-    // series — its /other-videos section page (in SECTION_PAGE_SLUGS) exists so the
+    // series — its /other-videos section page (in SECTIONS, sections.ts) exists so the
     // videos' breadcrumbs resolve. Reachable but NOT in the nav.
     id: 'other-videos',
     slug: 'other-videos',
@@ -1419,31 +1419,64 @@ export const LATEST_SLUGS: string[] = [
 const isProd = import.meta.env.PROD;
 
 /**
- * SCHEDULING gate (twin of the blog `pubDate` gate in src/lib/content.ts): in prod, a video
- * whose `publishedAt` is in the FUTURE is treated as not-yet-published and hidden everywhere
- * that reads the catalog through `publishedVideos()`/`getVideo()`. A video with no `publishedAt`
- * is always shown. In DEV nothing is gated, so scheduled videos preview locally. Set
- * `publishedAt` to your YouTube publish instant and let the cron rebuild reveal it after the
- * video goes live on YouTube (see .github/workflows/deploy.yml).
+ * Test seam for the catalog read helpers. Every field defaults to the module's own
+ * state (the real `VIDEOS`/`LATEST_SLUGS`, the wall clock, `import.meta.env.PROD`), so
+ * PRODUCTION call sites keep calling these functions with no `ctx` at all. Tests pass a
+ * fixture catalog + a frozen `now` + `prod: true` to drive the SAME functions the site
+ * runs — so a regression like the filter-before-slice bug is exercised on its real call
+ * path, not on a pure extract beside it. See src/data/videos.catalog.test.ts.
  */
-export function isVideoPublished(v: Video, now: Date = new Date()): boolean {
-  if (!isProd || !v.publishedAt) return true;
-  return new Date(v.publishedAt) <= now;
+export interface CatalogCtx {
+  /** Catalog to read from (default: the real VIDEOS). */
+  videos?: Video[];
+  /** Ordered "latest" slugs for latestVideos (default: the real LATEST_SLUGS). */
+  slugs?: string[];
+  /** The instant "now" the scheduling gate compares against (default: wall clock). */
+  now?: Date;
+  /** Whether to apply the prod hide-the-future policy (default: import.meta.env.PROD). */
+  prod?: boolean;
+}
+
+/**
+ * The scheduling FACT, environment-free: is this video's `publishedAt` still in the future
+ * relative to `now`? A video with no `publishedAt` is never scheduled (always live). This is
+ * the single home of the time comparison — both the prod publish gate (`isVideoPublished`) and
+ * the content calendar (`upcomingCalendarItems`, which wants exactly the scheduled set, even in
+ * dev) are defined in terms of it, so the two can no longer drift. Twin of the blog `pubDate`
+ * gate in src/lib/content.ts.
+ */
+export function isScheduled(v: Video, now: Date = new Date()): boolean {
+  return Boolean(v.publishedAt) && new Date(v.publishedAt as string) > now;
+}
+
+/**
+ * SCHEDULING gate: in prod, a video that `isScheduled` (future-dated) is hidden everywhere that
+ * reads the catalog through `publishedVideos()`/`getVideo()`/`videosInPlaylist()`. In DEV nothing
+ * is gated, so scheduled videos preview locally. Set `publishedAt` to your YouTube publish instant
+ * and let the cron rebuild reveal it after the video goes live (see .github/workflows/deploy.yml).
+ * The `prod` policy lives HERE, layered on top of the env-free `isScheduled` fact.
+ */
+export function isVideoPublished(v: Video, ctx: CatalogCtx = {}): boolean {
+  const { now = new Date(), prod = isProd } = ctx;
+  return !prod || !isScheduled(v, now);
 }
 
 /** The catalog a build should expose — every video minus the ones still scheduled (prod only). */
-export function publishedVideos(): Video[] {
-  return VIDEOS.filter((v) => isVideoPublished(v));
+export function publishedVideos(ctx: CatalogCtx = {}): Video[] {
+  const { videos = VIDEOS } = ctx;
+  return videos.filter((v) => isVideoPublished(v, ctx));
 }
 
 /** Homepage "latest" videos, newest-first, in LATEST_SLUGS order. */
-export function latestVideos(limit = LATEST_SLUGS.length): Video[] {
+export function latestVideos(limit?: number, ctx: CatalogCtx = {}): Video[] {
+  const { slugs = LATEST_SLUGS } = ctx;
   // Filter BEFORE slicing: scheduled (future-dated) videos near the top of the
   // list must be skipped over — not counted against the limit — or a scheduled
   // pick leaves a hole in the grid (e.g. 2 scheduled → only 4 of 6 tiles fill).
-  return LATEST_SLUGS.map((slug) => getVideo(slug))
+  return slugs
+    .map((slug) => getVideo(slug, ctx))
     .filter((v): v is Video => Boolean(v))
-    .slice(0, limit);
+    .slice(0, limit ?? slugs.length);
 }
 
 /**
@@ -1512,44 +1545,28 @@ export function morePlaylists(): Playlist[] {
   return PLAYLISTS.filter((p) => p.tier === 'more');
 }
 
-/**
- * Slugs of playlists that have a dedicated section page → drives heading links.
- * Includes the focal nav pages PLUS back-catalog ('more'-tier) playlists whose
- * section page exists ONLY so breadcrumbs/`/videos` headings resolve — they are
- * still kept out of the nav and the homepage (see `tier` on Playlist).
- */
-const SECTION_PAGE_SLUGS = new Set([
-  'mulesoft-ai',
-  'learn-acb',
-  'mulesoft-from-start',
-  'curietech',
-  'cicd-github-actions',
-  'datacloud-mulesoft',
-  'dataweave-challenges',
-  'getting-to-the-point',
-  'other-videos',
-]);
+// Which playlists have a section page — and the heading/breadcrumb links to them —
+// now live in src/data/sections.ts (SECTIONS + sectionHref), co-located with the
+// section config that defines them.
 
-/** Section-page href for a playlist's heading link, or undefined if it has no section page. */
-export function sectionHref(p: Playlist): string | undefined {
-  return SECTION_PAGE_SLUGS.has(p.slug) ? `/${p.slug}` : undefined;
-}
-
-export function getVideo(slug: string): Video | undefined {
-  return VIDEOS.find((v) => v.slug === slug && isVideoPublished(v));
+export function getVideo(slug: string, ctx: CatalogCtx = {}): Video | undefined {
+  const { videos = VIDEOS } = ctx;
+  return videos.find((v) => v.slug === slug && isVideoPublished(v, ctx));
 }
 
 /**
  * Look up a catalog video by its YouTube id. Used to link a blog post's
  * embedded video to its /video/<slug> page (which carries the transcript).
  */
-export function getVideoByYoutubeId(youtubeId: string): Video | undefined {
-  return VIDEOS.find((v) => v.youtubeId === youtubeId && isVideoPublished(v));
+export function getVideoByYoutubeId(youtubeId: string, ctx: CatalogCtx = {}): Video | undefined {
+  const { videos = VIDEOS } = ctx;
+  return videos.find((v) => v.youtubeId === youtubeId && isVideoPublished(v, ctx));
 }
 
 /** Videos belonging to a playlist, in catalog order (scheduled ones hidden in prod). */
-export function videosInPlaylist(playlistId: string): Video[] {
-  return VIDEOS.filter((v) => v.playlists.includes(playlistId) && isVideoPublished(v));
+export function videosInPlaylist(playlistId: string, ctx: CatalogCtx = {}): Video[] {
+  const { videos = VIDEOS } = ctx;
+  return videos.filter((v) => v.playlists.includes(playlistId) && isVideoPublished(v, ctx));
 }
 
 /**
@@ -1559,9 +1576,10 @@ export function videosInPlaylist(playlistId: string): Video[] {
  */
 export function playlistNeighbors(
   playlistId: string,
-  slug: string
+  slug: string,
+  ctx: CatalogCtx = {}
 ): { prev?: Video; next?: Video } {
-  const list = videosInPlaylist(playlistId);
+  const list = videosInPlaylist(playlistId, ctx);
   const i = list.findIndex((v) => v.slug === slug);
   if (i === -1) return {};
   return { prev: list[i - 1], next: list[i + 1] };

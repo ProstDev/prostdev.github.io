@@ -16,6 +16,8 @@
     "youtube-analytics": "node scripts/youtube-analytics.mjs",
     "analyze-video": "node scripts/analyze-video.mjs",
     "transcribe": "node scripts/transcribe-video.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "astro": "astro"
   },
   "dependencies": {
@@ -29,6 +31,7 @@
     "tailwindcss": "^4.1.0"
   },
   "devDependencies": {
-    "pagefind": "^1.3.0"
+    "pagefind": "^1.3.0",
+    "vitest": "^4.1.10"
   }
 }

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getSkills, formatDate } from '@/lib/content';
+import { renderMarkdown } from '@/lib/markdown-export';
 import { SITE } from '@/config';
 
 export async function getStaticPaths() {
@@ -13,26 +14,21 @@ export const GET: APIRoute = async ({ props }) => {
   const updated =
     updatedDate && updatedDate.valueOf() !== pubDate.valueOf() ? updatedDate : null;
 
-  const frontmatter = [
-    `# ${title}`,
-    '',
-    `> ${description}`,
-    '',
-    difficulty ? `- **Difficulty:** ${difficulty}` : null,
-    tags.length ? `- **Tags:** ${tags.join(', ')}` : null,
-    `- **Added:** ${formatDate(pubDate)}`,
-    updated ? `- **Last modified:** ${formatDate(updated)}` : null,
-    `- **Source:** ${SITE.url}/skill/${skill.id}`,
-    '',
-    '---',
-    '',
-  ]
-    .filter((l) => l !== null)
-    .join('\n');
+  const md = renderMarkdown({
+    title,
+    description,
+    headerRule: true,
+    meta: [
+      difficulty ? { label: 'Difficulty', value: difficulty } : null,
+      tags.length ? { label: 'Tags', value: tags.join(', ') } : null,
+      { label: 'Added', value: formatDate(pubDate) },
+      updated ? { label: 'Last modified', value: formatDate(updated) } : null,
+      { label: 'Source', value: `${SITE.url}/skill/${skill.id}` },
+    ],
+    sections: [{ body: skill.body ?? '' }],
+  });
 
-  const body = skill.body ?? '';
-
-  return new Response(frontmatter + body, {
+  return new Response(md, {
     headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
   });
 };

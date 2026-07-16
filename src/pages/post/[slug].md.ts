@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getPosts, formatDate, getSeriesParts } from '@/lib/content';
 import { getSeriesForPost, seriesPosition } from '@/data/series';
+import { renderMarkdown, type DocSection } from '@/lib/markdown-export';
 import { SITE } from '@/config';
 
 export async function getStaticPaths() {
@@ -12,51 +13,37 @@ export const GET: APIRoute = async ({ props }) => {
   const { post } = props as { post: Awaited<ReturnType<typeof getPosts>>[number] };
   const { title, description, author, pubDate, category, tags, readerNotes, faqs } = post.data;
 
-  const frontmatter = [
-    `# ${title}`,
-    '',
-    `> ${description}`,
-    '',
-    `- **Author:** ${author}`,
-    `- **Published:** ${formatDate(pubDate)}`,
-    `- **Category:** ${category}`,
-    tags.length ? `- **Tags:** ${tags.join(', ')}` : null,
-    `- **Source:** ${SITE.url}/post/${post.id}`,
-    '',
-    '---',
-    '',
-  ]
-    .filter((l) => l !== null)
-    .join('\n');
+  const sections: DocSection[] = [];
 
   // Series navigation as a machine-readable block (AEO) — mirrors the on-page
   // prev/next + jump menu, driven by src/data/series.ts.
-  let seriesBlock = '';
   const series = getSeriesForPost(post.id);
   if (series) {
     const parts = await getSeriesParts(series, post.id);
     const pos = seriesPosition(series, post.id);
-    seriesBlock =
-      `## Series: ${series.title} (Part ${pos} of ${parts.length})\n\n` +
-      parts
+    sections.push({
+      heading: `Series: ${series.title} (Part ${pos} of ${parts.length})`,
+      body: parts
         .map((p) =>
           p.isCurrent
             ? `${p.position}. ${p.title} (this post)`
             : `${p.position}. [${p.title}](${SITE.url}/post/${p.slug})`
         )
-        .join('\n') +
-      '\n\n---\n\n';
+        .join('\n'),
+    });
   }
 
-  const body = post.body ?? '';
+  // The body follows the header (or the series block, if any). When a series
+  // block precedes it, it needs its own `---` divider.
+  sections.push({ body: post.body ?? '', rule: Boolean(series) });
 
   // Curated reader comments preserved from the old Wix site (AEO) — mirrors ReaderNotes.astro.
   // Verbatim; a note may carry a code snippet, serialized as a fenced block.
-  let notesBlock = '';
   if (readerNotes && readerNotes.length > 0) {
-    notesBlock =
-      '\n\n---\n\n## Reader notes\n\n' +
-      readerNotes
+    sections.push({
+      heading: 'Reader notes',
+      rule: true,
+      body: readerNotes
         .map((n) => {
           const reply = n.replyTo ? `↳ Reply to ${n.replyTo} — ` : '';
           const head = `${reply}**${n.author}**${n.date ? ` (${formatDate(n.date)})` : ''}`;
@@ -73,18 +60,34 @@ export const GET: APIRoute = async ({ props }) => {
             .join('\n\n');
           return segments ? `${head}: ${segments}` : head;
         })
-        .join('\n\n');
+        .join('\n\n'),
+    });
   }
 
   // FAQ section (AEO) — mirrors Faqs.astro + the FAQPage JSON-LD. Verbatim Q&A so all surfaces agree.
-  let faqBlock = '';
   if (faqs && faqs.length > 0) {
-    faqBlock =
-      '\n\n---\n\n## FAQs\n\n' +
-      faqs.map((f) => `### ${f.question}\n\n${f.answer}`).join('\n\n');
+    sections.push({
+      heading: 'FAQs',
+      rule: true,
+      body: faqs.map((f) => `### ${f.question}\n\n${f.answer}`).join('\n\n'),
+    });
   }
 
-  return new Response(frontmatter + seriesBlock + body + notesBlock + faqBlock, {
+  const md = renderMarkdown({
+    title,
+    description,
+    headerRule: true,
+    meta: [
+      { label: 'Author', value: author },
+      { label: 'Published', value: formatDate(pubDate) },
+      { label: 'Category', value: category },
+      tags.length ? { label: 'Tags', value: tags.join(', ') } : null,
+      { label: 'Source', value: `${SITE.url}/post/${post.id}` },
+    ],
+    sections,
+  });
+
+  return new Response(md, {
     headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
   });
 };

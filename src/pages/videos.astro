@@ -2,7 +2,8 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PlaylistRow from '@/components/PlaylistRow.astro';
 import ExternalPlaylistCard from '@/components/ExternalPlaylistCard.astro';
-import { videosInPlaylist, primaryPlaylists, morePlaylists, sectionHref, FUN_PLAYLISTS, COMMUNITY_PLAYLISTS } from '@/data/videos';
+import { videosInPlaylist, primaryPlaylists, morePlaylists, FUN_PLAYLISTS, COMMUNITY_PLAYLISTS } from '@/data/videos';
+import { sectionHref } from '@/data/sections';
 
 // Featured series first, then the rest — one uniform list, no visual separation.
 const playlists = [...primaryPlaylists(), ...morePlaylists()];
