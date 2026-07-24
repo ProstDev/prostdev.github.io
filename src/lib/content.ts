@@ -27,6 +27,43 @@ export async function getPosts(): Promise<CollectionEntry<'blog'>[]> {
   );
 }
 
+/**
+ * The scheduling FACT for a post, environment-free: is its `pubDate` still in the future relative
+ * to `now`? Twin of `isScheduled()` for videos (src/data/videos.ts). `draft` is a SEPARATE lever
+ * ("never build"), not "scheduled" — so this reports ONLY the future-date embargo. The prod publish
+ * gate (getPosts, `pubDate <= now`) is the exact complement of this predicate, and the config-time
+ * sitemap reader (scheduled-slugs.mjs) mirrors it from raw frontmatter (astro.config.mjs can't import
+ * astro:content). All three agree except for a post crossing pubDate DURING a build — its own build's
+ * `new Date()` snapshots differ by ms — which only ever leaves a just-published post briefly absent
+ * from the sitemap (never a teaser IN it), and self-heals on the next 15-min cron build.
+ */
+export function isPostScheduled(
+  post: CollectionEntry<'blog'>,
+  now: Date = new Date()
+): boolean {
+  return post.data.pubDate > now;
+}
+
+/**
+ * Posts a build should RENDER AS PAGES — the published set (getPosts) PLUS scheduled (future-dated,
+ * non-draft) posts. A scheduled post builds a `noindex` "coming soon" TEASER at `/post/<slug>` (+
+ * its `/og/post/<slug>.png` card) so a link shared before publish returns 200 with the correct OG
+ * preview (LinkedIn caches it once; the body later swaps to the full article at the SAME URL — no
+ * re-scrape needed). Used ONLY by the page + OG-image getStaticPaths (post/[slug].astro,
+ * og/post/[slug].png.ts). Everything that LISTS or FEEDS posts (blog index, homepage, RSS, sitemap,
+ * llms, `.md`, tag/category) keeps calling getPosts(), so teasers never leak into those. `draft:true`
+ * is still excluded (never built). This is getPosts() minus the `pubDate <= now` clause; in DEV
+ * nothing is gated, so it returns the same set as getPosts().
+ */
+export async function getRenderablePosts(): Promise<CollectionEntry<'blog'>[]> {
+  const posts = await getCollection('blog', ({ data }) =>
+    isProd ? data.draft !== true : true
+  );
+  return posts.sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+}
+
 /** Unique sorted tag list across posts. */
 export async function getTags(): Promise<{ tag: string; count: number }[]> {
   const posts = await getPosts();

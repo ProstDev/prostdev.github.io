@@ -1,0 +1,33 @@
+---
+/**
+ * "Coming soon" panel shown IN PLACE of the article body on a scheduled post's teaser page
+ * (post/[slug].astro, when `scheduled`). The page itself returns 200 with the correct OG card so a
+ * pre-publish LinkedIn/social share previews correctly; this panel is what a curious early click
+ * sees instead of the (embargoed) body. Reuses the dashed-panel idiom + the `calendar` icon already
+ * used elsewhere; semantic tokens only, so it works in both themes. See getRenderablePosts /
+ * isPostScheduled in src/lib/content.ts.
+ */
+import Icon from '@/components/Icon.astro';
+import { formatDate } from '@/lib/content';
+
+interface Props {
+  /** The instant the article goes live (post.pubDate). Rendered in UTC to match the rest of the site. */
+  pubDate: Date;
+}
+const { pubDate } = Astro.props;
+---
+<div class="my-10 rounded-xl border border-dashed border-default p-8 text-center">
+  <Icon name="calendar" class="mx-auto mb-3 h-6 w-6 text-accent" />
+  <p class="text-lg font-semibold">This article is scheduled</p>
+  <p class="mt-2 text-muted">
+    It goes live on <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>.
+    In the meantime, see
+    <!-- WCAG 1.4.3 + 1.4.1: this link sits OUTSIDE `.prose`, so it doesn't inherit the
+         `.prose :where(a)` --accent-strong rule. Plain `--accent` (.text-accent) is only 3.46:1 on
+         white → fails AA 4.5:1 for normal text in the LIGHT theme; and a color-only-at-rest link
+         (hover-only underline) fails 1.4.1 since accent-vs-muted-text is ~1.6:1, well under G183's
+         3:1. Fix: --accent-strong (5.03:1 light / 9.89:1 dark) + a PERSISTENT underline as the
+         non-color affordance. -->
+    <a href="/calendar" class="font-medium text-[var(--accent-strong)] underline underline-offset-2 hover:no-underline">what's coming next</a>.
+  </p>
+</div>

@@ -7,6 +7,13 @@ import remarkCallouts from './src/lib/remark-callouts.mjs';
 import rehypeTables from './src/lib/rehype-tables.mjs';
 import rehypeLinkExternal from './src/lib/rehype-link-external.mjs';
 import shikiCodeTitle from './src/lib/shiki-code-title.mjs';
+import { scheduledPostSlugs, postSlugFromUrl } from './src/lib/scheduled-slugs.mjs';
+
+// Scheduled (future-dated) posts build a `noindex` teaser page for shareable pre-publish previews
+// (see getRenderablePosts in src/lib/content.ts) but must NOT appear in the sitemap until they
+// reveal — otherwise the deploy guard in .github/workflows/deploy.yml would treat the teaser URL as
+// already-live and never deploy the pubDate reveal. Frozen once at config load (= build start).
+const scheduled = scheduledPostSlugs();
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,7 +26,16 @@ export default defineConfig({
     '/post/getting-started-with-anypoint-code-builder':
       '/post/getting-started-with-anypoint-code-builder-in-vs-code-beginner-guide',
   },
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({
+      // Drop scheduled posts' teaser URLs; keep everything else. See `scheduled` above.
+      filter: (url) => {
+        const slug = postSlugFromUrl(url);
+        return !(slug && scheduled.has(slug));
+      },
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

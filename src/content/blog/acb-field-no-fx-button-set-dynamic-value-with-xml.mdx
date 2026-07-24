@@ -1,0 +1,143 @@
+---
+title: "No fx button on an ACB field? Set a dynamic value in the XML"
+description: >-
+  A field in Anypoint Code Builder has no fx button? Set the dynamic value in the flow XML with a
+  #[] expression, and read properties with Mule::p() instead of ${}.
+pubDate: 2026-07-24
+category: Guides
+tags: [MuleSoft, Anypoint Code Builder, DataWeave, Visual Studio Code]
+heroImage: ../../assets/blog/acb-field-no-fx-button-set-dynamic-value-with-xml.png
+faqs:
+  - question: "Why does a field in Anypoint Code Builder have no fx button?"
+    answer: "Two common reasons. Not every field in a connector is expression-enabled in the UI, so some are exposed only as plain text inputs and the visual editor never renders the fx toggle next to them, even though the attribute still accepts a runtime expression. It can also be the connector version, since which fields expose the fx button is defined by the connector itself, so an older version may be missing it on a field a newer release has fixed. It's worth checking Exchange or your `pom.xml` for a newer version first."
+  - question: "How do I set a dynamic value on a field that has no fx button?"
+    answer: "Open the flow's `.xml` file directly and set the attribute by hand with a DataWeave expression wrapped in `#[ ]`, for example `path=\"#[vars.apiVersion ++ '/orders/' ++ payload.orderId]\"`. Everything inside `#[ ]` is DataWeave evaluated at runtime, which is what makes the value dynamic. Replace `path` with the actual attribute name for your connector field."
+  - question: "Is editing the flow XML directly safe, or does it bypass the runtime?"
+    answer: "It's safe. Setting the attribute in the XML is equivalent to what the fx button would have produced, so you're not working around the runtime, just reaching the same setting a different way. After you save, the value shows up on the component in the visual view and the flow runs with your expression."
+  - question: "How do I use a value from a properties file inside the expression?"
+    answer: "Read it with the `Mule::p('property.name')` function inside the `#[ ]`. `Mule::p()` reads the value of a Mule application property from your `.yaml` or `.properties` files (and also system properties or environment variables), so you can treat it like any other DataWeave value, for example `#[Mule::p('orders.api.basePath') ++ payload.orderId]`."
+  - question: "When should I use ${property} versus #[Mule::p('property')]?"
+    answer: "Use `${property}` when a field takes a plain, standalone property value. Switch to `#[Mule::p('property')]` the moment you need to concatenate or transform it, because `${...}` is a static placeholder, not a DataWeave expression, so you can't join it with `++` or mix it with the payload. Both read the same property; only the second is a real DataWeave expression you can build on."
+draft: false
+---
+
+There was a question in the MuleSoft Community Slack workspace about a wall people hit in **Anypoint
+Code Builder (ACB)**: you want to pass a *dynamic* value into a component field, but that field has
+no **fx** button. The fx button (sometimes described as the "f" button) is what flips a field into
+expression mode so you can type DataWeave. No button, no obvious way to make the value dynamic from
+the UI.
+
+The good news: the restriction is only in the visual editor. The underlying Mule XML has no such
+limit, so you can set the value yourself.
+
+## TL;DR
+
+Open the flow's XML and set the attribute inline with a DataWeave expression wrapped in `#[ ]`:
+
+```xml
+<http:request method="GET" path="#[vars.apiVersion ++ '/orders/' ++ payload.orderId]" />
+```
+
+If the value comes from a **properties file** (`.yaml` or `.properties`), read it inside the
+expression with `Mule::p('...')` instead of the `${...}` placeholder syntax, and concatenate with
+`++`:
+
+```xml
+<http:request method="GET" path="#[Mule::p('orders.api.basePath') ++ payload.orderId]" />
+```
+
+Replace `path` with the real attribute name for your connector field. That's the whole trick. The
+rest of this post explains why it works and walks through each piece.
+
+## Why the fx button is sometimes missing
+
+Not every field in a connector is expression-enabled in the UI. Some are exposed only as plain text
+inputs, so the visual editor never renders the fx toggle next to them, even though the attribute
+behind that field will happily accept a runtime expression. It's a gap in the visual layer, not a
+limitation of the runtime.
+
+It can also come down to the **connector version**. Which fields expose the fx button is defined by
+the connector itself, so an **older version** may be missing it on a field that a newer release has
+since fixed. Before anything else, it's worth checking Exchange (or your `pom.xml`) for a newer
+version of the connector and updating it. That alone can bring the button back.
+
+Either way, the fix below works: stop fighting the UI and go one level down.
+
+## Fix it in the XML with `#[ ]`
+
+Every Mule flow is just XML. In ACB you can open the flow's `.xml` file directly and edit the
+attribute by hand. Anywhere Mule accepts an expression, you write it between `#[` and `]`:
+
+```xml
+<http:request method="GET" path="#[vars.apiVersion ++ '/orders/' ++ payload.orderId]" />
+```
+
+A few things to note:
+
+- `path` here is a stand-in. Use whatever the **actual attribute name** is for your connector's
+  field (`path`, `url`, `query`, `fileName`, and so on). Hover the field in the UI or check the
+  connector docs if you're not sure what it maps to.
+- Everything inside `#[ ]` is DataWeave, evaluated **at runtime** for each event, which is exactly
+  what "dynamic" means here. You get the full language: variables (`vars.*`), the incoming message
+  (`payload`, `attributes`), functions, and `++` for concatenation.
+- Setting the attribute in the XML is equivalent to what the fx button would have produced. You're
+  not working around the runtime, you're just reaching the same setting a different way.
+
+Once you save, switch back to the visual view. The value shows up on the component, and the flow runs
+with your expression.
+
+> [!TIP]
+> If you're not sure which attribute a UI field writes to, set a placeholder value in the visual
+> editor first, then open the XML and look for it. Now you know the exact attribute name to make
+> dynamic.
+
+## When the value lives in a properties file: use `Mule::p()`
+
+A very common case is that part of the dynamic value isn't computed from the payload but read from
+configuration, like a base URL that changes per environment. In the UI, connector fields can
+consume properties with the `${...}` placeholder syntax:
+
+```xml
+<http:request method="GET" path="${orders.api.basePath}" />
+```
+
+That works fine on its own. But the moment you need to **combine** that property with something else,
+`${...}` gets awkward, because it isn't a DataWeave expression, it's a static placeholder. You can't
+concatenate it with `++` or mix it with the payload.
+
+The clean way is to move the property *inside* the expression with the `Mule::p()` function.
+`Mule::p('property.name')` reads the value of a Mule application property (from your `.yaml` /
+`.properties` files, and also system properties or environment variables), so you can treat it like
+any other DataWeave value:
+
+```xml
+<http:request method="GET" path="#[Mule::p('orders.api.basePath') ++ payload.orderId]" />
+```
+
+Now the base path comes from configuration and the order ID comes from the payload, joined at
+runtime. Same idea works with variables or literals:
+
+```xml
+<http:request method="GET" path="#[Mule::p('orders.api.basePath') ++ '/' ++ vars.orderId]" />
+```
+
+> [!NOTE]
+> Rule of thumb: use `${property}` when a field takes a **plain, standalone** property value, and
+> switch to `#[Mule::p('property')]` the moment you need to **concatenate or transform** it. Both
+> read the same property; only the second one is a real DataWeave expression you can build on.
+
+## Quick recap
+
+- No fx button on a field just means the visual editor won't let you type an expression there. The
+  attribute still accepts one.
+- First check Exchange or your `pom.xml` for a newer connector version, since an older one can be
+  the reason the button is missing.
+- Open the flow XML and set the attribute inline: `attr="#[ your expression ]"`.
+- For values from a properties file, read them with `Mule::p('name')` inside the `#[ ]` (instead of
+  `${...}`) so you can concatenate and transform them.
+
+A small trick, but it turns "this field won't let me" into "this field does exactly what I need."
+
+I hope this was helpful.
+
+💬 Prost! 🍻
