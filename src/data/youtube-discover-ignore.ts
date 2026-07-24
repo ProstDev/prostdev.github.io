@@ -17,6 +17,7 @@
 // This list only silences the discover nudge; it has NO effect on the live site or the catalog.
 
 export const DISCOVER_IGNORE_IDS: string[] = [
+  '07RgkWzH_s8', // 3 AIs mocked MuleSoft data — only 2 made it last 👀 #mulesoft (Short)
   'pgiwM8TH4sA', // using docker compose to create an instant mysql installation locally! #mulesoft #acb #docker #mysql
   '6RhN2O_CQ1k', // #mulesoft #acb #anypointcodebuilder #technology #tech
   'dEeUCDjsADg', // Here’s your best friend in ACB: the Command Palette. #mulesoft #coding

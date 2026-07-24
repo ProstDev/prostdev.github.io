@@ -206,8 +206,17 @@ async function fetchVideos(ids, key) {
   return map;
 }
 
+// A YouTube Short is a vertical clip that historically capped at 60s (now up to 3 min). The
+// Data API exposes no "isShort" flag, so we treat duration ≤ this as a Short and DROP it from
+// discovery — the channel's real tutorials are all multi-minute, so 60s is a safe, false-positive-
+// free cutoff. Shorts are teasers/promos deliberately kept OUT of the curated catalog (they'd
+// otherwise flood the tracking issue and can't be sensibly authored via /add-video).
+const SHORT_MAX_SECONDS = 60;
+
 // Channel uploads not in the catalog. Cheap path only: channels.list → uploads playlist
 // → playlistItems paging (1 unit each). NEVER search.list (100 units + eventually-consistent).
+// Shorts (duration ≤ SHORT_MAX_SECONDS) are dropped: playlistItems has no duration, so we do one
+// batched videos.list (1 unit / 50) over the candidates to get contentDetails.
 async function discover(key, knownIds) {
   const ch = await fetchJson(`${API}/channels?part=contentDetails&forHandle=${HANDLE}&key=${key}`);
   const uploads = ch.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
@@ -226,7 +235,16 @@ async function discover(key, knownIds) {
     pageToken = data.nextPageToken ?? '';
     await sleep(DELAY_MS);
   } while (pageToken);
-  return found;
+
+  if (!found.length) return found;
+  // Drop Shorts: fetch durations for the candidates and keep only genuine long-form uploads. A
+  // video the API doesn't return a parseable duration for (livestream, still-processing) is KEPT —
+  // we only silence something we can positively identify as a Short.
+  const durations = await fetchVideos(found.map((v) => v.id), key);
+  return found.filter((v) => {
+    const secs = isoDurationToSeconds(durations.get(v.id)?.contentDetails?.duration);
+    return secs == null || secs > SHORT_MAX_SECONDS;
+  });
 }
 
 // ---- diff (pure) ----
@@ -261,9 +279,14 @@ function computeDiff(catalog, apiMap, now = new Date()) {
     }
 
     if (apiDate) {
+      // The catalog may store a precise premiere timestamp (`2026-07-14T11:35:00Z`, with a
+      // reveal-time comment) while the API only reports the date — normalize BOTH to the UTC
+      // YYYY-MM-DD so extra time precision isn't a false "differs" flag; only a genuine
+      // different-day mismatch surfaces.
+      const catDate = publishedToDate(v.publishedAt);
       if (!v.publishedAt) {
         findings.push({ kind: 'published_fill', youtubeId: v.youtubeId, slug: v.slug, to: apiDate });
-      } else if (v.publishedAt !== apiDate) {
+      } else if (catDate !== apiDate) {
         findings.push({ kind: 'published_drift', youtubeId: v.youtubeId, slug: v.slug, from: v.publishedAt, to: apiDate });
       }
     }
