@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import { getPosts, getSkills, getTags, getCategories, tagUrl, categoryUrl } from '@/lib/content';
+import { getPosts, getTags, getCategories, tagUrl, categoryUrl } from '@/lib/content';
 import { PLAYLISTS, videosInPlaylist } from '@/data/videos';
+import { RESOURCES, RESOURCE_TYPE_LABEL } from '@/data/resources';
 import { SITE } from '@/config';
 
 /**
@@ -9,7 +10,6 @@ import { SITE } from '@/config';
  */
 export const GET: APIRoute = async () => {
   const posts = await getPosts();
-  const skills = await getSkills();
   const categories = await getCategories();
   const tags = await getTags();
 
@@ -45,16 +45,19 @@ export const GET: APIRoute = async () => {
   }
   lines.push('');
 
-  // Claude Code skills — reusable AI-agent skills the author shares (not site build tooling).
-  if (skills.length) {
-    lines.push('## Claude Code skills');
+  // Community resources — community-built MuleSoft tooling Alex Martinez recommends. Each links
+  // straight to its off-site store/repo (no on-site page).
+  if (RESOURCES.length) {
+    lines.push('## Community resources');
     lines.push('');
     lines.push(
-      'Reusable Claude Code / AI-agent skills Alex Martinez uses and shares. Each has a machine-readable Markdown version (append `.md` to its URL).'
+      'Community-built MuleSoft tools Alex Martinez uses and recommends — Chrome/VSCode extensions, themes, and reusable AI agent skills.'
     );
     lines.push('');
-    for (const s of skills) {
-      lines.push(`- [${s.data.title}](${SITE.url}/skill/${s.id}): ${s.data.description}`);
+    for (const r of RESOURCES) {
+      if (r.url === '#') continue; // skip placeholders that aren't live yet
+      const by = r.authors?.length ? ` (by ${r.authors.map((a) => a.name).join(' and ')})` : '';
+      lines.push(`- [${r.title}](${r.url}) — ${RESOURCE_TYPE_LABEL[r.type]}${by}: ${r.description}`);
     }
     lines.push('');
   }

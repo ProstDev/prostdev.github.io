@@ -1,0 +1,90 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ResourceCard from '@/components/ResourceCard.astro';
+import { RESOURCES, RESOURCE_TYPE_LABEL, type ResourceType } from '@/data/resources';
+
+// Filter chips = the distinct resource types present, in the enum's declared order (stable UI),
+// with "All" first. Each chip filters by type label; cards carry their type as a data attribute.
+const typeOrder = Object.keys(RESOURCE_TYPE_LABEL) as ResourceType[];
+// A resource counts toward every type it belongs to — its primary `type` plus any `secondaryTypes`
+// (so e.g. an IDE-that's-also-a-VSCode-extension shows under both chips).
+const resourceTypes = (r: (typeof RESOURCES)[number]): ResourceType[] => [
+  r.type,
+  ...(r.secondaryTypes ?? []),
+];
+const presentTypes = typeOrder.filter((t) => RESOURCES.some((r) => resourceTypes(r).includes(t)));
+---
+<BaseLayout
+  title="Resources"
+  description="Community-built MuleSoft tools I use and recommend — Chrome extensions, VSCode extensions and themes, and reusable AI agent skills. Each links straight to its store or repo."
+>
+  <div class="py-10">
+    <header class="mb-10 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Resources</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-muted">
+        Community-built MuleSoft tools I use and recommend — Chrome extensions, VSCode extensions and
+        themes, and reusable AI agent skills. Everything links straight to its store or repo, and
+        the list is machine-readable via
+        <a href="/llms.txt" class="text-accent hover:underline">llms.txt</a>.
+      </p>
+    </header>
+
+    {RESOURCES.length === 0 ? (
+      <p class="rounded-xl border border-dashed border-default p-10 text-center text-muted">
+        No resources yet — check back soon!
+      </p>
+    ) : (
+      <>
+        <!-- Type filters -->
+        {presentTypes.length > 1 && (
+          <div class="mb-8 flex flex-wrap items-center gap-2">
+            <span class="text-sm font-semibold text-default">Type:</span>
+            <button
+              type="button"
+              data-type="All"
+              class="type-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+              data-active="true"
+            >
+              All
+            </button>
+            {presentTypes.map((t) => (
+              <button
+                type="button"
+                data-type={t}
+                class="type-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+              >
+                {RESOURCE_TYPE_LABEL[t]}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div id="resource-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {RESOURCES.map((resource) => (
+            <div class="resource-item h-full" data-type={resourceTypes(resource).join(' ')}>
+              <ResourceCard resource={resource} />
+            </div>
+          ))}
+        </div>
+      </>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.type-filter-btn');
+  const items = document.querySelectorAll<HTMLElement>('.resource-item');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.type;
+      buttons.forEach((b) => b.removeAttribute('data-active'));
+      btn.setAttribute('data-active', 'true');
+      items.forEach((item) => {
+        // data-type is a space-separated list (primary + secondary types).
+        const types = (item.dataset.type ?? '').split(' ');
+        const show = type === 'All' || (type !== undefined && types.includes(type));
+        item.classList.toggle('hidden', !show);
+      });
+    });
+  });
+</script>

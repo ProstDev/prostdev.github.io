@@ -50,7 +50,7 @@ describe('renderMarkdown — header block', () => {
   });
 });
 
-describe('renderMarkdown — headerRule (posts & skills)', () => {
+describe('renderMarkdown — headerRule (posts)', () => {
   it('appends a `---` after the meta and attaches the first section with a SINGLE newline', () => {
     const out = renderMarkdown({
       ...base,

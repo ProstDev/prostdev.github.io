@@ -1,8 +1,8 @@
 /**
  * schema.org JSON-LD builders — the one home for structured-data shape.
  *
- * Four routes (post / skill / tag / category) hand-built an identical `BreadcrumbList`,
- * and post+skill re-typed the same author/publisher entities, tag+category the same
+ * Several routes (post / tag / category) hand-built an identical `BreadcrumbList`,
+ * and posts re-typed the same author/publisher entities, tag+category the same
  * `CollectionPage`+`ItemList`. A schema.org tweak meant N synchronized edits, and the
  * boilerplate buried each page's real logic. These builders concentrate that knowledge so
  * a route's frontmatter reads as intent (`buildBreadcrumbList([{ name, url }])`) not plumbing.
@@ -43,8 +43,8 @@ export function buildBreadcrumbList(trail: Crumb[]): Record<string, unknown> {
 
 /**
  * The `author` (Person) + `publisher` (Organization) pair shared by the Article schemas.
- * Spread into a `BlogPosting`/`TechArticle` object. `author` defaults to the site owner
- * (skills are always Alex); posts pass their per-post byline.
+ * Spread into a `BlogPosting`/`TechArticle` object. `author` defaults to the site owner;
+ * posts pass their per-post byline.
  */
 export function byline(author: string = SITE.author): {
   author: Record<string, unknown>;

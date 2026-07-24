@@ -1,5 +1,5 @@
 /**
- * Document model for the machine-readable `.md` endpoints (post / skill / video).
+ * Document model for the machine-readable `.md` endpoints (post / video).
  *
  * These endpoints all emit the same shape — an `# H1`, a `> blockquote`
  * description, a bullet list of metadata, then a series of `## sections` — but
@@ -14,7 +14,7 @@
  * per-type branch.
  *
  * The output is byte-for-byte what the endpoints emitted before, including one
- * historical quirk: on posts & skills the header's `---` divider is followed by
+ * historical quirk: on posts the header's `---` divider is followed by
  * a SINGLE newline (`headerRule`), whereas every divider BETWEEN sections uses a
  * blank line on each side (`rule`).
  */
@@ -45,7 +45,7 @@ export interface MarkdownDoc {
   meta: Array<MetaItem | null | false | undefined>;
   /**
    * Emit a `---` after the meta list; the first section then attaches directly
-   * beneath it with a single newline (posts & skills). Omit for docs that flow
+   * beneath it with a single newline (posts). Omit for docs that flow
    * straight into their first `##` section with a blank line (videos).
    */
   headerRule?: boolean;

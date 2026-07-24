@@ -87,31 +87,6 @@ const TAGS = [
   'Visual Studio Code',
 ] as const;
 
-/**
- * Canonical tag vocabulary for the SKILLS collection — a SEPARATE list from the blog `TAGS`
- * (AI-skill topics like Claude Code / MDX / AEO are a different vocabulary from MuleSoft/DataWeave).
- * Like `TAGS`, it's a z.enum, so an un-approved/mistyped skill tag FAILS the build (content sync)
- * naming the offending file — this is what keeps skill-tag sprawl from creeping back. To introduce
- * a NEW tag, add it here first, then use it. Keep alphabetized (case-insensitive); preserve
- * brand/acronym casing (CLAUDE.md, JSON-LD, MDX, SEO, AEO…). See the `add-skill` skill.
- */
-const SKILL_TAGS = [
-  'Accessibility',
-  'AEO',
-  'Claude Code',
-  'CLAUDE.md',
-  'Configuration',
-  'Context',
-  'Git',
-  'JSON-LD',
-  'Maintenance',
-  'MDX',
-  'SEO',
-  'Technical Writing',
-  'Tutorials',
-  'Workflow',
-] as const;
-
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
   schema: ({ image }) =>
@@ -192,42 +167,5 @@ const transcripts = defineCollection({
     .passthrough(),
 });
 
-/**
- * Shared library of Claude Code / AI-agent SKILLS the author uses — NOT an auto-mirror of the
- * `.claude/` tooling that builds this site (that's a private submodule the build can't read).
- * Each entry is a hand-authored MDX page in `src/content/skills/`, with the verbatim `SKILL.md`
- * pasted into a fenced code block for readers to see + copy. See `/skills`.
- *
- * `tags` is a z.enum over `SKILL_TAGS` (a SEPARATE vocabulary from the blog `TAGS` — AI-skill
- * topics like Claude Code / MDX / AEO, not MuleSoft/DataWeave). Like the blog, an un-approved tag
- * fails the build naming the file; add new tags to `SKILL_TAGS` first.
- */
-const skills = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/skills' }),
-  schema: ({ image }) =>
-    z.object({
-      /**
-       * Canonical, invocable skill name (kebab-case, e.g. `add-faqs`). Stays the source of truth
-       * for MACHINE surfaces (URL slug, `.md` endpoint heading, `llms.txt`) — AIs need the exact
-       * name they'd invoke. Humans see `displayName` on the cards / detail header instead.
-       */
-      title: z.string(),
-      /** Human-friendly headline shown on the visible catalog card + detail page (e.g. "Add FAQs").
-       *  Falls back to `title` when absent. Never used on the machine-readable endpoints. */
-      displayName: z.string().optional(),
-      description: z.string(),
-      /** Short hook shown under the title on the detail page. */
-      tagline: z.string().optional(),
-      difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
-      tags: z.array(z.enum(SKILL_TAGS)).default([]),
-      heroImage: image().optional(),
-      /** Optional Icon.astro name rendered on the card/detail header. */
-      icon: z.string().optional(),
-      pubDate: z.coerce.date(),
-      updatedDate: z.coerce.date().optional(),
-      draft: z.boolean().default(false),
-    }),
-});
-
-export const collections = { blog, transcripts, skills };
-export { CATEGORIES, TAGS, SKILL_TAGS };
+export const collections = { blog, transcripts };
+export { CATEGORIES, TAGS };

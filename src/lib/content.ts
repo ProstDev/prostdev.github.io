@@ -146,18 +146,6 @@ export function postUrl(id: string): string {
   return `/post/${id}`;
 }
 
-/** All non-draft (in prod) skills, ordered alphabetically by title. */
-export async function getSkills(): Promise<CollectionEntry<'skills'>[]> {
-  const skills = await getCollection('skills', ({ data }) =>
-    isProd ? data.draft !== true : true
-  );
-  return skills.sort((a, b) => a.data.title.localeCompare(b.data.title));
-}
-
-export function skillUrl(id: string): string {
-  return `/skill/${id}`;
-}
-
 /**
  * Resolve a series' registry slugs to renderable parts {slug, title, position, isCurrent},
  * pulling each post's display title from the blog collection at build time (the registry in

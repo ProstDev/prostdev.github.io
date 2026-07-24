@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import { RESOURCE_TYPE_LABEL, RESOURCE_TYPE_ICON, resourceIcon, type Resource } from '@/data/resources';
+import Icon from './Icon.astro';
+
+interface Props {
+  resource: Resource;
+}
+const { resource } = Astro.props;
+const { title, type, secondaryTypes, url, description, note, authors, image } = resource;
+const typeLabel = RESOURCE_TYPE_LABEL[type];
+const iconName = resourceIcon(resource);
+// A "#" url is an intentional placeholder (a resource that isn't live yet) — render the title as
+// plain text, not a broken link.
+const isPlaceholder = url === '#';
+---
+<article class="group flex h-full flex-col overflow-hidden rounded-xl border border-default bg-surface-card transition-shadow hover:shadow-md">
+  <!-- 16:9 cover: a real logo/screenshot when the entry has one, else a generated brand-gradient
+       cover with the type's icon watermark (so every card carries a consistent visual anchor). -->
+  {isPlaceholder ? (
+    <div class="aspect-video w-full shrink-0 overflow-hidden">
+      {image ? (
+        <Image src={image} alt={`${title} cover`} width={640} height={360} class="block h-full w-full object-cover" />
+      ) : (
+        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700">
+          <Icon name={iconName} class="h-16 w-16 text-white opacity-90" />
+        </div>
+      )}
+    </div>
+  ) : (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener"
+      aria-label={`Open ${title} — ${typeLabel} (opens in a new tab)`}
+      class="block aspect-video w-full shrink-0 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+    >
+      {image ? (
+        <Image src={image} alt={`${title} cover`} width={640} height={360} class="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+      ) : (
+        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700">
+          <Icon name={iconName} class="h-16 w-16 text-white opacity-90 transition-transform duration-300 group-hover:scale-110" />
+        </div>
+      )}
+    </a>
+  )}
+
+  <div class="flex flex-1 flex-col p-5">
+    <div class="mb-2 flex flex-wrap items-center gap-1.5">
+      <span class="inline-flex items-center gap-1 rounded-full bg-[var(--accent-strong)] px-2.5 py-0.5 text-xs font-semibold text-[var(--accent-contrast)]">
+        <Icon name={iconName} class="h-3.5 w-3.5" />
+        {typeLabel}
+      </span>
+      {secondaryTypes?.map((t) => (
+        <span class="inline-flex items-center gap-1 rounded-full border border-default px-2.5 py-0.5 text-xs font-semibold text-muted">
+          <Icon name={RESOURCE_TYPE_ICON[t]} class="h-3.5 w-3.5" />
+          {RESOURCE_TYPE_LABEL[t]}
+        </span>
+      ))}
+    </div>
+
+    <h3 class="text-lg font-bold leading-snug">
+      {isPlaceholder ? (
+        <span class="text-default">{title}</span>
+      ) : (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener"
+          aria-label={`Open ${title} — ${typeLabel} (opens in a new tab)`}
+          class="inline-flex items-center gap-1.5 text-default transition-colors group-hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+        >
+          {title}
+          <Icon name="external" class="h-4 w-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+        </a>
+      )}
+    </h3>
+
+    <p class="mt-2 text-sm text-muted">{description}</p>
+    {note && <p class="mt-2 text-sm text-muted">{note}</p>}
+
+    {authors && authors.length > 0 && (
+      <p class="mt-auto pt-4 text-xs text-muted">
+        by{' '}
+        {authors.map((a, i) => (
+          <>
+            {i > 0 && (i === authors.length - 1 ? ' and ' : ', ')}
+            {a.url ? (
+              <a
+                href={a.url}
+                target="_blank"
+                rel="noopener"
+                aria-label={`${a.name}'s profile (opens in a new tab)`}
+                class="font-medium text-[var(--accent-strong)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              >
+                {a.name}
+              </a>
+            ) : (
+              <span class="font-medium text-default">{a.name}</span>
+            )}
+          </>
+        ))}
+      </p>
+    )}
+  </div>
+</article>

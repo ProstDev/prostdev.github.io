@@ -14,7 +14,7 @@ export const SITE = {
 /** Primary navigation. `match` is used to highlight the active link. */
 export const NAV: { label: string; href: string }[] = [
   { label: 'Blog', href: '/blog' },
-  { label: 'Skills', href: '/skills' },
+  { label: 'Resources', href: '/resources' },
   { label: 'Videos', href: '/videos' },
   { label: 'New to Mule', href: '/mulesoft-from-start' },
   { label: 'Learn ACB', href: '/learn-acb' },
