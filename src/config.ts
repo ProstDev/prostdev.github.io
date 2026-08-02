@@ -14,11 +14,11 @@ export const SITE = {
 /** Primary navigation. `match` is used to highlight the active link. */
 export const NAV: { label: string; href: string }[] = [
   { label: 'Blog', href: '/blog' },
-  { label: 'Resources', href: '/resources' },
   { label: 'Videos', href: '/videos' },
   { label: 'New to Mule', href: '/mulesoft-from-start' },
   { label: 'Learn ACB', href: '/learn-acb' },
   { label: 'MuleSoft + AI', href: '/mulesoft-ai' },
+  { label: 'Resources', href: '/resources' },
 ];
 
 export const SOCIAL = {
