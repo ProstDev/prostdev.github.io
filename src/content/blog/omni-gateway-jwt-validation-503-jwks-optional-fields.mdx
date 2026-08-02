@@ -1,0 +1,153 @@
+---
+title: "503s after adding the JWT Validation policy on an Omni Gateway MCP server? The \"optional\" JWKS fields aren't optional"
+description: >-
+  Securing an MCP server on Omni Gateway with the JWT Validation policy and getting only 503s with no
+  logs? The new-UI JWKS Caching TTL and connection timeout fields are marked optional but the policy
+  engine treats them as required. Fill them in.
+pubDate: 2026-08-02
+category: Guides
+tags: [MuleSoft, Flex Gateway, JWT, Security]
+heroImage: ../../assets/blog/omni-gateway-jwt-validation-503-jwks-optional-fields.png
+faqs:
+  - question: "Why does the JWT Validation policy return a 503 with no logs on Omni Gateway?"
+    answer: "When JWKS is the key origin and the JWKS Caching TTL and JWKS Service connection timeout fields are left blank, the policy engine fails to configure the extension at startup with `Invalid configuration: JWKS service URL, timeout and cache time to live must be set`. Because the failure happens while the policy is being applied, the gateway returns a 503 on every request and the rejection can happen too early in the pipeline to produce the log you'd expect. Set both fields and the 503s stop."
+  - question: "The JWKS Caching TTL and connection timeout fields are marked Optional. Why do I have to fill them in?"
+    answer: "The new policy-configuration UI marks JWKS Caching TTL (minutes) and JWKS Service connection timeout (milliseconds) as optional and leaves them blank, but the policy engine treats them as required whenever JWKS is selected as the key origin. So the UI lets you save a config the engine then rejects. The traditional UI fills in default values for both, which is why it works and the new UI doesn't."
+  - question: "How do I fix the JWKS 503 on the JWT Validation policy?"
+    answer: "Explicitly set both fields even though they're marked optional, for example `jwksServiceTimeToLive: 60` (minutes) and `jwksServiceConnectionTimeout: 10000` (milliseconds). Or configure the policy with the traditional UI, which populates the default values automatically."
+  - question: "Why does the same JWT Validation policy work on my REST APIs but not my MCP server?"
+    answer: "It's almost certainly which UI each one was configured in, not anything about MCP or SSE. REST APIs configured earlier through the traditional UI got the JWKS timeout and cache-TTL defaults filled in automatically, so they work. A newer MCP server set up through the new UI leaves those fields blank, so the policy fails to configure and returns 503."
+draft: false
+---
+
+Another question in the **MuleSoft Community Slack** workspace, and this one got troubleshot by
+Slackbot for a good while before we finally landed on the real answer. The setup: someone secured an
+**MCP server on Omni Gateway** with the **JWT Validation** policy, and the moment the policy went on,
+every request came back **503**. The same policy and configuration was already working fine on their
+REST APIs, which made it extra confusing.
+
+Slackbot (which, fun fact, runs on Sonnet, same as MuleSoft Vibes) offered a very reasonable-looking
+checklist: JWKS fetch failures, Gatekeeper blocking on a bad policy, SSE handshake quirks, policy
+ordering for MCP. All plausible. None of them were it. The actual cause turned out to be much more
+boring, and it was hiding in a single log line.
+
+> [!NOTE]
+> This is a good reminder that an AI's tidy checklist is a starting point, not a diagnosis. The thing
+> that actually solved it was reading the logs.
+
+## TL;DR
+
+If you configured the JWT Validation policy with **JWKS** as the key origin using the **new UI**, the
+two fields **JWKS Caching TTL (minutes)** and **JWKS Service connection timeout (milliseconds)** are
+marked *Optional* and left blank. The policy engine treats them as **required**, so it fails to apply
+and you get a 503 on every request.
+
+The fix: fill both in. Either set them explicitly:
+
+```yaml
+jwksServiceTimeToLive: 60            # minutes
+jwksServiceConnectionTimeout: 10000  # milliseconds
+```
+
+Or configure the policy with the **traditional UI**, which populates those defaults for you
+automatically.
+
+## The symptom: a 503 on every request, and no useful log
+
+The tell here is the combination:
+
+- Add the JWT Validation policy, and **every** request returns **503**, including the initial
+  connection.
+- Remove the policy, and the server responds normally again, so the policy is clearly the cause.
+- There is **no error in the gateway logs** pointing at anything obvious. It just fails.
+
+That last part is what sends people down the wrong path. A 503 with no log feels like a networking or
+streaming problem, so it's tempting to start poking at SSE, the MCP handshake, or how your client
+sends the token.
+
+## The red herrings
+
+Because MCP servers use **Server-Sent Events (SSE)**, and because JWT on a streaming connection
+genuinely does have quirks, the plausible theories pile up fast:
+
+- Maybe the Bearer token isn't present on the initial SSE handshake.
+- Maybe **policy ordering** is wrong and JWT is running before the MCP Support policy.
+- Maybe the JWKS endpoint isn't reachable from the gateway.
+
+These are all real things that *can* cause problems, which is exactly why they're such convincing
+dead ends. In this case they weren't the issue. The token was being sent, the ordering was fine, and
+the JWKS URL was reachable. The policy simply never finished configuring itself.
+
+## The actual cause: one log line
+
+The breakthrough was finding this in the logs:
+
+```text
+failed to configure extension: Invalid configuration: JWKS service URL, timeout and cache time to live must be set
+```
+
+There it is. The policy engine is saying it needs three things to stand up the JWKS extension: the
+service URL, a **timeout**, and a **cache time to live**. The URL was set. The other two were not,
+because the new UI left them blank and told everyone that was fine.
+
+Here's the trap. In the new policy-configuration UI, these two fields are labeled as optional:
+
+- **JWKS Caching TTL (minutes) (Optional)**
+- **JWKS Service connection timeout (milliseconds) (Optional)**
+
+So you fill in your JWKS URL, leave the "optional" fields empty, save, and everything *looks* correct.
+But the engine treats both as **required** whenever JWKS is the key origin. The UI happily lets you
+save a configuration the engine then refuses to apply, and because that failure happens while the
+policy is being brought up, you get a 503 before any request-level logging kicks in.
+
+> [!WARNING]
+> "Optional" in this UI means "the form won't stop you from saving it blank," not "the engine will
+> accept it blank." When JWKS is your key origin, both of these fields are effectively required.
+
+## The fix
+
+Set both fields, even though the UI says you don't have to:
+
+```yaml
+jwksServiceTimeToLive: 60            # minutes
+jwksServiceConnectionTimeout: 10000  # milliseconds
+```
+
+Save, and the policy configures cleanly. The 503s stop and the JWT Validation policy starts doing its
+actual job.
+
+If you'd rather not hand-set them, configure the policy through the **traditional UI** instead. It
+fills in sensible defaults for both the caching TTL and the connection timeout automatically, so the
+policy applies without you touching them.
+
+## Why it worked on REST APIs but not the MCP server
+
+This is the part that makes the whole thing click. The reason the **same** policy config worked on
+the REST APIs and failed on the MCP server had nothing to do with MCP, SSE, or the token at all:
+
+- The REST APIs were configured **earlier**, through the **traditional UI**, so the JWKS timeout and
+  cache-TTL defaults were populated for them.
+- The MCP server was a **newer** setup configured through the **new UI**, which left those fields
+  blank.
+
+Same policy, same JWKS origin, two different UIs, and only one of them filled in the required
+defaults. That's the whole mystery.
+
+## Quick recap
+
+- A JWT Validation policy that returns **503 on every request with no useful log**, right after you
+  add it, is very likely failing to configure, not failing at request time.
+- Check the logs for `failed to configure extension: Invalid configuration: JWKS service URL, timeout
+  and cache time to live must be set`.
+- The new UI marks **JWKS Caching TTL** and **JWKS Service connection timeout** as *Optional* but the
+  engine requires them when JWKS is the key origin. Fill both in (for example `60` minutes and
+  `10000` ms), or use the traditional UI, which sets the defaults for you.
+- If the same policy works on an older API but not a newer one, suspect **which UI each was
+  configured in** before you suspect anything about MCP or SSE.
+
+Worth flagging to MuleSoft support too, since the new UI should really either populate these defaults
+or enforce the fields as required when JWKS is selected.
+
+I hope this was helpful.
+
+💬 Prost! 🍻
