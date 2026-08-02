@@ -33,6 +33,7 @@ import dataweaveStudioCover from '@/assets/resources/dataweave-studio.png';
 import dwcodeCover from '@/assets/resources/dwcode.png';
 import mulefdCover from '@/assets/resources/mulefd.png';
 import integrationTrailsCover from '@/assets/resources/integration-trails.png';
+import upendraMulesoftToolsCover from '@/assets/resources/upendra-mulesoft-tools.png';
 
 export type ResourceType =
   | 'chrome-extension'
@@ -188,6 +189,15 @@ export const RESOURCES: Resource[] = [
     authors: [{ name: 'Matt Pocock', url: 'https://www.linkedin.com/in/mapocock/' }],
   },
   {
+    id: 'mule-xml-formatter',
+    title: 'Mule XML Formatter',
+    type: 'vscode-extension',
+    url: 'https://marketplace.visualstudio.com/items?itemName=SravanNerella.mule-xml-formatter',
+    description:
+      'A VSCode extension that formats Mule XML config files consistently — tidying indentation and structure so your flow XML stays clean and readable.',
+    authors: [{ name: 'Sravan Nerella', url: 'https://www.linkedin.com/in/sravan-nerella/' }],
+  },
+  {
     id: 'mulefd',
     title: 'MuleFD',
     type: 'tool',
@@ -219,6 +229,18 @@ export const RESOURCES: Resource[] = [
       'The AI agent skills I use for MuleSoft content and development, packaged so you can install and run them yourself.',
     image: prostdevSkillsCover,
     authors: [{ name: 'Alex Martinez', url: 'https://www.linkedin.com/in/alexandra-n-martinez/' }],
+  },
+  {
+    id: 'upendra-mulesoft-tools',
+    title: "Upendra's MuleSoft Tools",
+    type: 'tool',
+    url: 'https://upendra-thunuguntla.github.io/#tools',
+    description:
+      'A growing collection of free, browser-based MuleSoft dev tools — a Secure Properties generator, JSON↔RAML and RAML↔OAS converters, YAML↔Properties converters, a MuleSoft log to cURL converter, a Mule XML SDK helper, a cron expression builder, and more.',
+    image: upendraMulesoftToolsCover,
+    authors: [
+      { name: 'Upendra Thunuguntla', url: 'https://www.linkedin.com/in/upendra-thunuguntla/' },
+    ],
   },
   // TODO: try it first, then add. FlowSpace — https://nqnconsulting.com/flowspace
   // by NQN Consulting (https://www.linkedin.com/in/nqnconsulting/). Type + description TBD.
