@@ -11,6 +11,9 @@
  *      RESOURCES array) with a unique `id`, its `title`, `type`, off-site `url`, and a
  *      one-to-three-sentence `description`. Add a longer `note` and an `authors` list if useful
  *      (omit `authors` for self-authored entries; a resource can credit more than one creator).
+ *      A `description` states only what's OBSERVABLE (type, what it does, the tools it lists) — do
+ *      NOT repeat a resource's own marketing claims as fact ("runs client-side / no data leaves
+ *      your browser", "fastest", "secure") unless verified; on our site they read as our endorsement.
  *   2. If the `type` is new, add it to ResourceType + RESOURCE_TYPE_LABEL + RESOURCE_TYPE_ICON.
  *   3. (Optional) Give it a real logo: drop the file in `src/assets/resources/`, `import` it at the
  *      top of this file, and set it as the entry's `image`. Without one, the card shows a generated
