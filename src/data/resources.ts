@@ -37,6 +37,7 @@ import dwcodeCover from '@/assets/resources/dwcode.png';
 import mulefdCover from '@/assets/resources/mulefd.png';
 import integrationTrailsCover from '@/assets/resources/integration-trails.png';
 import upendraMulesoftToolsCover from '@/assets/resources/upendra-mulesoft-tools.png';
+import muleySolutionsToolsCover from '@/assets/resources/muley-solutions-tools.png';
 
 export type ResourceType =
   | 'chrome-extension'
@@ -221,6 +222,19 @@ export const RESOURCES: Resource[] = [
     authors: [
       { name: 'Alex Martinez', url: 'https://www.linkedin.com/in/alexandra-n-martinez/' },
       { name: 'NaveenKumar Namachivayam', url: 'https://www.linkedin.com/in/naveenkumarn/' },
+    ],
+  },
+  {
+    id: 'muley-solutions-tools',
+    title: 'Muley Solutions Tools',
+    type: 'tool',
+    url: 'https://muley.solutions/tools',
+    description:
+      'A curated directory of working MuleSoft Agent Fabric and Anypoint Platform tools and interactive demos — agentic asset designers, an Omni Gateway policy marketplace, agent/MCP testing toolkits, network tracers, and connectors — filterable by category and each linking out to the live tool or demo.',
+    image: muleySolutionsToolsCover,
+    authors: [
+      { name: 'Philipp Schöne', url: 'https://www.linkedin.com/in/pschoene/' },
+      { name: 'Farhan Modjdehi', url: 'https://www.linkedin.com/in/farhan-modjdehi/' },
     ],
   },
   {
