@@ -9,6 +9,7 @@ export type IconName =
   | 'youtube'
   | 'github'
   | 'linkedin'
+  | 'slack'
   | 'vscode'
   | 'chrome'
   | 'sun'

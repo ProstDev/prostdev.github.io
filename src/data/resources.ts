@@ -38,6 +38,7 @@ import mulefdCover from '@/assets/resources/mulefd.png';
 import integrationTrailsCover from '@/assets/resources/integration-trails.png';
 import upendraMulesoftToolsCover from '@/assets/resources/upendra-mulesoft-tools.png';
 import muleySolutionsToolsCover from '@/assets/resources/muley-solutions-tools.png';
+import mulesoftCommunitySlackCover from '@/assets/resources/mulesoft-community-slack.png';
 
 export type ResourceType =
   | 'chrome-extension'
@@ -46,6 +47,7 @@ export type ResourceType =
   | 'agent-skills'
   | 'ide'
   | 'challenges'
+  | 'slack'
   | 'tool';
 
 export interface Resource {
@@ -89,6 +91,7 @@ export const RESOURCE_TYPE_LABEL: Record<ResourceType, string> = {
   challenges: 'Challenges',
   'chrome-extension': 'Chrome extension',
   ide: 'IDE',
+  slack: 'Slack',
   tool: 'Tool',
   'vscode-extension': 'VSCode extension',
   'vscode-theme': 'VSCode theme',
@@ -100,6 +103,7 @@ export const RESOURCE_TYPE_ICON: Record<ResourceType, IconName> = {
   challenges: 'trophy',
   'chrome-extension': 'chrome',
   ide: 'terminal',
+  slack: 'slack',
   tool: 'wrench',
   'vscode-extension': 'vscode',
   'vscode-theme': 'vscode',
@@ -236,6 +240,25 @@ export const RESOURCES: Resource[] = [
       { name: 'Philipp Schöne', url: 'https://www.linkedin.com/in/pschoene/' },
       { name: 'Farhan Modjdehi', url: 'https://www.linkedin.com/in/farhan-modjdehi/' },
     ],
+  },
+  {
+    id: 'dataweave-slack',
+    title: 'Official DataWeave Language Slack Workspace',
+    type: 'slack',
+    url: 'https://join.slack.com/t/dataweavelanguage/shared_invite/zt-1ewv2igp0-3ZiqQqaMdO_utwaEjxBpTw',
+    description:
+      'A community Slack workspace focused on the DataWeave language — ask questions, share transforms, and connect with other DataWeave developers. The link is an open invite to join.',
+    authors: [{ name: 'MuleSoft' }],
+  },
+  {
+    id: 'mulesoft-community-slack',
+    title: 'Official MuleSoft Community Slack Workspace',
+    type: 'slack',
+    url: 'https://docs.google.com/forms/d/e/1FAIpQLScfuc3_R8sEl23xLkZBPIs6n7--HFhyuZewJiJKsKzQbnY9HQ/viewform',
+    description:
+      'A community Slack workspace for MuleSoft developers to ask questions, share tips, and connect. The link opens a Google Form to request an invite.',
+    image: mulesoftCommunitySlackCover,
+    authors: [{ name: 'MuleSoft' }],
   },
   {
     id: 'prostdev-skills',
