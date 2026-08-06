@@ -58,3 +58,4 @@ to make money is not. For commercial licensing, contact **alex@prostdev.com**.
 
 Guest-authored posts remain © their respective authors (see each post's `author` field), published
 here under the same noncommercial terms.
+
