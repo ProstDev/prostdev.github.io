@@ -1,13 +1,19 @@
 ---
 import { Image } from 'astro:assets';
-import { RESOURCE_TYPE_LABEL, RESOURCE_TYPE_ICON, resourceIcon, type Resource } from '@/data/resources';
+import {
+  RESOURCE_TYPE_LABEL,
+  RESOURCE_TYPE_ICON,
+  RESOURCE_TAG_LABEL,
+  resourceIcon,
+  type Resource,
+} from '@/data/resources';
 import Icon from './Icon.astro';
 
 interface Props {
   resource: Resource;
 }
 const { resource } = Astro.props;
-const { title, type, secondaryTypes, url, description, note, authors, image } = resource;
+const { title, type, secondaryTypes, tags, url, description, note, authors, image } = resource;
 const typeLabel = RESOURCE_TYPE_LABEL[type];
 const iconName = resourceIcon(resource);
 // A "#" url is an intentional placeholder (a resource that isn't live yet) — render the title as
@@ -79,28 +85,41 @@ const isPlaceholder = url === '#';
     <p class="mt-2 text-sm text-muted">{description}</p>
     {note && <p class="mt-2 text-sm text-muted">{note}</p>}
 
-    {authors && authors.length > 0 && (
-      <p class="mt-auto pt-4 text-xs text-muted">
-        by{' '}
-        {authors.map((a, i) => (
-          <>
-            {i > 0 && (i === authors.length - 1 ? ' and ' : ', ')}
-            {a.url ? (
-              <a
-                href={a.url}
-                target="_blank"
-                rel="noopener"
-                aria-label={`${a.name}'s profile (opens in a new tab)`}
-                class="font-medium text-[var(--accent-strong)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-              >
-                {a.name}
-              </a>
-            ) : (
-              <span class="font-medium text-default">{a.name}</span>
-            )}
-          </>
-        ))}
-      </p>
-    )}
+    <!-- Tags + author pinned to the bottom as one group (matches PostCard's mt-auto meta block) -->
+    <div class="mt-auto">
+      {tags && tags.length > 0 && (
+        <ul class="mt-4 flex flex-wrap gap-1.5" aria-label="Tags">
+          {tags.map((t) => (
+            <li class="rounded-md border border-default px-2 py-0.5 text-xs font-medium text-muted">
+              {RESOURCE_TAG_LABEL[t]}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {authors && authors.length > 0 && (
+        <p class="mt-3 text-xs text-muted">
+          by{' '}
+          {authors.map((a, i) => (
+            <>
+              {i > 0 && (i === authors.length - 1 ? ' and ' : ', ')}
+              {a.url ? (
+                <a
+                  href={a.url}
+                  target="_blank"
+                  rel="noopener"
+                  aria-label={`${a.name}'s profile (opens in a new tab)`}
+                  class="font-medium text-[var(--accent-strong)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                >
+                  {a.name}
+                </a>
+              ) : (
+                <span class="font-medium text-default">{a.name}</span>
+              )}
+            </>
+          ))}
+        </p>
+      )}
+    </div>
   </div>
 </article>

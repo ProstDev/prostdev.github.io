@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getPosts, getTags, getCategories, tagUrl, categoryUrl } from '@/lib/content';
 import { PLAYLISTS, videosInPlaylist } from '@/data/videos';
-import { RESOURCES, RESOURCE_TYPE_LABEL } from '@/data/resources';
+import { RESOURCES, RESOURCE_TYPE_LABEL, RESOURCE_TAG_LABEL } from '@/data/resources';
 import { SITE } from '@/config';
 
 /**
@@ -57,7 +57,12 @@ export const GET: APIRoute = async () => {
     for (const r of RESOURCES) {
       if (r.url === '#') continue; // skip placeholders that aren't live yet
       const by = r.authors?.length ? ` (by ${r.authors.map((a) => a.name).join(' and ')})` : '';
-      lines.push(`- [${r.title}](${r.url}) — ${RESOURCE_TYPE_LABEL[r.type]}${by}: ${r.description}`);
+      const tags = r.tags?.length
+        ? ` [${r.tags.map((t) => RESOURCE_TAG_LABEL[t]).join(', ')}]`
+        : '';
+      lines.push(
+        `- [${r.title}](${r.url}) — ${RESOURCE_TYPE_LABEL[r.type]}${tags}${by}: ${r.description}`
+      );
     }
     lines.push('');
   }

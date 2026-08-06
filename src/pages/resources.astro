@@ -1,11 +1,19 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ResourceCard from '@/components/ResourceCard.astro';
-import { RESOURCES, RESOURCE_TYPE_LABEL, type ResourceType } from '@/data/resources';
+import {
+  RESOURCES,
+  RESOURCE_TYPE_LABEL,
+  RESOURCE_TAG_LABEL,
+  type ResourceType,
+  type ResourceTag,
+} from '@/data/resources';
 
-// Filter chips = the distinct resource types present, in the enum's declared order (stable UI),
-// with "All" first. Each chip filters by type label; cards carry their type as a data attribute.
+// Two filter rows (Type × Tag), AND-combined client-side — buttons only, no /tag/ archive route.
+// Chips = the distinct values present, in each enum's declared order (stable UI), with "All" first.
+// Cards carry their types + tags as space-separated data attributes.
 const typeOrder = Object.keys(RESOURCE_TYPE_LABEL) as ResourceType[];
+const tagOrder = Object.keys(RESOURCE_TAG_LABEL) as ResourceTag[];
 // A resource counts toward every type it belongs to — its primary `type` plus any `secondaryTypes`
 // (so e.g. an IDE-that's-also-a-VSCode-extension shows under both chips).
 const resourceTypes = (r: (typeof RESOURCES)[number]): ResourceType[] => [
@@ -13,6 +21,7 @@ const resourceTypes = (r: (typeof RESOURCES)[number]): ResourceType[] => [
   ...(r.secondaryTypes ?? []),
 ];
 const presentTypes = typeOrder.filter((t) => RESOURCES.some((r) => resourceTypes(r).includes(t)));
+const presentTags = tagOrder.filter((t) => RESOURCES.some((r) => r.tags?.includes(t)));
 ---
 <BaseLayout
   title="Resources"
@@ -59,32 +68,92 @@ const presentTypes = typeOrder.filter((t) => RESOURCES.some((r) => resourceTypes
           </div>
         )}
 
+        <!-- Tag filters (subject) — combines with the Type row (AND) -->
+        {presentTags.length > 1 && (
+          <div class="mb-8 flex flex-wrap items-center gap-2">
+            <span class="text-sm font-semibold text-default">Tag:</span>
+            <button
+              type="button"
+              data-tag="All"
+              class="tag-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+              data-active="true"
+            >
+              All
+            </button>
+            {presentTags.map((t) => (
+              <button
+                type="button"
+                data-tag={t}
+                class="tag-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+              >
+                {RESOURCE_TAG_LABEL[t]}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div id="resource-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {RESOURCES.map((resource) => (
-            <div class="resource-item h-full" data-type={resourceTypes(resource).join(' ')}>
+            <div
+              class="resource-item h-full"
+              data-type={resourceTypes(resource).join(' ')}
+              data-tag={(resource.tags ?? []).join(' ')}
+            >
               <ResourceCard resource={resource} />
             </div>
           ))}
         </div>
+
+        <!-- Empty state when a Type × Tag combination has no matches -->
+        <p id="resource-empty" class="hidden rounded-xl border border-dashed border-default p-10 text-center text-muted">
+          No resources match that combination — try a different type or tag.
+        </p>
       </>
     )}
   </div>
 </BaseLayout>
 
 <script>
-  const buttons = document.querySelectorAll<HTMLButtonElement>('.type-filter-btn');
+  // Two single-select filter rows (Type, Tag) combined with AND. No archive routes — pure client
+  // filtering. Each row tracks its own active value; a card shows only if it matches BOTH.
+  const typeButtons = document.querySelectorAll<HTMLButtonElement>('.type-filter-btn');
+  const tagButtons = document.querySelectorAll<HTMLButtonElement>('.tag-filter-btn');
   const items = document.querySelectorAll<HTMLElement>('.resource-item');
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const type = btn.dataset.type;
-      buttons.forEach((b) => b.removeAttribute('data-active'));
-      btn.setAttribute('data-active', 'true');
-      items.forEach((item) => {
-        // data-type is a space-separated list (primary + secondary types).
-        const types = (item.dataset.type ?? '').split(' ');
-        const show = type === 'All' || (type !== undefined && types.includes(type));
-        item.classList.toggle('hidden', !show);
+  const empty = document.getElementById('resource-empty');
+
+  let activeType = 'All';
+  let activeTag = 'All';
+
+  const apply = () => {
+    let visible = 0;
+    items.forEach((item) => {
+      // data-type / data-tag are space-separated lists (a resource can carry several of each).
+      const types = (item.dataset.type ?? '').split(' ').filter(Boolean);
+      const tags = (item.dataset.tag ?? '').split(' ').filter(Boolean);
+      const show =
+        (activeType === 'All' || types.includes(activeType)) &&
+        (activeTag === 'All' || tags.includes(activeTag));
+      item.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    empty?.classList.toggle('hidden', visible > 0);
+  };
+
+  const wire = (
+    buttons: NodeListOf<HTMLButtonElement>,
+    key: 'type' | 'tag',
+    set: (value: string) => void
+  ) => {
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        set(btn.dataset[key] ?? 'All');
+        buttons.forEach((b) => b.removeAttribute('data-active'));
+        btn.setAttribute('data-active', 'true');
+        apply();
       });
     });
-  });
+  };
+
+  wire(typeButtons, 'type', (v) => (activeType = v));
+  wire(tagButtons, 'tag', (v) => (activeTag = v));
 </script>

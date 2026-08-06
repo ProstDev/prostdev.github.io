@@ -15,6 +15,9 @@
  *      NOT repeat a resource's own marketing claims as fact ("runs client-side / no data leaves
  *      your browser", "fastest", "secure") unless verified; on our site they read as our endorsement.
  *   2. If the `type` is new, add it to ResourceType + RESOURCE_TYPE_LABEL + RESOURCE_TYPE_ICON.
+ *   2b. Add subject `tags` (a CLOSED enum, like the blog's) — the /resources page renders them as a
+ *      second filter row (Type × Tag, AND-combined; buttons only, NO archive route). Assign only
+ *      tags the resource OBSERVABLY fits. To add a new tag, extend ResourceTag + RESOURCE_TAG_LABEL.
  *   3. (Optional) Give it a real logo: drop the file in `src/assets/resources/`, `import` it at the
  *      top of this file, and set it as the entry's `image`. Without one, the card shows a generated
  *      icon tile (brand gradient + the type's Icon).
@@ -41,7 +44,7 @@ import muleySolutionsToolsCover from '@/assets/resources/muley-solutions-tools.p
 import mulesoftCommunitySlackCover from '@/assets/resources/mulesoft-community-slack.png';
 import mclsMuleSecurePropertiesCover from '@/assets/resources/mcls-mule-secure-properties.jpeg';
 import muleflowBizviewCover from '@/assets/resources/muleflow-bizview.jpg';
-import muleflowVisualizerCover from '@/assets/resources/muleflow-visualizer.jpg';
+import muleflowVisualizerForBitbucketCover from '@/assets/resources/muleflow-visualizer-for-bitbucket.jpg';
 import muleflowVisualizerForGithubCover from '@/assets/resources/muleflow-visualizer-for-github.jpg';
 
 export type ResourceType =
@@ -53,6 +56,33 @@ export type ResourceType =
   | 'challenges'
   | 'slack'
   | 'tool';
+
+/**
+ * Subject tags — a CLOSED enum (mirrors the blog's `TAGS`). These cross-cut `type`: several tools
+ * of different types can share a tag (e.g. MuleFD and the MuleFlow extensions are all `visualizer`s).
+ * Drives the second filter row on /resources. To add one, extend this + RESOURCE_TAG_LABEL.
+ */
+export type ResourceTag =
+  | 'ai'
+  | 'cli'
+  | 'dataweave'
+  | 'formatter'
+  | 'learning'
+  | 'monitoring'
+  | 'security'
+  | 'visualizer';
+
+/** Human-readable label per tag — drives the filter chips + card chips. Alphabetical by label. */
+export const RESOURCE_TAG_LABEL: Record<ResourceTag, string> = {
+  ai: 'AI',
+  cli: 'CLI',
+  dataweave: 'DataWeave',
+  formatter: 'Formatter',
+  learning: 'Learning',
+  monitoring: 'Monitoring',
+  security: 'Security',
+  visualizer: 'Visualizer',
+};
 
 export interface Resource {
   /** Stable kebab-case slug — used for list keys and filter data attributes. */
@@ -66,6 +96,11 @@ export interface Resource {
    * its primary `type`. Keep off `type` to avoid duplicates.
    */
   secondaryTypes?: ResourceType[];
+  /**
+   * Subject tags (closed `ResourceTag` enum) — cross-cutting the `type`. Drives the second filter
+   * row and the card's tag chips. Assign only tags the resource observably fits; omit if none apply.
+   */
+  tags?: ResourceTag[];
   /** Off-site link (Chrome Web Store, VSCode Marketplace, GitHub, etc.). */
   url: string;
   /** One-to-three-sentence blurb shown on the card. */
@@ -124,6 +159,7 @@ export const RESOURCES: Resource[] = [
     id: 'anypoint-monitor',
     title: 'Anypoint Monitor',
     type: 'vscode-extension',
+    tags: ['monitoring'],
     url: 'https://marketplace.visualstudio.com/items?itemName=EdgarMoran.anypoint-monitor',
     description:
       'A VSCode extension that surfaces Anypoint Platform monitoring data without leaving your editor.',
@@ -145,6 +181,7 @@ export const RESOURCES: Resource[] = [
     title: 'DataWeave Studio',
     type: 'ide',
     secondaryTypes: ['vscode-extension'],
+    tags: ['dataweave'],
     url: 'https://github.com/Ashutosh-Vijay/DataWeave-Studio',
     description:
       'A local IDE for DataWeave 2.0 — run, test, and debug transforms without Anypoint Studio. Available as a desktop app or a VSCode extension, with the engine and runtime bundled in for offline use.',
@@ -155,6 +192,7 @@ export const RESOURCES: Resource[] = [
     id: 'dwcode',
     title: 'DWCode',
     type: 'challenges',
+    tags: ['dataweave', 'learning'],
     url: 'https://dwcode.vercel.app/',
     description:
       'A browser-based DataWeave practice platform — coding problems, a playground, contests, and a leaderboard to sharpen your DataWeave skills.',
@@ -168,6 +206,7 @@ export const RESOURCES: Resource[] = [
     id: 'fluxmule',
     title: 'FluxMule',
     type: 'chrome-extension',
+    secondaryTypes: ['ide'],
     url: 'https://chromewebstore.google.com/detail/fluxmule/imnkaohplcoblbkccemmdbbpbnenhjec',
     description:
       'A Chrome extension that streamlines working inside the Anypoint Platform right from your browser.',
@@ -183,6 +222,7 @@ export const RESOURCES: Resource[] = [
     id: 'integration-trails',
     title: 'Integration Trails',
     type: 'challenges',
+    tags: ['dataweave', 'learning'],
     url: 'https://app.integrationtrails.io/challenges',
     description:
       'A hands-on learning platform for integration developers — practice DataWeave and MuleSoft skills through graded challenges, structured trails, and a gamified XP leaderboard.',
@@ -193,6 +233,7 @@ export const RESOURCES: Resource[] = [
     id: 'matt-pocock-skills',
     title: 'Matt Pocock Skills',
     type: 'agent-skills',
+    tags: ['ai'],
     url: 'https://github.com/mattpocock/skills',
     description:
       'A collection of AI agent skills I reach for a lot — TDD, debugging, code review, domain modeling, and more.',
@@ -204,6 +245,7 @@ export const RESOURCES: Resource[] = [
     id: 'mcls-mule-secure-properties',
     title: 'MCLS Mule Secure Properties',
     type: 'vscode-extension',
+    tags: ['security'],
     url: 'https://marketplace.visualstudio.com/items?itemName=MasterCompcouk.mcls-mule-secure-properties',
     description:
       'A VSCode extension that previews, encrypts, and decrypts MuleSoft secure properties in YAML and .properties files.',
@@ -214,6 +256,7 @@ export const RESOURCES: Resource[] = [
     id: 'mule-xml-formatter',
     title: 'Mule XML Formatter',
     type: 'vscode-extension',
+    tags: ['formatter'],
     url: 'https://marketplace.visualstudio.com/items?itemName=SravanNerella.mule-xml-formatter',
     description:
       'A VSCode extension that formats Mule XML config files consistently — tidying indentation and structure so your flow XML stays clean and readable.',
@@ -223,6 +266,7 @@ export const RESOURCES: Resource[] = [
     id: 'mulefd',
     title: 'MuleFD',
     type: 'tool',
+    tags: ['cli', 'visualizer'],
     url: 'https://github.com/manikmagar/mulefd',
     description:
       'A CLI tool that reads Mule 3/4 app config and generates visual flow diagrams — mapping how flows connect, spotting unused or recursive flows, and untangling flow spaghetti.',
@@ -233,6 +277,7 @@ export const RESOURCES: Resource[] = [
     id: 'muleflow-bizview',
     title: 'MuleFlow BizView',
     type: 'chrome-extension',
+    tags: ['visualizer'],
     url: 'https://chromewebstore.google.com/detail/muleflow-bizview/jjglahhpajacblleceggnmgjdoaaehpn',
     description:
       'A Chrome extension that turns a MuleSoft project into interactive diagrams — an overview map of how flows connect and left-to-right flowcharts for each flow — and searches across the business logic (DataWeave, SQL, HTTP parameters). Exports diagrams to Draw.io, LucidChart, or PNG.',
@@ -240,19 +285,21 @@ export const RESOURCES: Resource[] = [
     authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
   },
   {
-    id: 'muleflow-visualizer',
-    title: 'MuleFlow Visualizer',
+    id: 'muleflow-visualizer-for-bitbucket',
+    title: 'MuleFlow Visualizer for Bitbucket',
     type: 'chrome-extension',
+    tags: ['visualizer'],
     url: 'https://chromewebstore.google.com/detail/muleflow-visualizer/kfnggnohaknfjipdnkkfibdgkhecbfkg',
     description:
       'A Chrome extension that renders MuleSoft XML files as flow diagrams directly in Bitbucket Cloud — showing flows, subflows, and MUnit tests, with pull-request diff support and a component search.',
-    image: muleflowVisualizerCover,
+    image: muleflowVisualizerForBitbucketCover,
     authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
   },
   {
     id: 'muleflow-visualizer-for-github',
     title: 'MuleFlow Visualizer for GitHub',
     type: 'chrome-extension',
+    tags: ['visualizer'],
     url: 'https://chromewebstore.google.com/detail/muleflow-visualizer-for-g/miooblfebdbnpnliffkpmbdgnbhomgjf',
     description:
       'A Chrome extension that renders MuleSoft XML files as flow diagrams directly in GitHub — on both repository files and pull-request diffs — with a component search and a property inspector.',
@@ -276,6 +323,7 @@ export const RESOURCES: Resource[] = [
     id: 'muley-solutions-tools',
     title: 'Muley Solutions Tools',
     type: 'tool',
+    tags: ['ai'],
     url: 'https://muley.solutions/tools',
     description:
       'A curated directory of working MuleSoft Agent Fabric and Anypoint Platform tools and interactive demos — agentic asset designers, an Omni Gateway policy marketplace, agent/MCP testing toolkits, network tracers, and connectors — filterable by category and each linking out to the live tool or demo.',
@@ -289,6 +337,7 @@ export const RESOURCES: Resource[] = [
     id: 'dataweave-slack',
     title: 'Official DataWeave Language Slack Workspace',
     type: 'slack',
+    tags: ['dataweave'],
     url: 'https://join.slack.com/t/dataweavelanguage/shared_invite/zt-1ewv2igp0-3ZiqQqaMdO_utwaEjxBpTw',
     description:
       'A community Slack workspace focused on the DataWeave language — ask questions, share transforms, and connect with other DataWeave developers. The link is an open invite to join.',
@@ -308,6 +357,7 @@ export const RESOURCES: Resource[] = [
     id: 'prostdev-skills',
     title: 'ProstDev Skills',
     type: 'agent-skills',
+    tags: ['ai'],
     url: 'https://github.com/ProstDev/skills',
     description:
       'The AI agent skills I use for MuleSoft content and development, packaged so you can install and run them yourself.',
@@ -318,6 +368,7 @@ export const RESOURCES: Resource[] = [
     id: 'upendra-mulesoft-tools',
     title: "Upendra's MuleSoft Tools",
     type: 'tool',
+    tags: ['formatter', 'security'],
     url: 'https://upendra-thunuguntla.github.io/#tools',
     description:
       'A growing collection of free, browser-based MuleSoft dev tools — a Secure Properties generator, JSON↔RAML and RAML↔OAS converters, YAML↔Properties converters, a MuleSoft log to cURL converter, a Mule XML SDK helper, a cron expression builder, and more.',
