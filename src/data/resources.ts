@@ -39,6 +39,10 @@ import integrationTrailsCover from '@/assets/resources/integration-trails.png';
 import upendraMulesoftToolsCover from '@/assets/resources/upendra-mulesoft-tools.png';
 import muleySolutionsToolsCover from '@/assets/resources/muley-solutions-tools.png';
 import mulesoftCommunitySlackCover from '@/assets/resources/mulesoft-community-slack.png';
+import mclsMuleSecurePropertiesCover from '@/assets/resources/mcls-mule-secure-properties.jpeg';
+import muleflowBizviewCover from '@/assets/resources/muleflow-bizview.jpg';
+import muleflowVisualizerCover from '@/assets/resources/muleflow-visualizer.jpg';
+import muleflowVisualizerForGithubCover from '@/assets/resources/muleflow-visualizer-for-github.jpg';
 
 export type ResourceType =
   | 'chrome-extension'
@@ -197,6 +201,16 @@ export const RESOURCES: Resource[] = [
     authors: [{ name: 'Matt Pocock', url: 'https://www.linkedin.com/in/mapocock/' }],
   },
   {
+    id: 'mcls-mule-secure-properties',
+    title: 'MCLS Mule Secure Properties',
+    type: 'vscode-extension',
+    url: 'https://marketplace.visualstudio.com/items?itemName=MasterCompcouk.mcls-mule-secure-properties',
+    description:
+      'A VSCode extension that previews, encrypts, and decrypts MuleSoft secure properties in YAML and .properties files.',
+    image: mclsMuleSecurePropertiesCover,
+    authors: [{ name: 'Lukasz Skowronek', url: 'https://www.linkedin.com/in/lukaszskowronek/' }],
+  },
+  {
     id: 'mule-xml-formatter',
     title: 'Mule XML Formatter',
     type: 'vscode-extension',
@@ -214,6 +228,36 @@ export const RESOURCES: Resource[] = [
       'A CLI tool that reads Mule 3/4 app config and generates visual flow diagrams — mapping how flows connect, spotting unused or recursive flows, and untangling flow spaghetti.',
     image: mulefdCover,
     authors: [{ name: 'Manik Magar', url: 'https://www.linkedin.com/in/manikmagar/' }],
+  },
+  {
+    id: 'muleflow-bizview',
+    title: 'MuleFlow BizView',
+    type: 'chrome-extension',
+    url: 'https://chromewebstore.google.com/detail/muleflow-bizview/jjglahhpajacblleceggnmgjdoaaehpn',
+    description:
+      'A Chrome extension that turns a MuleSoft project into interactive diagrams — an overview map of how flows connect and left-to-right flowcharts for each flow — and searches across the business logic (DataWeave, SQL, HTTP parameters). Exports diagrams to Draw.io, LucidChart, or PNG.',
+    image: muleflowBizviewCover,
+    authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
+  },
+  {
+    id: 'muleflow-visualizer',
+    title: 'MuleFlow Visualizer',
+    type: 'chrome-extension',
+    url: 'https://chromewebstore.google.com/detail/muleflow-visualizer/kfnggnohaknfjipdnkkfibdgkhecbfkg',
+    description:
+      'A Chrome extension that renders MuleSoft XML files as flow diagrams directly in Bitbucket Cloud — showing flows, subflows, and MUnit tests, with pull-request diff support and a component search.',
+    image: muleflowVisualizerCover,
+    authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
+  },
+  {
+    id: 'muleflow-visualizer-for-github',
+    title: 'MuleFlow Visualizer for GitHub',
+    type: 'chrome-extension',
+    url: 'https://chromewebstore.google.com/detail/muleflow-visualizer-for-g/miooblfebdbnpnliffkpmbdgnbhomgjf',
+    description:
+      'A Chrome extension that renders MuleSoft XML files as flow diagrams directly in GitHub — on both repository files and pull-request diffs — with a component search and a property inspector.',
+    image: muleflowVisualizerForGithubCover,
+    authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
   },
   {
     id: 'mulesoft-community-theme',
