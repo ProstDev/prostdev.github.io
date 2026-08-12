@@ -1,0 +1,144 @@
+---
+import CommunityCard from '@/components/CommunityCard.astro';
+import Icon from '@/components/Icon.astro';
+import {
+  COMMUNITY_TYPE_LABEL,
+  communityIsAmbassador,
+  type CommunityLink,
+  type CommunityType,
+} from '@/data/community';
+
+interface Props {
+  /** The creators to render on this page (already partitioned into blogs vs. channels). */
+  links: CommunityLink[];
+  /** Shown in the empty state / no-match copy — e.g. "creators", "blogs", "channels". */
+  noun?: string;
+}
+const { links, noun = 'creators' } = Astro.props;
+
+// Two filter rows (Type × Ambassador), AND-combined client-side — buttons only, no archive route.
+// Type chips = the distinct values present on THIS page, in the enum's declared order (stable UI),
+// with "All" first; the row hides when only one type is present (e.g. the Channels page). The
+// Ambassador row is a single toggle, shown only when at least one creator here is flagged.
+const typeOrder = Object.keys(COMMUNITY_TYPE_LABEL) as CommunityType[];
+const presentTypes = typeOrder.filter((t) => links.some((c) => c.type === t));
+const hasAmbassadors = links.some((c) => communityIsAmbassador(c));
+---
+{links.length === 0 ? (
+  <p class="rounded-xl border border-dashed border-default p-10 text-center text-muted">
+    No {noun} yet — check back soon!
+  </p>
+) : (
+  <>
+    <!-- Type filters -->
+    {presentTypes.length > 1 && (
+      <div class="mb-8 flex flex-wrap items-center gap-2">
+        <span class="text-sm font-semibold text-default">Type:</span>
+        <button
+          type="button"
+          data-type="All"
+          class="type-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+          data-active="true"
+        >
+          All
+        </button>
+        {presentTypes.map((t) => (
+          <button
+            type="button"
+            data-type={t}
+            class="type-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+          >
+            {COMMUNITY_TYPE_LABEL[t]}
+          </button>
+        ))}
+      </div>
+    )}
+
+    <!-- Ambassador filter — combines with the Type row (AND). The active "MuleSoft Ambassadors"
+         chip uses the gold ambassador tokens (not the blue accent) to echo the card badge. -->
+    {hasAmbassadors && (
+      <div class="mb-8 flex flex-wrap items-center gap-2">
+        <span class="text-sm font-semibold text-default">Show:</span>
+        <button
+          type="button"
+          data-ambassador="All"
+          class="ambassador-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+          data-active="true"
+        >
+          Everyone
+        </button>
+        <button
+          type="button"
+          data-ambassador="true"
+          class="ambassador-filter-btn inline-flex items-center gap-1 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--ambassador-bg)] hover:text-[var(--ambassador-bg)] data-[active=true]:border-[var(--ambassador-bg)] data-[active=true]:bg-[var(--ambassador-bg)] data-[active=true]:font-semibold data-[active=true]:text-[var(--ambassador-text)]"
+        >
+          <Icon name="star" class="h-4 w-4" />
+          MuleSoft Ambassadors
+        </button>
+      </div>
+    )}
+
+    <div id="community-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {links.map((link) => (
+        <div
+          class="community-item h-full"
+          data-type={link.type}
+          data-ambassador={communityIsAmbassador(link) ? 'true' : ''}
+        >
+          <CommunityCard link={link} />
+        </div>
+      ))}
+    </div>
+
+    <!-- Empty state when a Type × Ambassador combination has no matches -->
+    <p id="community-empty" class="hidden rounded-xl border border-dashed border-default p-10 text-center text-muted">
+      No {noun} match that combination — try a different type or show everyone.
+    </p>
+  </>
+)}
+
+<script>
+  // Two single-select filter rows (Type, Ambassador) combined with AND. No archive routes — pure
+  // client filtering. Each row tracks its own active value; a card shows only if it matches BOTH.
+  const typeButtons = document.querySelectorAll<HTMLButtonElement>('.type-filter-btn');
+  const ambassadorButtons = document.querySelectorAll<HTMLButtonElement>('.ambassador-filter-btn');
+  const items = document.querySelectorAll<HTMLElement>('.community-item');
+  const empty = document.getElementById('community-empty');
+
+  let activeType = 'All';
+  let activeAmbassador = 'All';
+
+  const apply = () => {
+    let visible = 0;
+    items.forEach((item) => {
+      // data-type is a single value; data-ambassador is '' or 'true'. Split/filter keeps the shape
+      // identical to the resources filter (an empty attr yields [] and never matches 'true').
+      const types = (item.dataset.type ?? '').split(' ').filter(Boolean);
+      const amb = (item.dataset.ambassador ?? '').split(' ').filter(Boolean);
+      const show =
+        (activeType === 'All' || types.includes(activeType)) &&
+        (activeAmbassador === 'All' || amb.includes(activeAmbassador));
+      item.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    empty?.classList.toggle('hidden', visible > 0);
+  };
+
+  const wire = (
+    buttons: NodeListOf<HTMLButtonElement>,
+    key: 'type' | 'ambassador',
+    set: (value: string) => void
+  ) => {
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        set(btn.dataset[key] ?? 'All');
+        buttons.forEach((b) => b.removeAttribute('data-active'));
+        btn.setAttribute('data-active', 'true');
+        apply();
+      });
+    });
+  };
+
+  wire(typeButtons, 'type', (v) => (activeType = v));
+  wire(ambassadorButtons, 'ambassador', (v) => (activeAmbassador = v));
+</script>

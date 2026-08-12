@@ -1,10 +1,13 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ResourceCard from '@/components/ResourceCard.astro';
+import CommunitySectionNav from '@/components/CommunitySectionNav.astro';
+import Icon from '@/components/Icon.astro';
 import {
   RESOURCES,
   RESOURCE_TYPE_LABEL,
   RESOURCE_TAG_LABEL,
+  resourceIsAmbassador,
   type ResourceType,
   type ResourceTag,
 } from '@/data/resources';
@@ -22,21 +25,32 @@ const resourceTypes = (r: (typeof RESOURCES)[number]): ResourceType[] => [
 ];
 const presentTypes = typeOrder.filter((t) => RESOURCES.some((r) => resourceTypes(r).includes(t)));
 const presentTags = tagOrder.filter((t) => RESOURCES.some((r) => r.tags?.includes(t)));
+// A third filter dimension (Type × Tag × Ambassador), gated so it never renders a dead toggle.
+const hasAmbassadors = RESOURCES.some((r) => resourceIsAmbassador(r));
 ---
 <BaseLayout
-  title="Resources"
-  description="Community-built MuleSoft tools I use and recommend — Chrome extensions, VSCode extensions and themes, and reusable AI agent skills. Each links straight to its store or repo."
+  title="Community Resources"
+  description="Community-built MuleSoft tools worth knowing — Chrome extensions, VSCode extensions and themes, and reusable AI agent skills. Each links straight to its store or repo."
 >
   <div class="py-10">
-    <header class="mb-10 text-center">
-      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Resources</h1>
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Community Resources</h1>
       <p class="mx-auto mt-3 max-w-2xl text-muted">
-        Community-built MuleSoft tools I use and recommend — Chrome extensions, VSCode extensions and
-        themes, and reusable AI agent skills. Everything links straight to its store or repo, and
+        Community-built MuleSoft tools worth knowing — Chrome extensions, VSCode extensions and
+        themes, and reusable AI agent skills. Everything links straight to its store or repo, creators who are
+        <a
+          href="https://www.mulesoft.com/community/ambassadors"
+          target="_blank"
+          rel="noopener"
+          class="font-semibold text-accent hover:underline"
+          >MuleSoft Ambassadors</a
+        > are highlighted, and
         the list is machine-readable via
         <a href="/llms.txt" class="text-accent hover:underline">llms.txt</a>.
       </p>
     </header>
+
+    <CommunitySectionNav />
 
     {RESOURCES.length === 0 ? (
       <p class="rounded-xl border border-dashed border-default p-10 text-center text-muted">
@@ -92,12 +106,38 @@ const presentTags = tagOrder.filter((t) => RESOURCES.some((r) => r.tags?.include
           </div>
         )}
 
+        <!-- Ambassador filter — combines with the Type and Tag rows (AND). The active "MuleSoft
+             Ambassadors" chip uses the gold ambassador tokens (not the blue accent) to echo the
+             card badge. -->
+        {hasAmbassadors && (
+          <div class="mb-8 flex flex-wrap items-center gap-2">
+            <span class="text-sm font-semibold text-default">Show:</span>
+            <button
+              type="button"
+              data-ambassador="All"
+              class="ambassador-filter-btn rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] data-[active=true]:border-[var(--accent-strong)] data-[active=true]:bg-[var(--accent-strong)] data-[active=true]:font-semibold data-[active=true]:text-[var(--accent-contrast)]"
+              data-active="true"
+            >
+              Everyone
+            </button>
+            <button
+              type="button"
+              data-ambassador="true"
+              class="ambassador-filter-btn inline-flex items-center gap-1 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--text-muted)] transition-colors hover:border-[var(--ambassador-bg)] hover:text-[var(--ambassador-bg)] data-[active=true]:border-[var(--ambassador-bg)] data-[active=true]:bg-[var(--ambassador-bg)] data-[active=true]:font-semibold data-[active=true]:text-[var(--ambassador-text)]"
+            >
+              <Icon name="star" class="h-4 w-4" />
+              MuleSoft Ambassadors
+            </button>
+          </div>
+        )}
+
         <div id="resource-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {RESOURCES.map((resource) => (
             <div
               class="resource-item h-full"
               data-type={resourceTypes(resource).join(' ')}
               data-tag={(resource.tags ?? []).join(' ')}
+              data-ambassador={resourceIsAmbassador(resource) ? 'true' : ''}
             >
               <ResourceCard resource={resource} />
             </div>
@@ -106,7 +146,7 @@ const presentTags = tagOrder.filter((t) => RESOURCES.some((r) => r.tags?.include
 
         <!-- Empty state when a Type × Tag combination has no matches -->
         <p id="resource-empty" class="hidden rounded-xl border border-dashed border-default p-10 text-center text-muted">
-          No resources match that combination — try a different type or tag.
+          No resources match that combination — try a different type, tag, or show everyone.
         </p>
       </>
     )}
@@ -114,25 +154,30 @@ const presentTags = tagOrder.filter((t) => RESOURCES.some((r) => r.tags?.include
 </BaseLayout>
 
 <script>
-  // Two single-select filter rows (Type, Tag) combined with AND. No archive routes — pure client
-  // filtering. Each row tracks its own active value; a card shows only if it matches BOTH.
+  // Three single-select filter rows (Type, Tag, Ambassador) combined with AND. No archive routes —
+  // pure client filtering. Each row tracks its own active value; a card shows only if it matches ALL.
   const typeButtons = document.querySelectorAll<HTMLButtonElement>('.type-filter-btn');
   const tagButtons = document.querySelectorAll<HTMLButtonElement>('.tag-filter-btn');
+  const ambassadorButtons = document.querySelectorAll<HTMLButtonElement>('.ambassador-filter-btn');
   const items = document.querySelectorAll<HTMLElement>('.resource-item');
   const empty = document.getElementById('resource-empty');
 
   let activeType = 'All';
   let activeTag = 'All';
+  let activeAmbassador = 'All';
 
   const apply = () => {
     let visible = 0;
     items.forEach((item) => {
-      // data-type / data-tag are space-separated lists (a resource can carry several of each).
+      // data-type / data-tag are space-separated lists (a resource can carry several of each);
+      // data-ambassador is '' or 'true' (an empty attr yields [] and never matches 'true').
       const types = (item.dataset.type ?? '').split(' ').filter(Boolean);
       const tags = (item.dataset.tag ?? '').split(' ').filter(Boolean);
+      const amb = (item.dataset.ambassador ?? '').split(' ').filter(Boolean);
       const show =
         (activeType === 'All' || types.includes(activeType)) &&
-        (activeTag === 'All' || tags.includes(activeTag));
+        (activeTag === 'All' || tags.includes(activeTag)) &&
+        (activeAmbassador === 'All' || amb.includes(activeAmbassador));
       item.classList.toggle('hidden', !show);
       if (show) visible++;
     });
@@ -141,7 +186,7 @@ const presentTags = tagOrder.filter((t) => RESOURCES.some((r) => r.tags?.include
 
   const wire = (
     buttons: NodeListOf<HTMLButtonElement>,
-    key: 'type' | 'tag',
+    key: 'type' | 'tag' | 'ambassador',
     set: (value: string) => void
   ) => {
     buttons.forEach((btn) => {
@@ -156,4 +201,5 @@ const presentTags = tagOrder.filter((t) => RESOURCES.some((r) => r.tags?.include
 
   wire(typeButtons, 'type', (v) => (activeType = v));
   wire(tagButtons, 'tag', (v) => (activeTag = v));
+  wire(ambassadorButtons, 'ambassador', (v) => (activeAmbassador = v));
 </script>

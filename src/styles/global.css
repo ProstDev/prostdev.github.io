@@ -46,6 +46,12 @@
   --accent-strong: var(--color-brand-600);
   --accent-contrast: #ffffff;
 
+  /* MuleSoft Ambassador badge — a GOLD highlight, deliberately OFF the blue --accent scale so an
+     ambassador badge stands apart from the blue type pills (reads as "top of the community", not
+     just another chip). Gold fill + dark amber-brown text = 6.8:1 (light), clears WCAG AA. */
+  --ambassador-bg: #f59e0b;
+  --ambassador-text: #422006;
+
   /* Decorative cyan→violet gradients (light). These sit BEHIND content only and are
      never a text/contrast surface, so low-opacity tints are safe. --hero-glow is a
      soft radial bloom behind the hero; --band-wash is a faint diagonal sweep that

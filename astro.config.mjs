@@ -25,6 +25,12 @@ export default defineConfig({
   redirects: {
     '/post/getting-started-with-anypoint-code-builder':
       '/post/getting-started-with-anypoint-code-builder-in-vs-code-beginner-guide',
+    // The Community tab has no landing page of its own — its submenu splits into Blogs and
+    // Channels. Send the bare section path (and any old /community link) to the Blogs subpage.
+    '/community': '/community/blogs',
+    // Resources moved under the Community section (/community/resources); keep the old
+    // top-level path working for stale internal/SEO links.
+    '/resources': '/community/resources',
   },
   integrations: [
     mdx(),

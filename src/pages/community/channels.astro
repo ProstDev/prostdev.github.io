@@ -1,0 +1,37 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CommunityGrid from '@/components/CommunityGrid.astro';
+import CommunitySectionNav from '@/components/CommunitySectionNav.astro';
+import { communityChannels } from '@/data/community';
+
+// YouTube channels — the video side of the community showcase. Blogs, newsletters, and portfolios
+// live on the sibling /community/blogs page.
+const links = communityChannels();
+---
+<BaseLayout
+  title="Community Channels"
+  description="MuleSoft community YouTube channels worth following — from the people making great video content. Official MuleSoft Ambassadors are highlighted."
+>
+  <div class="py-10">
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Community Channels</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-muted">
+        MuleSoft community YouTube channels worth following — from the people making great video
+        content. Creators who are
+        <a
+          href="https://www.mulesoft.com/community/ambassadors"
+          target="_blank"
+          rel="noopener"
+          class="font-semibold text-accent hover:underline"
+          >MuleSoft Ambassadors</a
+        > are highlighted, and
+        the list is machine-readable via
+        <a href="/llms.txt" class="text-accent hover:underline">llms.txt</a>.
+      </p>
+    </header>
+
+    <CommunitySectionNav />
+
+    <CommunityGrid links={links} noun="channels" />
+  </div>
+</BaseLayout>

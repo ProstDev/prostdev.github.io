@@ -11,6 +11,8 @@ function isActive(href: string) {
   if (href === '/') return path === '/';
   return path === href || path.startsWith(href + '/');
 }
+// Stable DOM id per submenu (used to pair the disclosure button with its panel via aria-controls).
+const navId = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 ---
 <header class="sticky top-0 z-50 border-b border-default bg-surface/85 backdrop-blur-md">
   <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
@@ -22,22 +24,72 @@ function isActive(href: string) {
       </span>
     </a>
 
-    <!-- Desktop nav -->
+    <!-- Desktop nav. A parent item (has `children`) is a disclosure: the panel is revealed via CSS
+         group-hover / group-focus-within (works with no JS, so the submenu links are never lost);
+         the inline script only syncs aria-expanded + rotates the chevron for assistive tech. -->
     <nav class="ml-2 hidden items-center gap-1 lg:flex" aria-label="Primary">
-      {NAV.map((item) => (
-        <a
-          href={item.href}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-          class:list={[
-            'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-            isActive(item.href)
-              ? 'bg-accent/12 text-accent'
-              : 'text-muted hover:text-default hover:bg-[color:var(--bg-subtle)]',
-          ]}
-        >
-          {item.label}
-        </a>
-      ))}
+      {NAV.map((item) =>
+        'children' in item ? (
+          <div class="group relative" data-nav-dropdown>
+            <button
+              type="button"
+              aria-expanded="false"
+              aria-controls={`desktop-sub-${navId(item.label)}`}
+              class:list={[
+                'flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                item.children.some((c) => isActive(c.href))
+                  ? 'bg-accent/12 text-accent'
+                  : 'text-muted hover:text-default hover:bg-[color:var(--bg-subtle)]',
+              ]}
+            >
+              {item.label}
+              <Icon name="chevron-down" class="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
+            </button>
+            <!-- The panel is anchored flush to the button's bottom (top-full, NO margin) and uses
+                 pt-2 as a hoverable "bridge" instead of mt-1 — a margin gap is dead space that
+                 drops :hover as the pointer crosses it, closing the menu before you reach an item.
+                 The visible card is an inner div so the bridge stays transparent. -->
+            <div
+              id={`desktop-sub-${navId(item.label)}`}
+              class="invisible absolute left-0 top-full z-50 pt-2 translate-y-1 opacity-0 transition duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
+            >
+              <div class="w-52 rounded-xl border border-default bg-surface p-1.5 shadow-lg">
+                <ul class="space-y-0.5">
+                  {item.children.map((child) => (
+                    <li>
+                      <a
+                        href={child.href}
+                        aria-current={isActive(child.href) ? 'page' : undefined}
+                        class:list={[
+                          'block rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                          isActive(child.href)
+                            ? 'bg-accent/12 text-accent'
+                            : 'text-muted hover:text-default hover:bg-[color:var(--bg-subtle)]',
+                        ]}
+                      >
+                        {child.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <a
+            href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+            class:list={[
+              'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              isActive(item.href)
+                ? 'bg-accent/12 text-accent'
+                : 'text-muted hover:text-default hover:bg-[color:var(--bg-subtle)]',
+            ]}
+          >
+            {item.label}
+          </a>
+        )
+      )}
     </nav>
 
     <div class="ml-auto flex items-center gap-1.5">
@@ -58,21 +110,53 @@ function isActive(href: string) {
     </div>
   </div>
 
-  <!-- Mobile nav drawer -->
+  <!-- Mobile nav drawer. A parent item renders as an accordion (collapsed unless one of its child
+       routes is active); the inline script toggles the panel + aria-expanded + chevron. -->
   <nav id="mobile-menu" class="hidden border-t border-default bg-surface lg:hidden" aria-label="Mobile">
     <div class="space-y-1 px-4 py-3">
-      {NAV.map((item) => (
-        <a
-          href={item.href}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-          class:list={[
-            'block rounded-lg px-3 py-2 text-sm font-medium',
-            isActive(item.href) ? 'bg-accent/12 text-accent' : 'text-muted hover:text-default',
-          ]}
-        >
-          {item.label}
-        </a>
-      ))}
+      {NAV.map((item) =>
+        'children' in item ? (
+          <div>
+            <button
+              type="button"
+              class="mobile-accordion-btn flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-muted hover:text-default"
+              aria-expanded={item.children.some((c) => isActive(c.href)) ? 'true' : 'false'}
+              aria-controls={`mobile-sub-${navId(item.label)}`}
+            >
+              <span class:list={[item.children.some((c) => isActive(c.href)) && 'text-accent']}>{item.label}</span>
+              <Icon name="chevron-down" class:list={['h-4 w-4 transition-transform duration-200', item.children.some((c) => isActive(c.href)) && 'rotate-180']} />
+            </button>
+            <div
+              id={`mobile-sub-${navId(item.label)}`}
+              class:list={['space-y-1 pl-3', !item.children.some((c) => isActive(c.href)) && 'hidden']}
+            >
+              {item.children.map((child) => (
+                <a
+                  href={child.href}
+                  aria-current={isActive(child.href) ? 'page' : undefined}
+                  class:list={[
+                    'block rounded-lg px-3 py-2 text-sm font-medium',
+                    isActive(child.href) ? 'bg-accent/12 text-accent' : 'text-muted hover:text-default',
+                  ]}
+                >
+                  {child.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <a
+            href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+            class:list={[
+              'block rounded-lg px-3 py-2 text-sm font-medium',
+              isActive(item.href) ? 'bg-accent/12 text-accent' : 'text-muted hover:text-default',
+            ]}
+          >
+            {item.label}
+          </a>
+        )
+      )}
       <div class="flex gap-2 px-3 pt-2">
         <a href={SOCIAL.youtube} target="_blank" rel="noopener" aria-label="YouTube" class="text-muted hover:text-[#ff0000]"><Icon name="youtube" /></a>
         <a href={SOCIAL.github} target="_blank" rel="noopener" aria-label="GitHub" class="text-muted hover:text-default"><Icon name="github" /></a>
@@ -83,10 +167,35 @@ function isActive(href: string) {
 </header>
 
 <script>
+  // Mobile drawer open/close
   const btn = document.getElementById('mobile-menu-btn');
   const menu = document.getElementById('mobile-menu');
   btn?.addEventListener('click', () => {
     const open = menu?.classList.toggle('hidden') === false;
     btn.setAttribute('aria-expanded', String(open));
+  });
+
+  // Mobile submenu accordions — toggle the paired panel + the button's aria-expanded + chevron.
+  document.querySelectorAll<HTMLButtonElement>('.mobile-accordion-btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      const panel = document.getElementById(b.getAttribute('aria-controls') ?? '');
+      const open = b.getAttribute('aria-expanded') === 'true';
+      b.setAttribute('aria-expanded', String(!open));
+      panel?.classList.toggle('hidden', open);
+      b.querySelector('svg')?.classList.toggle('rotate-180', !open);
+    });
+  });
+
+  // Desktop dropdown — visibility is CSS (group-hover / group-focus-within); JS only keeps the
+  // button's aria-expanded truthful for assistive tech as hover/focus enters and leaves the group.
+  document.querySelectorAll<HTMLElement>('[data-nav-dropdown]').forEach((group) => {
+    const trigger = group.querySelector<HTMLButtonElement>('button');
+    const sync = (open: boolean) => trigger?.setAttribute('aria-expanded', String(open));
+    group.addEventListener('mouseenter', () => sync(true));
+    group.addEventListener('mouseleave', () => sync(false));
+    group.addEventListener('focusin', () => sync(true));
+    group.addEventListener('focusout', (e) => {
+      if (!group.contains(e.relatedTarget as Node | null)) sync(false);
+    });
   });
 </script>

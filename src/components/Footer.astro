@@ -21,9 +21,20 @@ const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent('Hello from pr
     <nav aria-label="Footer">
       <h2 class="text-sm font-semibold text-default">Explore</h2>
       <ul class="mt-3 space-y-2 text-sm">
-        {NAV.map((item) => (
-          <li><a href={item.href} class="text-muted transition-colors hover:text-accent">{item.label}</a></li>
-        ))}
+        {NAV.map((item) =>
+          'children' in item ? (
+            <li>
+              <span class="font-medium text-default">{item.label}</span>
+              <ul class="mt-2 space-y-2 pl-3">
+                {item.children.map((child) => (
+                  <li><a href={child.href} class="text-muted transition-colors hover:text-accent">{child.label}</a></li>
+                ))}
+              </ul>
+            </li>
+          ) : (
+            <li><a href={item.href} class="text-muted transition-colors hover:text-accent">{item.label}</a></li>
+          )
+        )}
       </ul>
     </nav>
 

@@ -9,8 +9,11 @@
  * HOW TO ADD A RESOURCE:
  *   1. Add a Resource entry below (in alphabetical order by `title`, case-insensitive — see the
  *      RESOURCES array) with a unique `id`, its `title`, `type`, off-site `url`, and a
- *      one-to-three-sentence `description`. Add a longer `note` and an `authors` list if useful
- *      (omit `authors` for self-authored entries; a resource can credit more than one creator).
+ *      one-to-three-sentence `description`. Add a longer `note` if useful, and credit creators with
+ *      `authors: [AUTHORS['<key>']]` from the shared registry (src/data/authors.ts; omit for Alex's
+ *      own entries, list more than one to co-credit). The "MuleSoft Ambassador" cover badge is
+ *      DERIVED from an author's `isAmbassador` flag in the registry (see resourceIsAmbassador) — set
+ *      it once on the person there, not per-resource; add a new person to AUTHORS if not listed.
  *      A `description` states only what's OBSERVABLE (type, what it does, the tools it lists) — do
  *      NOT repeat a resource's own marketing claims as fact ("runs client-side / no data leaves
  *      your browser", "fastest", "secure") unless verified; on our site they read as our endorsement.
@@ -26,6 +29,7 @@
  */
 import type { ImageMetadata } from 'astro';
 import type { IconName } from '@/components/icon-names';
+import { AUTHORS, hasAmbassador, type Author } from '@/data/authors';
 // Real cover images (optional, 16:9 works best). Drop a screenshot in `src/assets/resources/`
 // named after the entry's `id`, uncomment its import, and set it as that entry's `image`.
 // Without one, the card shows a generated gradient cover with the type icon.
@@ -108,10 +112,10 @@ export interface Resource {
   /** Optional longer explanation shown under the blurb. */
   note?: string;
   /**
-   * Creators to credit. Omit for Alex's own resources. Each has a `name` and optional profile
-   * `url` (LinkedIn, GitHub, etc.); list more than one to credit co-creators.
+   * Creators to credit — reference the shared registry, e.g. `[AUTHORS['edgar-moran']]` (list more
+   * than one to credit co-creators). Omit for Alex's own resources.
    */
-  authors?: { name: string; url?: string }[];
+  authors?: Author[];
   /** Optional Icon.astro name; falls back to RESOURCE_TYPE_ICON[type]. */
   icon?: IconName;
   /**
@@ -153,6 +157,15 @@ export function resourceIcon(resource: Resource): IconName {
   return resource.icon ?? RESOURCE_TYPE_ICON[resource.type];
 }
 
+/**
+ * True when any of the resource's credited authors is a MuleSoft Ambassador (drives the cover
+ * badge). Derived from the shared author registry — a resource with no authors (Alex's own, or an
+ * entity like MuleSoft) is only badged if that author is flagged in AUTHORS.
+ */
+export function resourceIsAmbassador(resource: Resource): boolean {
+  return hasAmbassador(resource.authors);
+}
+
 // Ordered alphabetically by `title` (case-insensitive). Keep new entries in that order.
 export const RESOURCES: Resource[] = [
   {
@@ -164,7 +177,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A VSCode extension that surfaces Anypoint Platform monitoring data without leaving your editor.',
     image: anypointMonitorCover,
-    authors: [{ name: 'Edgar Moran', url: 'https://www.linkedin.com/in/yucelmoran/' }],
+    authors: [AUTHORS['edgar-moran']],
   },
   {
     id: 'anypoint-platform-chrome-extension',
@@ -174,7 +187,7 @@ export const RESOURCES: Resource[] = [
     description:
       'Browser helpers for the Anypoint Platform that speed up everyday navigation and inspection tasks.',
     image: anypointPlatformChromeExtensionCover,
-    authors: [{ name: 'Edgar Moran', url: 'https://www.linkedin.com/in/yucelmoran/' }],
+    authors: [AUTHORS['edgar-moran']],
   },
   {
     id: 'dataweave-studio',
@@ -186,7 +199,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A local IDE for DataWeave 2.0 — run, test, and debug transforms without Anypoint Studio. Available as a desktop app or a VSCode extension, with the engine and runtime bundled in for offline use.',
     image: dataweaveStudioCover,
-    authors: [{ name: 'Ashutosh Vijay', url: 'https://www.linkedin.com/in/ashutosh-vijay/' }],
+    authors: [AUTHORS['ashutosh-vijay']],
   },
   {
     id: 'dwcode',
@@ -197,10 +210,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A browser-based DataWeave practice platform — coding problems, a playground, contests, and a leaderboard to sharpen your DataWeave skills.',
     image: dwcodeCover,
-    authors: [
-      { name: 'Bighnesh Kumar Sahoo', url: 'https://www.linkedin.com/in/bighnesh18/' },
-      { name: 'Priyanshu Dhawan', url: 'https://www.linkedin.com/in/priyanshuthe1/' },
-    ],
+    authors: [AUTHORS['bighnesh-kumar-sahoo'], AUTHORS['priyanshu-dhawan']],
   },
   {
     id: 'fluxmule',
@@ -211,12 +221,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A Chrome extension that streamlines working inside the Anypoint Platform right from your browser.',
     image: fluxmuleCover,
-    authors: [
-      {
-        name: 'Alexander Deroui Villar',
-        url: 'https://www.linkedin.com/in/alexander-deroui-villar-66297ba7/',
-      },
-    ],
+    authors: [AUTHORS['alexander-deroui-villar']],
   },
   {
     id: 'integration-trails',
@@ -227,7 +232,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A hands-on learning platform for integration developers — practice DataWeave and MuleSoft skills through graded challenges, structured trails, and a gamified XP leaderboard.',
     image: integrationTrailsCover,
-    authors: [{ name: 'Patryk Bandurski', url: 'https://www.linkedin.com/in/patryk-bandurski/' }],
+    authors: [AUTHORS['patryk-bandurski']],
   },
   {
     id: 'matt-pocock-skills',
@@ -239,7 +244,7 @@ export const RESOURCES: Resource[] = [
       'A collection of AI agent skills I reach for a lot — TDD, debugging, code review, domain modeling, and more.',
     note: 'Not MuleSoft-specific, but I use these a lot in my day-to-day.',
     image: mattPocockSkillsCover,
-    authors: [{ name: 'Matt Pocock', url: 'https://www.linkedin.com/in/mapocock/' }],
+    authors: [AUTHORS['matt-pocock']],
   },
   {
     id: 'mcls-mule-secure-properties',
@@ -250,7 +255,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A VSCode extension that previews, encrypts, and decrypts MuleSoft secure properties in YAML and .properties files.',
     image: mclsMuleSecurePropertiesCover,
-    authors: [{ name: 'Lukasz Skowronek', url: 'https://www.linkedin.com/in/lukaszskowronek/' }],
+    authors: [AUTHORS['lukasz-skowronek']],
   },
   {
     id: 'mule-xml-formatter',
@@ -260,7 +265,7 @@ export const RESOURCES: Resource[] = [
     url: 'https://marketplace.visualstudio.com/items?itemName=SravanNerella.mule-xml-formatter',
     description:
       'A VSCode extension that formats Mule XML config files consistently — tidying indentation and structure so your flow XML stays clean and readable.',
-    authors: [{ name: 'Sravan Nerella', url: 'https://www.linkedin.com/in/sravan-nerella/' }],
+    authors: [AUTHORS['sravan-nerella']],
   },
   {
     id: 'mulefd',
@@ -271,7 +276,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A CLI tool that reads Mule 3/4 app config and generates visual flow diagrams — mapping how flows connect, spotting unused or recursive flows, and untangling flow spaghetti.',
     image: mulefdCover,
-    authors: [{ name: 'Manik Magar', url: 'https://www.linkedin.com/in/manikmagar/' }],
+    authors: [AUTHORS['manik-magar']],
   },
   {
     id: 'muleflow-bizview',
@@ -282,7 +287,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A Chrome extension that turns a MuleSoft project into interactive diagrams — an overview map of how flows connect and left-to-right flowcharts for each flow — and searches across the business logic (DataWeave, SQL, HTTP parameters). Exports diagrams to Draw.io, LucidChart, or PNG.',
     image: muleflowBizviewCover,
-    authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
+    authors: [AUTHORS['ronald-vega']],
   },
   {
     id: 'muleflow-visualizer-for-bitbucket',
@@ -293,7 +298,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A Chrome extension that renders MuleSoft XML files as flow diagrams directly in Bitbucket Cloud — showing flows, subflows, and MUnit tests, with pull-request diff support and a component search.',
     image: muleflowVisualizerForBitbucketCover,
-    authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
+    authors: [AUTHORS['ronald-vega']],
   },
   {
     id: 'muleflow-visualizer-for-github',
@@ -304,7 +309,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A Chrome extension that renders MuleSoft XML files as flow diagrams directly in GitHub — on both repository files and pull-request diffs — with a component search and a property inspector.',
     image: muleflowVisualizerForGithubCover,
-    authors: [{ name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' }],
+    authors: [AUTHORS['ronald-vega']],
   },
   {
     id: 'mulesoft-community-theme',
@@ -314,10 +319,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A VSCode color theme tuned for MuleSoft development — clear, comfortable syntax colors for DataWeave and XML config.',
     image: mulesoftCommunityThemeCover,
-    authors: [
-      { name: 'Alex Martinez', url: 'https://www.linkedin.com/in/alexandra-n-martinez/' },
-      { name: 'NaveenKumar Namachivayam', url: 'https://www.linkedin.com/in/naveenkumarn/' },
-    ],
+    authors: [AUTHORS['alex-martinez'], AUTHORS['naveen-namachivayam']],
   },
   {
     id: 'muley-solutions-tools',
@@ -328,10 +330,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A curated directory of working MuleSoft Agent Fabric and Anypoint Platform tools and interactive demos — agentic asset designers, an Omni Gateway policy marketplace, agent/MCP testing toolkits, network tracers, and connectors — filterable by category and each linking out to the live tool or demo.',
     image: muleySolutionsToolsCover,
-    authors: [
-      { name: 'Philipp Schöne', url: 'https://www.linkedin.com/in/pschoene/' },
-      { name: 'Farhan Modjdehi', url: 'https://www.linkedin.com/in/farhan-modjdehi/' },
-    ],
+    authors: [AUTHORS['philipp-schone'], AUTHORS['farhan-modjdehi']],
   },
   {
     id: 'dataweave-slack',
@@ -341,7 +340,7 @@ export const RESOURCES: Resource[] = [
     url: 'https://join.slack.com/t/dataweavelanguage/shared_invite/zt-1ewv2igp0-3ZiqQqaMdO_utwaEjxBpTw',
     description:
       'A community Slack workspace focused on the DataWeave language — ask questions, share transforms, and connect with other DataWeave developers. The link is an open invite to join.',
-    authors: [{ name: 'MuleSoft' }],
+    authors: [AUTHORS['mulesoft']],
   },
   {
     id: 'mulesoft-community-slack',
@@ -351,7 +350,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A community Slack workspace for MuleSoft developers to ask questions, share tips, and connect. The link opens a Google Form to request an invite.',
     image: mulesoftCommunitySlackCover,
-    authors: [{ name: 'MuleSoft' }],
+    authors: [AUTHORS['mulesoft']],
   },
   {
     id: 'prostdev-skills',
@@ -362,7 +361,7 @@ export const RESOURCES: Resource[] = [
     description:
       'The AI agent skills I use for MuleSoft content and development, packaged so you can install and run them yourself.',
     image: prostdevSkillsCover,
-    authors: [{ name: 'Alex Martinez', url: 'https://www.linkedin.com/in/alexandra-n-martinez/' }],
+    authors: [AUTHORS['alex-martinez']],
   },
   {
     id: 'upendra-mulesoft-tools',
@@ -373,9 +372,7 @@ export const RESOURCES: Resource[] = [
     description:
       'A growing collection of free, browser-based MuleSoft dev tools — a Secure Properties generator, JSON↔RAML and RAML↔OAS converters, YAML↔Properties converters, a MuleSoft log to cURL converter, a Mule XML SDK helper, a cron expression builder, and more.',
     image: upendraMulesoftToolsCover,
-    authors: [
-      { name: 'Upendra Thunuguntla', url: 'https://www.linkedin.com/in/upendra-thunuguntla/' },
-    ],
+    authors: [AUTHORS['upendra-thunuguntla']],
   },
   // TODO: try it first, then add. FlowSpace — https://nqnconsulting.com/flowspace
   // by NQN Consulting (https://www.linkedin.com/in/nqnconsulting/). Type + description TBD.

@@ -1,0 +1,37 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CommunityGrid from '@/components/CommunityGrid.astro';
+import CommunitySectionNav from '@/components/CommunitySectionNav.astro';
+import { communityBlogs } from '@/data/community';
+
+// Blogs, newsletters, and portfolios — the written/reading side of the community showcase.
+// YouTube channels live on the sibling /community/channels page.
+const links = communityBlogs();
+---
+<BaseLayout
+  title="Community Blogs"
+  description="MuleSoft community blogs, newsletters, and portfolios worth following — written by the people making great content. Official MuleSoft Ambassadors are highlighted."
+>
+  <div class="py-10">
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Community Blogs</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-muted">
+        MuleSoft community blogs, newsletters, and portfolios worth following — from the people
+        making great written content. Creators who are
+        <a
+          href="https://www.mulesoft.com/community/ambassadors"
+          target="_blank"
+          rel="noopener"
+          class="font-semibold text-accent hover:underline"
+          >MuleSoft Ambassadors</a
+        > are highlighted, and
+        the list is machine-readable via
+        <a href="/llms.txt" class="text-accent hover:underline">llms.txt</a>.
+      </p>
+    </header>
+
+    <CommunitySectionNav />
+
+    <CommunityGrid links={links} noun="blogs" />
+  </div>
+</BaseLayout>

@@ -1,26 +1,38 @@
 ---
 import { Image } from 'astro:assets';
 import {
-  RESOURCE_TYPE_LABEL,
-  RESOURCE_TYPE_ICON,
-  RESOURCE_TAG_LABEL,
-  resourceIcon,
-  resourceIsAmbassador,
-  type Resource,
-} from '@/data/resources';
+  COMMUNITY_TYPE_LABEL,
+  communityIcon,
+  communityCoverIcon,
+  communityCoverStyle,
+  communityCoverGradient,
+  communityIsAmbassador,
+  type CommunityLink,
+} from '@/data/community';
 import Icon from './Icon.astro';
 
 interface Props {
-  resource: Resource;
+  link: CommunityLink;
 }
-const { resource } = Astro.props;
-const { title, type, secondaryTypes, tags, url, description, note, authors, image } = resource;
+const { link } = Astro.props;
+const { title, type, url, description, note, authors, image } = link;
 // Derived from the shared author registry — a card is badged when any of its authors is an
-// Ambassador (see resourceIsAmbassador / AUTHORS in src/data/authors.ts).
-const isAmbassador = resourceIsAmbassador(resource);
-const typeLabel = RESOURCE_TYPE_LABEL[type];
-const iconName = resourceIcon(resource);
-// A "#" url is an intentional placeholder (a resource that isn't live yet) — render the title as
+// Ambassador (see communityIsAmbassador / AUTHORS in src/data/authors.ts).
+const isAmbassador = communityIsAmbassador(link);
+const typeLabel = COMMUNITY_TYPE_LABEL[type];
+const iconName = communityIcon(link);
+// The generated cover tile can carry a brand-specific watermark (e.g. Medium) while the type badge
+// keeps the plain type icon. Falls back to `iconName` when no `coverIcon` is set.
+const coverIconName = communityCoverIcon(link);
+// Optional per-channel tile gradient pulled from the logo's own brand colors; when null the tile
+// keeps the default brand-blue gradient (`from-brand-400 to-brand-700`). Applied as an inline
+// `background-image` that overrides those utility classes, so the same markup works for both.
+const coverGradient = communityCoverGradient(link);
+const tileStyle = coverGradient ? `background-image: ${coverGradient}` : undefined;
+// A square logo/avatar (YouTube's default) sits centered on the brand gradient like an app icon; a
+// landscape screenshot fills the 16:9 cover edge-to-edge. See communityCoverStyle().
+const isAvatar = communityCoverStyle(link) === 'avatar';
+// A "#" url is an intentional placeholder (a creator that isn't live yet) — render the title as
 // plain text, not a broken link.
 const isPlaceholder = url === '#';
 // The link's aria-label overrides the inner "MuleSoft Ambassador" pill text for screen readers, so
@@ -28,16 +40,22 @@ const isPlaceholder = url === '#';
 const linkLabel = `Open ${title} — ${typeLabel}${isAmbassador ? ', MuleSoft Ambassador' : ''} (opens in a new tab)`;
 ---
 <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-default bg-surface-card transition-shadow hover:shadow-md">
-  <!-- 16:9 cover: a real logo/screenshot when the entry has one, else a generated brand-gradient
+  <!-- 16:9 cover: a real avatar/screenshot when the entry has one, else a generated brand-gradient
        cover with the type's icon watermark (so every card carries a consistent visual anchor).
        An Ambassador highlight pill overlays the top-right corner when applicable. -->
   {isPlaceholder ? (
     <div class="relative aspect-video w-full shrink-0 overflow-hidden">
       {image ? (
-        <Image src={image} alt={`${title} cover`} width={640} height={360} class="block h-full w-full object-cover" />
+        isAvatar ? (
+          <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700 p-6" style={tileStyle}>
+            <Image src={image} alt={`${title} logo`} width={360} height={360} class="block aspect-square h-full w-auto rounded-xl object-contain shadow-xl" />
+          </div>
+        ) : (
+          <Image src={image} alt={`${title} cover`} width={640} height={360} class="block h-full w-full object-cover" />
+        )
       ) : (
-        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700">
-          <Icon name={iconName} class="h-16 w-16 text-white opacity-90" />
+        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700" style={tileStyle}>
+          <Icon name={coverIconName} class="h-16 w-16 text-white opacity-90" />
         </div>
       )}
       {isAmbassador && (
@@ -56,10 +74,16 @@ const linkLabel = `Open ${title} — ${typeLabel}${isAmbassador ? ', MuleSoft Am
       class="relative block aspect-video w-full shrink-0 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
     >
       {image ? (
-        <Image src={image} alt={`${title} cover`} width={640} height={360} class="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        isAvatar ? (
+          <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700 p-6" style={tileStyle}>
+            <Image src={image} alt={`${title} logo`} width={360} height={360} class="block aspect-square h-full w-auto rounded-xl object-contain shadow-xl transition-transform duration-300 group-hover:scale-105" />
+          </div>
+        ) : (
+          <Image src={image} alt={`${title} cover`} width={640} height={360} class="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        )
       ) : (
-        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700">
-          <Icon name={iconName} class="h-16 w-16 text-white opacity-90 transition-transform duration-300 group-hover:scale-110" />
+        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-brand-700" style={tileStyle}>
+          <Icon name={coverIconName} class="h-16 w-16 text-white opacity-90 transition-transform duration-300 group-hover:scale-110" />
         </div>
       )}
       {isAmbassador && (
@@ -77,12 +101,6 @@ const linkLabel = `Open ${title} — ${typeLabel}${isAmbassador ? ', MuleSoft Am
         <Icon name={iconName} class="h-3.5 w-3.5" />
         {typeLabel}
       </span>
-      {secondaryTypes?.map((t) => (
-        <span class="inline-flex items-center gap-1 rounded-full border border-default px-2.5 py-0.5 text-xs font-semibold text-muted">
-          <Icon name={RESOURCE_TYPE_ICON[t]} class="h-3.5 w-3.5" />
-          {RESOURCE_TYPE_LABEL[t]}
-        </span>
-      ))}
     </div>
 
     <h3 class="text-lg font-bold leading-snug">
@@ -105,18 +123,8 @@ const linkLabel = `Open ${title} — ${typeLabel}${isAmbassador ? ', MuleSoft Am
     <p class="mt-2 text-sm text-muted">{description}</p>
     {note && <p class="mt-2 text-sm text-muted">{note}</p>}
 
-    <!-- Tags + author pinned to the bottom as one group (matches PostCard's mt-auto meta block) -->
+    <!-- Author pinned to the bottom (matches PostCard's mt-auto meta block) -->
     <div class="mt-auto">
-      {tags && tags.length > 0 && (
-        <ul class="mt-4 flex flex-wrap gap-1.5" aria-label="Tags">
-          {tags.map((t) => (
-            <li class="rounded-md border border-default px-2 py-0.5 text-xs font-medium text-muted">
-              {RESOURCE_TAG_LABEL[t]}
-            </li>
-          ))}
-        </ul>
-      )}
-
       {authors && authors.length > 0 && (
         <p class="mt-3 text-xs text-muted">
           by{' '}

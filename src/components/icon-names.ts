@@ -40,4 +40,7 @@ export type IconName =
   | 'alert-triangle'
   | 'alert-octagon'
   | 'book'
-  | 'calendar';
+  | 'calendar'
+  | 'globe'
+  | 'medium'
+  | 'star';

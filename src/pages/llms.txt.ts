@@ -1,7 +1,13 @@
 import type { APIRoute } from 'astro';
 import { getPosts, getTags, getCategories, tagUrl, categoryUrl } from '@/lib/content';
 import { PLAYLISTS, videosInPlaylist } from '@/data/videos';
-import { RESOURCES, RESOURCE_TYPE_LABEL, RESOURCE_TAG_LABEL } from '@/data/resources';
+import {
+  RESOURCES,
+  RESOURCE_TYPE_LABEL,
+  RESOURCE_TAG_LABEL,
+  resourceIsAmbassador,
+} from '@/data/resources';
+import { COMMUNITY, COMMUNITY_TYPE_LABEL, communityIsAmbassador } from '@/data/community';
 import { SITE } from '@/config';
 
 /**
@@ -51,7 +57,7 @@ export const GET: APIRoute = async () => {
     lines.push('## Community resources');
     lines.push('');
     lines.push(
-      'Community-built MuleSoft tools Alex Martinez uses and recommends — Chrome/VSCode extensions, themes, and reusable AI agent skills.'
+      'Community-built MuleSoft tools worth knowing — Chrome/VSCode extensions, themes, and reusable AI agent skills.'
     );
     lines.push('');
     for (const r of RESOURCES) {
@@ -60,8 +66,29 @@ export const GET: APIRoute = async () => {
       const tags = r.tags?.length
         ? ` [${r.tags.map((t) => RESOURCE_TAG_LABEL[t]).join(', ')}]`
         : '';
+      const amb = resourceIsAmbassador(r) ? ' [MuleSoft Ambassador]' : '';
       lines.push(
-        `- [${r.title}](${r.url}) — ${RESOURCE_TYPE_LABEL[r.type]}${tags}${by}: ${r.description}`
+        `- [${r.title}](${r.url}) — ${RESOURCE_TYPE_LABEL[r.type]}${tags}${amb}${by}: ${r.description}`
+      );
+    }
+    lines.push('');
+  }
+
+  // Community creators — MuleSoft community blogs, channels, portfolios, and newsletters worth
+  // following. Each links straight off-site (no on-site page). Ambassadors are flagged.
+  if (COMMUNITY.length) {
+    lines.push('## Community blogs & channels');
+    lines.push('');
+    lines.push(
+      'MuleSoft community creators worth following — blogs, YouTube channels, portfolios, and newsletters. Entries marked [MuleSoft Ambassador] are on the official MuleSoft Ambassadors roster.'
+    );
+    lines.push('');
+    for (const c of COMMUNITY) {
+      if (c.url === '#') continue; // skip placeholders that aren't live yet
+      const by = c.authors?.length ? ` (by ${c.authors.map((a) => a.name).join(' and ')})` : '';
+      const amb = communityIsAmbassador(c) ? ' [MuleSoft Ambassador]' : '';
+      lines.push(
+        `- [${c.title}](${c.url}) — ${COMMUNITY_TYPE_LABEL[c.type]}${amb}${by}: ${c.description}`
       );
     }
     lines.push('');

@@ -1,0 +1,28 @@
+---
+// Shared section toggle for the Community trio — the same three pills (Blogs · Channels ·
+// Resources, alphabetical) render identically on all three pages, mirroring the Community nav
+// dropdown. The active pill is derived from the current path, so each page just drops in
+// <CommunitySectionNav />.
+const path = Astro.url.pathname.replace(/\/$/, '');
+const sections = [
+  { label: 'Blogs', href: '/community/blogs' },
+  { label: 'Channels', href: '/community/channels' },
+  { label: 'Resources', href: '/community/resources' },
+];
+---
+<nav aria-label="Community sections" class="mb-10 flex flex-wrap justify-center gap-2">
+  {sections.map((s) => (
+    <a
+      href={s.href}
+      aria-current={path === s.href ? 'page' : undefined}
+      class:list={[
+        'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+        path === s.href
+          ? 'border-[var(--accent-strong)] bg-[var(--accent-strong)] font-semibold text-[var(--accent-contrast)]'
+          : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]',
+      ]}
+    >
+      {s.label}
+    </a>
+  ))}
+</nav>
