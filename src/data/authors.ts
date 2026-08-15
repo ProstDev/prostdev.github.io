@@ -30,6 +30,11 @@ export interface Author {
 
 /** Keyed by a stable kebab-case slug. Ordered alphabetically by key. */
 export const AUTHORS = {
+  'akshata-sawant': {
+    name: 'Akshata Sawant',
+    url: 'https://www.linkedin.com/in/akshatasawant02/',
+    isAmbassador: true,
+  },
   'alex-martinez': {
     name: 'Alex Martinez',
     url: 'https://www.linkedin.com/in/alexandra-n-martinez/',
@@ -38,6 +43,15 @@ export const AUTHORS = {
   'alexander-deroui-villar': {
     name: 'Alexander Deroui Villar',
     url: 'https://www.linkedin.com/in/alexander-deroui-villar-66297ba7/',
+  },
+  'ashish-pardhi': {
+    name: 'Ashish Pardhi',
+    url: 'https://www.linkedin.com/in/ashishpardhi/',
+    isAmbassador: true,
+  },
+  'arul-christhuraj-alphonse': {
+    name: 'Arul Christhuraj Alphonse',
+    url: 'https://www.linkedin.com/in/arulchristhuraj/',
   },
   'ashutosh-vijay': { name: 'Ashutosh Vijay', url: 'https://www.linkedin.com/in/ashutosh-vijay/' },
   'bighnesh-kumar-sahoo': { name: 'Bighnesh Kumar Sahoo', url: 'https://www.linkedin.com/in/bighnesh18/' },
@@ -48,7 +62,23 @@ export const AUTHORS = {
     isAmbassador: true,
   },
   'farhan-modjdehi': { name: 'Farhan Modjdehi', url: 'https://www.linkedin.com/in/farhan-modjdehi/' },
+  'florencia-cattelani': {
+    name: 'Florencia Cattelani',
+    url: 'https://www.linkedin.com/in/florenciacattelani/',
+    isAmbassador: true,
+  },
   'indresh-gupta': { name: 'Indresh Gupta', url: 'https://www.linkedin.com/in/indresh-gupta-788253118/' },
+  'ismeet-kaur': {
+    name: 'Ismeet Kaur',
+    url: 'https://www.linkedin.com/in/ismeet-kaur-712b19108/',
+    isAmbassador: true,
+  },
+  'itzel-andrea-moo': {
+    name: 'Itzel Andrea Moo',
+    url: 'https://www.linkedin.com/in/itzelmoo/',
+    isAmbassador: true,
+  },
+  'jim-andrews': { name: 'Jim Andrews', url: 'https://www.linkedin.com/in/jdaconsulting/' },
   'jitendra-bafna': {
     name: 'Jitendra Bafna',
     url: 'https://www.linkedin.com/in/jitendra-bafna-jacky/',
@@ -64,13 +94,28 @@ export const AUTHORS = {
     url: 'https://www.linkedin.com/in/kancharla-sandeep-sai-kumar-867120179/',
   },
   'karol-skrzymowski': { name: 'Karol Skrzymowski', url: 'https://www.linkedin.com/in/karolskrzymowski/' },
+  'kseniia-tarantsova': {
+    name: 'Kseniia Tarantsova',
+    url: 'https://www.linkedin.com/in/kseniia-tarantsova/',
+    isAmbassador: true,
+  },
   'lukasz-skowronek': { name: 'Lukasz Skowronek', url: 'https://www.linkedin.com/in/lukaszskowronek/' },
   'manik-magar': {
     name: 'Manik Magar',
     url: 'https://www.linkedin.com/in/manikmagar/',
     isAmbassador: true,
   },
+  'manisha-patil': {
+    name: 'Manisha Patil',
+    url: 'https://www.linkedin.com/in/manisha-patil-338078a0/',
+    isAmbassador: true,
+  },
   'matt-pocock': { name: 'Matt Pocock', url: 'https://www.linkedin.com/in/mapocock/' },
+  'matthias-transier': {
+    name: 'Matthias Transier',
+    url: 'https://www.linkedin.com/in/transier/',
+    isAmbassador: true,
+  },
   'mehak-garg': { name: 'Mehak Garg', url: 'https://www.linkedin.com/in/mehakgarg911/' },
   mulesoft: { name: 'MuleSoft' },
   'naseem-khan': { name: 'Naseem Khan', url: 'https://www.linkedin.com/in/naseem-khan-788a0724/' },
@@ -92,6 +137,11 @@ export const AUTHORS = {
   'priyanshu-dhawan': { name: 'Priyanshu Dhawan', url: 'https://www.linkedin.com/in/priyanshuthe1/' },
   'rahul-kumar': { name: 'Rahul Kumar', url: 'https://www.linkedin.com/in/rahulkumar16/' },
   'ronald-vega': { name: 'Ronald Vega', url: 'https://www.linkedin.com/in/ronald-vega/' },
+  'shubham-kalsi': {
+    name: 'Shubham Kalsi',
+    url: 'https://www.linkedin.com/in/shubhamkalsi/',
+    isAmbassador: true,
+  },
   'sravan-lingam': {
     name: 'Sravan Lingam',
     url: 'https://www.linkedin.com/in/sravanlingam/',

@@ -1,11 +1,11 @@
 ---
-// Shared section toggle for the Community trio — the same three pills (Blogs · Channels ·
-// Resources, alphabetical) render identically on all three pages, mirroring the Community nav
-// dropdown. The active pill is derived from the current path, so each page just drops in
-// <CommunitySectionNav />.
+// Shared section toggle for the Community group — the same pills (Blogs · Books · Channels ·
+// Resources, alphabetical) render identically on every page, mirroring the Community nav dropdown.
+// The active pill is derived from the current path, so each page just drops in <CommunitySectionNav />.
 const path = Astro.url.pathname.replace(/\/$/, '');
 const sections = [
   { label: 'Blogs', href: '/community/blogs' },
+  { label: 'Books', href: '/community/books' },
   { label: 'Channels', href: '/community/channels' },
   { label: 'Resources', href: '/community/resources' },
 ];

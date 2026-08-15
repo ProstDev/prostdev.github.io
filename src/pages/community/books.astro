@@ -1,0 +1,45 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BookCard from '@/components/BookCard.astro';
+import CommunitySectionNav from '@/components/CommunitySectionNav.astro';
+import { BOOKS } from '@/data/books';
+
+// MuleSoft / integration books worth reading, written by people in the community. Each links
+// straight to its publisher page — no on-site detail page.
+---
+<BaseLayout
+  title="Community Books"
+  description="MuleSoft and integration books worth reading, written by people in the community. Official MuleSoft Ambassadors are highlighted."
+>
+  <div class="py-10">
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-accent sm:text-5xl">Community Books</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-muted">
+        MuleSoft and integration books worth reading — written by people in the community. Authors who are
+        <a
+          href="https://www.mulesoft.com/community/ambassadors"
+          target="_blank"
+          rel="noopener"
+          class="font-semibold text-accent hover:underline"
+          >MuleSoft Ambassadors</a
+        > are highlighted, and
+        the list is machine-readable via
+        <a href="/llms.txt" class="text-accent hover:underline">llms.txt</a>.
+      </p>
+    </header>
+
+    <CommunitySectionNav />
+
+    {BOOKS.length === 0 ? (
+      <p class="rounded-xl border border-dashed border-default p-10 text-center text-muted">
+        No books yet — check back soon!
+      </p>
+    ) : (
+      <div class="grid gap-6 md:grid-cols-2">
+        {BOOKS.map((book) => (
+          <BookCard book={book} />
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>

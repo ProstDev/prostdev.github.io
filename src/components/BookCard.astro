@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets';
+import { bookIsAmbassador, type Book } from '@/data/books';
+import Icon from './Icon.astro';
+
+interface Props {
+  book: Book;
+}
+const { book } = Astro.props;
+const { title, subtitle, url, description, authors, publisher, year, cover, previousEdition } = book;
+// Derived from the shared author registry — a card is badged when any of its authors is an
+// Ambassador (see bookIsAmbassador / AUTHORS in src/data/authors.ts).
+const isAmbassador = bookIsAmbassador(book);
+// Publisher · year meta line (either part optional).
+const meta = [publisher, year].filter(Boolean).join(' · ');
+const linkLabel = `Open ${title}${isAmbassador ? ' — by a MuleSoft Ambassador' : ''} (opens in a new tab)`;
+---
+<article class="group flex h-full flex-col overflow-hidden rounded-xl border border-default bg-surface-card transition-shadow hover:shadow-md sm:flex-row">
+  <!-- Portrait cover on its own tinted panel — the book icon of the section. Links to the book. -->
+  <a
+    href={url}
+    target="_blank"
+    rel="noopener"
+    aria-label={linkLabel}
+    class="relative flex shrink-0 items-center justify-center overflow-hidden bg-[var(--bg-subtle)] p-5 sm:w-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+  >
+    <Image
+      src={cover}
+      alt={`Cover of ${title}`}
+      width={300}
+      height={370}
+      class="block w-32 rounded-md shadow-lg transition-transform duration-300 group-hover:scale-105 sm:w-full"
+    />
+    {isAmbassador && (
+      <span class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-[var(--ambassador-bg)] px-2.5 py-1 text-xs font-semibold text-[var(--ambassador-text)] shadow-sm">
+        <Icon name="star" class="h-3.5 w-3.5" />
+        Ambassador
+      </span>
+    )}
+  </a>
+
+  <div class="flex flex-1 flex-col p-5">
+    <div class="mb-2 flex flex-wrap items-center gap-1.5">
+      <span class="inline-flex items-center gap-1 rounded-full bg-[var(--accent-strong)] px-2.5 py-0.5 text-xs font-semibold text-[var(--accent-contrast)]">
+        <Icon name="book" class="h-3.5 w-3.5" />
+        Book
+      </span>
+      {meta && <span class="text-xs text-muted">{meta}</span>}
+    </div>
+
+    <h3 class="text-lg font-bold leading-snug">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener"
+        aria-label={linkLabel}
+        class="inline-flex items-start gap-1.5 text-default transition-colors group-hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+      >
+        {title}
+        <Icon name="external" class="mt-1 h-4 w-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+      </a>
+    </h3>
+    {subtitle && <p class="mt-1 text-sm font-medium text-default">{subtitle}</p>}
+
+    <p class="mt-2 text-sm text-muted">{description}</p>
+
+    <!-- An earlier edition shown as an inline cross-link (not its own card) — e.g. a superseded
+         edition Alex co-authored. -->
+    {previousEdition && (
+      <p class="mt-2 text-xs text-muted">
+        <a
+          href={previousEdition.url}
+          target="_blank"
+          rel="noopener"
+          aria-label={`${previousEdition.label} of ${title}${previousEdition.year ? ` (${previousEdition.year})` : ''}${previousEdition.note ? `, ${previousEdition.note}` : ''} (opens in a new tab)`}
+          class="inline-flex items-center gap-1 font-medium text-[var(--accent-strong)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+        >
+          <Icon name="book" class="h-3.5 w-3.5 shrink-0" />
+          {previousEdition.label}
+          {previousEdition.year && ` (${previousEdition.year})`}
+        </a>
+        {previousEdition.note && <span> — {previousEdition.note}</span>}
+      </p>
+    )}
+
+    <!-- Authors pinned to the bottom (matches CommunityCard's mt-auto meta block) -->
+    <div class="mt-auto">
+      <p class="mt-3 text-xs text-muted">
+        by{' '}
+        {authors.map((a, i) => (
+          <>
+            {i > 0 && (i === authors.length - 1 ? ' and ' : ', ')}
+            {a.url ? (
+              <a
+                href={a.url}
+                target="_blank"
+                rel="noopener"
+                aria-label={`${a.name}'s profile (opens in a new tab)`}
+                class="font-medium text-[var(--accent-strong)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              >
+                {a.name}
+              </a>
+            ) : (
+              <span class="font-medium text-default">{a.name}</span>
+            )}
+          </>
+        ))}
+      </p>
+    </div>
+  </div>
+</article>

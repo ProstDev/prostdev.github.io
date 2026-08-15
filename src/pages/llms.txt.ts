@@ -8,6 +8,7 @@ import {
   resourceIsAmbassador,
 } from '@/data/resources';
 import { COMMUNITY, COMMUNITY_TYPE_LABEL, communityIsAmbassador } from '@/data/community';
+import { BOOKS, bookIsAmbassador } from '@/data/books';
 import { SITE } from '@/config';
 
 /**
@@ -90,6 +91,31 @@ export const GET: APIRoute = async () => {
       lines.push(
         `- [${c.title}](${c.url}) — ${COMMUNITY_TYPE_LABEL[c.type]}${amb}${by}: ${c.description}`
       );
+    }
+    lines.push('');
+  }
+
+  // Community books — MuleSoft / integration books worth reading, written by people in the
+  // community. Each links straight to its publisher page (no on-site page). Ambassadors are flagged.
+  if (BOOKS.length) {
+    lines.push('## Community books');
+    lines.push('');
+    lines.push(
+      'MuleSoft and integration books worth reading, written by people in the community. Entries marked [MuleSoft Ambassador] have at least one author on the official MuleSoft Ambassadors roster.'
+    );
+    lines.push('');
+    for (const b of BOOKS) {
+      const by = ` (by ${b.authors.map((a) => a.name).join(' and ')})`;
+      const amb = bookIsAmbassador(b) ? ' [MuleSoft Ambassador]' : '';
+      const meta = [b.publisher, b.year].filter(Boolean).join(', ');
+      const metaStr = meta ? ` — ${meta}` : '';
+      lines.push(`- [${b.title}](${b.url})${metaStr}${amb}${by}: ${b.description}`);
+      if (b.previousEdition) {
+        const pe = b.previousEdition;
+        const peYear = pe.year ? ` (${pe.year})` : '';
+        const peNote = pe.note ? `, ${pe.note}` : '';
+        lines.push(`  - [${pe.label}${peYear}](${pe.url})${peNote}`);
+      }
     }
     lines.push('');
   }

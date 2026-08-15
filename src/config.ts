@@ -29,6 +29,7 @@ export const NAV: NavItem[] = [
     label: 'Community',
     children: [
       { label: 'Blogs', href: '/community/blogs' },
+      { label: 'Books', href: '/community/books' },
       { label: 'Channels', href: '/community/channels' },
       { label: 'Resources', href: '/community/resources' },
     ],

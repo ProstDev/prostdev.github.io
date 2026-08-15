@@ -41,11 +41,16 @@ import { AUTHORS, hasAmbassador, type Author } from '@/data/authors';
 // sits centered on the brand gradient like an app icon ('avatar', the default for `type: 'youtube'`).
 import aiPickedAlexApproved from '@/assets/community/ai-picked-alex-approved.jpg';
 import anotherIntegrationBlog from '@/assets/community/another-integration-blog.png';
+import betweenTwoMulesYoutube from '@/assets/community/between-two-mules-youtube.jpg';
 import bridgingTheGapYoutube from '@/assets/community/bridging-the-gap-youtube.jpg';
 import exploreAndLearnByNkYoutube from '@/assets/community/explore-and-learn-by-nk-youtube.jpg';
 import flowState from '@/assets/community/flow-state.png';
+import iamuTechYoutube from '@/assets/community/iamu-tech-youtube.jpg';
+import integriseYoutube from '@/assets/community/integrise-youtube.jpg';
 import jitendraBafnaDzone from '@/assets/community/jitendra-bafna-dzone.png';
+import m2MulesoftMasterclassYoutube from '@/assets/community/m2-mulesoft-masterclass-youtube.jpg';
 import mule4developerYoutube from '@/assets/community/mule4developer-youtube.jpg';
+import muleAceAcademyYoutube from '@/assets/community/mule-ace-academy-youtube.jpg';
 import mulesoftAiAgentforceAcademyYoutube from '@/assets/community/mulesoft-ai-agentforce-academy-youtube.jpg';
 import mulesoftTechzone from '@/assets/community/mulesoft-techzone.jpg';
 import qaInsightsYoutube from '@/assets/community/qa-insights-youtube.jpg';
@@ -181,6 +186,19 @@ export const COMMUNITY: CommunityLink[] = [
     coverGradient: ['#13847a', '#0a3d38'],
   },
   {
+    id: 'between-two-mules-youtube',
+    title: 'Between Two Mules',
+    type: 'youtube',
+    url: 'https://www.youtube.com/@betweenTwoMules',
+    description:
+      'Ismeet Kaur and Shubham Kalsi’s MuleSoft channel — a mix of hands-on tutorials and a podcast: a multi-part DataWeave series (data types, selectors, composite/complex types, flow control), MuleSoft batch processing, MUnit integration testing, an RPA series, and Anypoint VPC setup, alongside "Muley" podcast episodes and Montreal/Jaipur meetup recordings with guests from the MuleSoft community.',
+    authors: [AUTHORS['ismeet-kaur'], AUTHORS['shubham-kalsi']],
+    image: betweenTwoMulesYoutube,
+    // Full-bleed neon-on-dark-brick art; near-black corners let the square blend at its edges,
+    // with a faint purple tint toward the neon lettering.
+    coverGradient: ['#0a0612', '#060606'],
+  },
+  {
     id: 'bridging-the-gap-blog',
     title: 'Bridging the Gap',
     type: 'blog',
@@ -213,6 +231,18 @@ export const COMMUNITY: CommunityLink[] = [
     authors: [AUTHORS['pranav-davar']],
   },
   {
+    id: 'edgar-moran-medium',
+    title: 'Edgar Moran on Medium',
+    type: 'blog',
+    url: 'https://yucelmoran.com/',
+    description:
+      'Edgar Moran’s Medium (on his own yucelmoran.com domain) — hands-on MuleSoft and integration posts spanning reading Excel files from SharePoint via the Microsoft Graph API, securing a MuleSoft MCP server with the managed Flex Gateway, dynamic GraphQL requests with DataWeave, and the REST Connect connector (RAML to connector), alongside pieces on his Anypoint Monitor VSCode extension, Databricks Delta Sharing, and the tech-lead journey.',
+    authors: [AUTHORS['edgar-moran']],
+    coverIcon: 'medium',
+    // Medium's brand tile is near-black behind a white mark.
+    coverGradient: ['#242424', '#000000'],
+  },
+  {
     id: 'explore-and-learn-by-nk-youtube',
     title: 'Explore & learn by NK',
     type: 'youtube',
@@ -224,6 +254,18 @@ export const COMMUNITY: CommunityLink[] = [
     // The channel art is a full-bleed graphic split warm-brown (left) → navy (right); the tile
     // gradient follows that diagonal so the square sits seamlessly on its own edge tones.
     coverGradient: ['#3a2418', '#152238'],
+  },
+  {
+    id: 'florencia-cattelani-medium',
+    title: 'Florencia Cattelani on Medium',
+    type: 'blog',
+    url: 'https://medium.com/@florcattelani',
+    description:
+      'Florencia Cattelani’s Medium (in Spanish) — strategy-and-adoption pieces on AI and integration: AI maturity levels and how to prepare for an AI project, Agentforce, Data Cloud and MuleSoft as engines of change, calculating the business value of MuleSoft, RPA adoption, and Dreamforce recaps.',
+    authors: [AUTHORS['florencia-cattelani']],
+    coverIcon: 'medium',
+    // Medium's brand tile is near-black behind a white mark.
+    coverGradient: ['#242424', '#000000'],
   },
   {
     id: 'flow-state',
@@ -239,6 +281,19 @@ export const COMMUNITY: CommunityLink[] = [
     coverGradient: ['#e0a020', '#0f2430'],
   },
   {
+    id: 'iamu-tech-youtube',
+    title: 'I AM U in Tech',
+    type: 'youtube',
+    url: 'https://www.youtube.com/@IAMUTech',
+    description:
+      'Itzel Moo’s Salesforce and MuleSoft channel — beginner-friendly, high-energy study-group sessions and explainers, including a "Salesforce Unlocked" intro series, Service Cloud case-management study groups, a fun guide to profiles, roles, and permission sets, hyperautomation vs. automation, and a step-by-step on scheduling your Salesforce certification exam.',
+    authors: [AUTHORS['itzel-andrea-moo']],
+    image: iamuTechYoutube,
+    // Pink "I AM Ü!" globe logo on a white square — the white square stays white (app-icon frame);
+    // the backdrop is a pink→deep-magenta tile pulled from the logo's own pink.
+    coverGradient: ['#fb68a3', '#5c1030'],
+  },
+  {
     id: 'indresh-gupta-medium',
     title: 'Indresh Gupta on Medium',
     type: 'blog',
@@ -249,6 +304,19 @@ export const COMMUNITY: CommunityLink[] = [
     coverIcon: 'medium',
     // Medium's brand tile is near-black behind a white mark.
     coverGradient: ['#242424', '#000000'],
+  },
+  {
+    id: 'integrise-youtube',
+    title: 'Integrise',
+    type: 'youtube',
+    url: 'https://www.youtube.com/@Integrise',
+    description:
+      'Kseniia Tarantsova’s MuleSoft channel — a MAC Project (MuleSoft AI Connectors) demo series wiring MuleSoft to AI (the Whisperer speech-to-text/text-to-speech, Webcrawler, and Einstein Trust Layer connectors, AI Chain + Inference flows, building Agentforce agents), alongside DataWeave best-practices and Tree Module tutorials and Maven/POM-BOM fundamentals for Mule developers.',
+    authors: [AUTHORS['kseniia-tarantsova']],
+    image: integriseYoutube,
+    // Navy circuitry "eye" logo (cyan iris) on a white square — the white square stays white
+    // (app-icon frame); the backdrop is a navy tile pulled from the logo's own linework.
+    coverGradient: ['#14375c', '#08182a'],
   },
   {
     id: 'jitendra-bafna-dzone',
@@ -286,6 +354,31 @@ export const COMMUNITY: CommunityLink[] = [
     coverGradient: ['#c8102e', '#4a0d18'],
   },
   {
+    id: 'm2-mulesoft-masterclass-youtube',
+    title: 'M² – MuleSoft MasterClass',
+    type: 'youtube',
+    url: 'https://www.youtube.com/@M2MuleSoftMasterClass',
+    description:
+      'Manisha Patil’s MuleSoft channel — step-by-step Anypoint Code Builder walkthroughs (importing a Studio project, scaffolding and designing a REST API spec with RAML, implementing and deploying an API to CloudHub), Mule 4 Salesforce Connector tutorials (query, upsert, OAuth2 auth-code create), transaction management in Mule 4, and MCP server demos (tool-listener implementation, connecting an MCP server to Cursor AI).',
+    authors: [AUTHORS['manisha-patil']],
+    image: m2MulesoftMasterclassYoutube,
+    // White-cornered circular badge (blue mule on navy circuitry) sits app-icon style on a
+    // blue→navy tile pulled from its own palette; the white square corners stay white.
+    coverGradient: ['#1e63c0', '#08183a'],
+  },
+  {
+    id: 'matthias-transier-medium',
+    title: 'Matthias Transier on Medium',
+    type: 'blog',
+    url: 'https://medium.com/@matthias.transier',
+    description:
+      'Matthias Transier’s Medium — hands-on Mule 4 developer posts, including agentic coding with Anypoint Studio, streaming large files to AWS S3, integrating SAP with MuleSoft, sending application logs to RabbitMQ with JSON Logger, and mocking errors in MUnit.',
+    authors: [AUTHORS['matthias-transier']],
+    coverIcon: 'medium',
+    // Medium's brand tile is near-black behind a white mark.
+    coverGradient: ['#242424', '#000000'],
+  },
+  {
     id: 'mehak-garg-medium',
     title: 'Mehak Garg on Medium',
     type: 'blog',
@@ -296,6 +389,19 @@ export const COMMUNITY: CommunityLink[] = [
     coverIcon: 'medium',
     // Medium's brand tile is near-black behind a white mark.
     coverGradient: ['#242424', '#000000'],
+  },
+  {
+    id: 'mule-ace-academy-youtube',
+    title: 'Mule Ace Academy',
+    type: 'youtube',
+    url: 'https://www.youtube.com/@MuleAceAcademy',
+    description:
+      'Ashish Pardhi’s MuleSoft channel focused on Agent Fabric and agentic AI — building and deploying an Agent Network 2.0 to CloudHub, MCP servers with the MCP Connector, A2A end-to-end demos, and Omni Gateway custom policies (Rust + WASM), alongside infrastructure deep dives on Runtime Fabric, Terraform, native gRPC with APIkit, and Intelligent Document Processing.',
+    authors: [AUTHORS['ashish-pardhi']],
+    image: muleAceAcademyYoutube,
+    // Navy shield mascot on a white square — the white square stays white (app-icon frame); the
+    // backdrop is a navy→deep-navy tile pulled from the shield's own color.
+    coverGradient: ['#154b74', '#08243a'],
   },
   {
     id: 'mule4developer-medium',
