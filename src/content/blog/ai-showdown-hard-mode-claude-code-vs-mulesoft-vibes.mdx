@@ -1,0 +1,175 @@
+---
+title: 'AI Showdown Hard Mode: Claude Code vs MuleSoft Vibes'
+description: >-
+  Hard-mode rematch of AI Showdown: MuleSoft Edition. Same API-led brief, but
+  every architect requirement is now mandatory: specs, security, secrets,
+  error handling, MUnit, persistence, a parent POM. Here's how Claude and
+  MuleSoft Vibes did with nowhere to hide.
+pubDate: 2026-08-18T12:00:00Z
+category: Opinion
+tags: [MuleSoft, API, APIKit, AI, Claude Code, MUnit, Security, Error Handling, Testing]
+heroImage: ../../assets/blog/ai-showdown-hard-mode-claude-code-vs-mulesoft-vibes.jpeg
+---
+
+Same ring, harder rules.
+
+In [the last round](/post/ai-showdown-3-ais-design-api-led-connectivity-in-mulesoft) I handed three AIs a MuleSoft architect brief and let them build a 3-layer API-led network for a Customers + Orders domain. The catch that time: half the good stuff was optional, so the tools that skipped specs, tests, and persistence weren't technically breaking any rule. This round, I closed that loophole.
+
+**Hard mode makes every architect-level requirement mandatory**: spec-first with APIkit, security enforced *and* documented in the spec, multi-environment secure properties, a global error handler, MUnit for the two guarded business rules, persistence that survives a restart, a parent POM, and the latest, identical versions across every app. No "the prompt didn't ask for it" escape hatch. There's nowhere to hide.
+
+Two contestants this time, and the matchup is the interesting part.
+
+> [!TIP]
+> Want the exact prompt both AIs received? The full [instructions I gave them](https://github.com/alexandramartinez/ai-showdown-hard/blob/main/instructions-given.md) are in the repo, and you can browse [the whole project here](https://github.com/alexandramartinez/ai-showdown-hard).
+
+## The bet
+
+- 🟦 **Claude**: Claude Code, Opus 4.8, MAX effort
+- 🟩 **MuleSoft Vibes**: Sonnet underneath, but loaded with the full MuleSoft skill packs
+
+Vibes runs on **Sonnet, a smaller model than Opus 4.8**, but it ships with the whole MuleSoft skill set baked in. So *in theory* the domain scaffolding should let it punch above its model weight. Hard mode is exactly the test for that theory: if the skills work, the gap from last round should close. If they don't, the finicky mandatory details are where it'll show.
+
+> [!NOTE]
+> These aren't comparable tiers of compute: different models, different effort levels. Read this as "what each tool produced from the same hard-mode brief," not a controlled benchmark. What makes it fair is that both got the *identical* prompt with the *identical* mandatory list.
+
+## TL;DR
+
+Both built genuinely API-led solutions this time, and that alone is a big deal, because last round Vibes skipped almost everything. But each side has exactly **one clear miss** against the mandatory list:
+
+- **Claude** (Opus 4.8) is the tighter engineering artifact: real encrypted secrets for every environment, a true reactor POM, 84 MUnit tests that actually **built green** under an enforced coverage gate, and zero duplication. Its miss: it folded the process layer into the experience app, so it ships only **two layers as real APIs**, a literal miss on the "one API per layer" rule.
+- **MuleSoft Vibes** (Sonnet + skills) delivered the more textbook topology: a genuine **separate process tier per entity** and real ObjectStore persistence. Its miss: it left the **secrets as fill-in-the-blank placeholders**, so security can't actually authenticate as shipped, and it copy-pasted the error handler across all five apps.
+
+**The skills narrowed a wide gap to a narrow one. They didn't erase the model's edge on the finicky, mandatory, easy-to-fake details.**
+
+## The brief (hard mode)
+
+Same domain as last round (a Customers + Orders network across Experience, Process, and System) with these 11 operations:
+
+1. List all customers
+2. Get one customer's details
+3. Get a customer's orders
+4. Get one order's details
+5. Create a customer
+6. Edit a customer
+7. Delete a customer **only if they have no orders**
+8. Create an order attached to a customer
+9. Edit an existing order
+10. **Cancel** an order (a status change, *not* a delete)
+11. Delete an order
+
+Operations #7 and #10 are business-rule traps on purpose. What changed this round is the requirements list, **all mandatory now:**
+
+1. **Spec-first**: design each API as OAS or RAML, implement against it with APIkit.
+2. **Security**: enforce client-id/secret on the experience layer *and* document the scheme in the spec.
+3. **Multi-env properties**: externalize everything into dev/test/prod files, with secrets as *secure properties, not hardcoded*.
+4. **Error handling**: one consistent global handler in every app, returning structured errors.
+5. **Tests**: MUnit for the two guarded rules.
+6. **Persistence**: mock and seed the data as if wired to a real DB, and it must survive a restart.
+7. **Best practices**: consistent naming, no copy-pasted flows, a parent POM, and the latest identical versions everywhere.
+
+## The scorecard
+
+| Requirement (all mandatory) | 🟦 Claude | 🟩 MuleSoft Vibes |
+|---|---|---|
+| **Apps** | ❌ 3 (exp + prc folded · 2 sys) | ✅ 5 (1 exp · 2 prc · 2 sys) |
+| **All 3 layers as real APIs** | ❌ No (process folded into experience) | ✅ Yes (dedicated process apps) |
+| **Parent POM** | ✅ True reactor (`<modules>`, one build) | ⚠️ Version-mgmt only (no reactor) |
+| **Spec-first (OAS) + APIkit** | ⚠️ Yes, 3/3 apps | ✅ Yes, **5/5 apps** |
+| **11 operations** | ✅ 11/11 functional | ✅ 11/11 functional |
+| **Security enforced** | ✅ Yes + **real ciphertext secret** | ⚠️ Yes, but **secret is a placeholder** |
+| **Multi-env props (dev/test/prod)** | ✅ Yes | ✅ Yes |
+| **Secrets as real secure properties** | ✅ Yes (dev, test, **and** prod) | ❌ No (placeholders, dev only) |
+| **Global error handler** | ✅ **One shared file**, imported | ❌ Copy-pasted across 5 apps |
+| **Delete-only-if-no-orders (#7)** | ✅ Yes (test: DELETE never fires) | ✅ Yes (test: 409) |
+| **Cancel ≠ delete (#10)** | ✅ Yes (test: count unchanged) | ✅ Yes (test: status) |
+| **Persistence survives restart** | ✅ File-backed JSON | ✅ **ObjectStore `persistent="true"`** |
+| **MUnit tests** | ✅ **84**, green build, ≥80% gate | ⚠️ 27, no gate, not built here |
+| **Latest, identical versions** | ⚠️ Mule 4.11.5, all pinned | ⚠️ Mule 4.9.4, all pinned |
+
+> [!NOTE]
+> **Security enforced** and **Secrets as real secure properties** are really a matter of preference. Some people would rather the AI *not* drop real secrets into the project at all and generate them themselves; others prefer it filling in at least the local/dev values so the app can actually run and be tested out of the box. Neither is wrong. Either way, you should **re-add all the secrets yourself for prod (and any environment that isn't local/dev)**, never trust AI-committed values there.
+
+## 🟦 Claude: the tighter engineering artifact
+
+Claude shipped **three apps** and a **true reactor POM** (`packaging=pom` with a `<modules>` list), so a single `mvn clean package` at the root compiles, tests, coverage-gates, and packages all three apps in one command. Children declare zero versions; everything is centralized in the parent.
+
+It went fully spec-first with OAS 3.0.3 on all three apps, and modeled the domain strictly: distinct request vs. response types (`CustomerInput` vs. `Customer`), a shared `ApiError` schema, and an order status enum. Because the APIkit scaffolder plugin sits behind an auth-gated EE Nexus that wasn't available, Claude **hand-authored** the router flows to match each spec's contract exactly, then wrote dedicated router-error MUnit suites to lock that fragile flow-name-to-spec mapping (a typo there is a silent 404).
+
+Two things stand out:
+
+- **Real secrets, everywhere.** The client secret and internal gateway key are genuine Blowfish/CBC ciphertext, filled in for **dev, test, and prod**. The decryption key is supplied only at launch via `-Denc.key=…`, never committed. Security runs as shipped.
+- **Proof it works.** The tree contains packaged jars and surefire reports: the **84 MUnit tests actually ran here and came back 0 failures, 0 errors**, under a parent-POM coverage gate (`requiredApplicationCoverage=80`, `failBuild=true`). That's an acceptance gate, not just a test folder.
+
+Both business rules are proven adversarially: the delete-guard asserts a 409 **and** `verify-call times="0"` on the downstream customer DELETE (proving no destructive call leaks out), and cancel asserts the order **count is unchanged** (record kept, not deleted).
+
+The catch: Claude folded the process concern into the experience app. It documented the call. API-led names three *concerns*, not necessarily three *deployables*, and its process section talks only to the System APIs, never a datastore. It even names the boundary "the promotion seam," so it lifts out into a standalone Process app if a second channel ever appears. A defensible engineering call, **but the prompt didn't leave it to judgment.** It required "at least three, one per layer," and a process *concern* inside the experience deployable is not a process *API*. So Claude ships only two layers as real APIs: a literal miss on a mandatory clause.
+
+## 🟩 MuleSoft Vibes: the textbook topology
+
+This is the big turnaround. Last round, Vibes skipped specs, APIkit, tests, the error handler, and its writes didn't persist. **This time it did all of them.**
+
+Vibes chose **five apps**, the fullest, most literal reading of API-led: one experience, a **separate process app per entity** (customers-process, orders-process), and a system app per entity. The delete-guard lives in customers-process (which reaches into orders-system for the cross-entity check); cancel-vs-delete lives in orders-process. This is the more textbook "one API per concern" topology (the design most MuleSoft courseware would draw) and it's the only one of the two that literally satisfies the "one API per layer" requirement.
+
+It's genuinely spec-first now, with OAS on **all five apps** (~32 operations across the tiers), so every internal hop is contract-first, not just the edge. And the persistence turnaround is the clearest evidence the skills paid off: **ObjectStore v2 with `persistent="true"`**, seeded once at startup, with real CRUD writes (verified 8 `os:store` calls per system app) that survive a restart. It has 27 MUnit tests covering both guarded rules plus customer-id immutability and invalid-customer-on-create.
+
+But the two mandatory requirements that are *fiddly rather than conceptual* are exactly where it slipped:
+
+- **Secrets left as placeholders.** The secure-properties machinery is correct (AES/CBC, key supplied at runtime, enforced before routing), but the values are unfilled: `id: "![REPLACE_WITH_ENCRYPTED_DEV_CLIENT_ID]"`. And there's only a `config-secure-dev.yaml`, no test or prod secure file. Vibes technically avoided hardcoding, but by leaving the secret blank, so its security **cannot authenticate anyone** until a human encrypts real values first. A literal miss on a mandatory requirement.
+- **Copy-pasted error handler.** The global handler is duplicated across all five apps in two variants: exactly the copy-pasted-flow duplication the prompt told both AIs to avoid.
+
+Its parent POM also governs versions (`dependencyManagement` + `pluginManagement`) but has **no `<modules>`**, so you must `mvn install` the parent first, then build each of the five apps individually. And nothing was built in the repo: no `target/`, so the 27 tests are asserted but unproven here.
+
+> [!WARNING]
+> One more practical snag: I couldn't run the Vibes projects in Anypoint Code Builder at all. VS Code + ACB needs a VS Code workspace to open the apps as Mule projects, and Vibes never created one, so there was nothing for ACB to load. It had to be wired up by hand before it could run.
+
+## Where the two really diverge
+
+Both are genuinely API-led now, so the story is in the details each got right, and each side owns exactly one miss:
+
+| Dimension | 🟦 Claude | 🟩 Vibes |
+|---|---|---|
+| **Topology** | 2 real layers (process folded) ❌ | 3 real layers ✅ |
+| **Parent POM** | True reactor, one build ✅ | Version mgmt only ⚠️ |
+| **Secrets** | Real ciphertext, all envs ✅ | Placeholders, dev only ❌ |
+| **Error handler reuse** | Authored once ✅ | Copy-pasted ×5 ⚠️ |
+| **Tests + proof** | 84, green build, gate ✅ | 27, no gate, unbuilt ⚠️ |
+| **Persistence** | File-backed JSON ✅ | ObjectStore `persistent` ✅ |
+| **Runtime** | Mule 4.11.5 (recent LTS) | Mule 4.9.4 (older) |
+
+**Vibes wins topology; Claude wins execution rigor.** Vibes' 5-app split is both the more by-the-book architecture and the compliant one, its strongest card. Claude's secrets, reactor build, coverage gate, and zero duplication are the un-glamorous, mandatory details that are easy to fake and hard to actually finish.
+
+## The version reality check
+
+The brief said "latest, identical versions." Both used real, released versions and Java 17 (no hallucinated numbers) and both centralized versions in the parent so their apps are internally consistent. But **neither reached the true-latest Mule 4.12.0.**
+
+| Component | 🟦 Claude | 🟩 Vibes | Latest GA |
+|---|---|---|---|
+| Mule runtime | ⚠️ 4.11.5 | ❌ 4.9.4 | 4.12.0 |
+| Java | ✅ 17 | ✅ 17 | 17 |
+| mule-maven-plugin | ✅ 4.10.1 | ❌ 4.3.0 | 4.10.0 |
+| APIkit | ⚠️ 1.11.17 | ✅ **1.12.0** | 1.12.1 |
+| HTTP connector | ✅ 1.11.3 | ⚠️ 1.10.3 | 1.11.3 |
+| MUnit | ⚠️ 3.7.0 | ❌ 3.3.0 | 3.7.1 |
+
+Claude is on the more current line across the board and documents *why* 4.11.5 (it's the newest runtime whose embedded EE distribution is cached locally, so MUnit can boot offline). Vibes is a generation behind on almost everything, except APIkit, where its 1.12.0 is actually newer than Claude's 1.11.17. Same lesson as last round: AIs anchor to whatever versions dominated their training data, not to what shipped last week. **Pin your versions yourself.**
+
+## So did the skills pay off?
+
+Mostly, and that's the real story. A Sonnet-based tool carrying the MuleSoft skill packs produced a legitimately API-led solution that, unlike its earlier-showdown self, has specs on every tier, APIkit, a wired global error handler, real ObjectStore persistence that survives a restart, and MUnit coverage of both guarded rules. On *conceptual completeness* and *textbook topology*, Vibes is right there, and on the "one API per layer" clause, it's flatly ahead.
+
+Where Opus 4.8 still wins is execution rigor: real secrets everywhere, no copy-paste, a one-command reactor that proved itself green under an enforced gate, and a more current version stack with the trade-offs written down.
+
+**Each side has exactly one clear miss:** Vibes left its secrets as placeholders (security can't run as shipped); Claude shipped only two layers as real APIs (no dedicated process tier).
+
+- **Want the cleaner textbook diagram, a genuine process tier, and the letter of the "one API per layer" rule?** 🟩 **MuleSoft Vibes**: the more canonical *and* more compliant architecture, and a big step up from last round.
+- **Want the thing you could promote to production tomorrow** (secrets that decrypt, one build that proves itself, zero duplication, an enforced quality gate)? 🟦 **Claude**: still the stronger engineering artifact.
+
+The skills closed a wide gap to a narrow one. They didn't erase the model's edge on the finicky, mandatory, easy-to-fake details, even as Claude gave one of those details back on topology.
+
+## What's next?
+
+**AI Showdown: MuleSoft Edition (2026) 🥊** is an ongoing series comparing AI coding tools on the same MuleSoft and DataWeave challenges. Round 1 was DataWeave puzzles; Round 2 was API-led architecture; this was the hard-mode rematch.
+
+🎯 What should the next round test, and which AI should join the ring? Drop a comment on YouTube or reply to this post.
+
+🔔 Subscribe so you don't miss the next round: [youtube.com/prostdev](https://www.youtube.com/prostdev)

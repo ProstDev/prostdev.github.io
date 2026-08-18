@@ -174,6 +174,7 @@ export const SERIES: Series[] = [
     posts: [
       'claude-code-vs-curietech-dataweave',
       'ai-showdown-3-ais-design-api-led-connectivity-in-mulesoft',
+      'ai-showdown-hard-mode-claude-code-vs-mulesoft-vibes',
     ],
   },
 ];
