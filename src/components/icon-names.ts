@@ -43,4 +43,5 @@ export type IconName =
   | 'calendar'
   | 'globe'
   | 'medium'
+  | 'phone'
   | 'star';

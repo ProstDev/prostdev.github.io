@@ -50,6 +50,8 @@ import mclsMuleSecurePropertiesCover from '@/assets/resources/mcls-mule-secure-p
 import muleflowBizviewCover from '@/assets/resources/muleflow-bizview.jpg';
 import muleflowVisualizerForBitbucketCover from '@/assets/resources/muleflow-visualizer-for-bitbucket.jpg';
 import muleflowVisualizerForGithubCover from '@/assets/resources/muleflow-visualizer-for-github.jpg';
+import muleyeForAndroidCover from '@/assets/resources/muleye-for-android.jpg';
+import muleyeForIosCover from '@/assets/resources/muleye-for-ios.jpg';
 
 export type ResourceType =
   | 'chrome-extension'
@@ -59,6 +61,7 @@ export type ResourceType =
   | 'ide'
   | 'challenges'
   | 'slack'
+  | 'mobile-app'
   | 'tool';
 
 /**
@@ -134,6 +137,7 @@ export const RESOURCE_TYPE_LABEL: Record<ResourceType, string> = {
   challenges: 'Challenges',
   'chrome-extension': 'Chrome extension',
   ide: 'IDE',
+  'mobile-app': 'Mobile app',
   slack: 'Slack',
   tool: 'Tool',
   'vscode-extension': 'VSCode extension',
@@ -146,6 +150,7 @@ export const RESOURCE_TYPE_ICON: Record<ResourceType, IconName> = {
   challenges: 'trophy',
   'chrome-extension': 'chrome',
   ide: 'terminal',
+  'mobile-app': 'phone',
   slack: 'slack',
   tool: 'wrench',
   'vscode-extension': 'vscode',
@@ -331,6 +336,28 @@ export const RESOURCES: Resource[] = [
       'A curated directory of working MuleSoft Agent Fabric and Anypoint Platform tools and interactive demos — agentic asset designers, an Omni Gateway policy marketplace, agent/MCP testing toolkits, network tracers, and connectors — filterable by category and each linking out to the live tool or demo.',
     image: muleySolutionsToolsCover,
     authors: [AUTHORS['philipp-schone'], AUTHORS['farhan-modjdehi']],
+  },
+  {
+    id: 'muleye-for-android',
+    title: 'Muleye for Android',
+    type: 'mobile-app',
+    tags: ['monitoring'],
+    url: 'https://play.google.com/store/apps/details?id=com.moran.anypointmobile',
+    description:
+      'An Android app for monitoring and managing the Anypoint Platform from your phone — check application status, runtime versions, and replicas, stream and filter logs (ERROR/WARN/INFO/DEBUG), view metrics, start/stop/restart deployments, and switch across environments, accounts, and business groups. Supports CloudHub 1.0, CloudHub 2.0, and Hybrid apps.',
+    image: muleyeForAndroidCover,
+    authors: [AUTHORS['edgar-moran']],
+  },
+  {
+    id: 'muleye-for-ios',
+    title: 'Muleye for iOS',
+    type: 'mobile-app',
+    tags: ['monitoring'],
+    url: 'https://apps.apple.com/us/app/muleye/id6752311018',
+    description:
+      'An iOS app for monitoring and managing the Anypoint Platform from your phone — check application status, runtime versions, and replicas, stream and filter logs (ERROR/WARN/INFO/DEBUG), view metrics, start/stop/restart deployments, and switch across environments, accounts, and business groups. Supports CloudHub 1.0, CloudHub 2.0, and Hybrid apps.',
+    image: muleyeForIosCover,
+    authors: [AUTHORS['edgar-moran']],
   },
   {
     id: 'dataweave-slack',
