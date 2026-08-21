@@ -70,6 +70,7 @@ const TAGS = [
   'Oracle',
   'PostgreSQL',
   'Postman',
+  'Product',
   'Python',
   'RAML',
   'REST',
