@@ -39,7 +39,8 @@ import anypointMonitorCover from '@/assets/resources/anypoint-monitor.png';
 import mulesoftCommunityThemeCover from '@/assets/resources/mulesoft-community-theme.png';
 import prostdevSkillsCover from '@/assets/resources/prostdev-skills.png';
 import mattPocockSkillsCover from '@/assets/resources/matt-pocock-skills.png';
-import dataweaveStudioCover from '@/assets/resources/dataweave-studio.png';
+import dataweaveStudioCover from '@/assets/resources/dataweave-studio.jpg';
+import dataweaveStudioForWindowsCover from '@/assets/resources/dataweave-studio-for-windows.jpg';
 import dwcodeCover from '@/assets/resources/dwcode.png';
 import mulefdCover from '@/assets/resources/mulefd.png';
 import integrationTrailsCover from '@/assets/resources/integration-trails.png';
@@ -196,14 +197,25 @@ export const RESOURCES: Resource[] = [
   },
   {
     id: 'dataweave-studio',
-    title: 'DataWeave Studio',
-    type: 'ide',
-    secondaryTypes: ['vscode-extension'],
+    title: 'DataWeave Studio (VSCode extension)',
+    type: 'vscode-extension',
+    secondaryTypes: ['ide'],
     tags: ['dataweave'],
-    url: 'https://github.com/Ashutosh-Vijay/DataWeave-Studio',
+    url: 'https://marketplace.visualstudio.com/items?itemName=ashutosh-vijay.dataweave-studio',
     description:
-      'A local IDE for DataWeave 2.0 — run, test, and debug transforms without Anypoint Studio. Available as a desktop app or a VSCode extension, with the engine and runtime bundled in for offline use.',
+      'The VSCode extension build of DataWeave Studio — run, test, and debug DataWeave 2.0 transforms inside your editor without Anypoint Studio, with the engine and runtime bundled in for offline use.',
     image: dataweaveStudioCover,
+    authors: [AUTHORS['ashutosh-vijay']],
+  },
+  {
+    id: 'dataweave-studio-for-windows',
+    title: 'DataWeave Studio for Windows',
+    type: 'ide',
+    tags: ['dataweave'],
+    url: 'https://apps.microsoft.com/detail/9nwd4l4j7d92',
+    description:
+      'The Windows desktop build of DataWeave Studio, distributed through the Microsoft Store — a local IDE for running, testing, and debugging DataWeave 2.0 transforms without Anypoint Studio.',
+    image: dataweaveStudioForWindowsCover,
     authors: [AUTHORS['ashutosh-vijay']],
   },
   {
