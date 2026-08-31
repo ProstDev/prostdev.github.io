@@ -1,0 +1,104 @@
+---
+title: 'Sound and desktop alerts for Claude Code with hooks'
+description: 'Get a sound and a native macOS banner when Claude Code finishes a turn or is blocked waiting for your permission, using the settings.json hooks system.'
+pubDate: 2026-08-31
+category: Tutorials
+tags: [Claude Code, macOS]
+heroImage: ../../assets/blog/sound-and-desktop-alerts-for-claude-code-with-hooks.jpeg
+faqs:
+  - question: 'How do I get a sound when Claude Code finishes a task?'
+    answer: 'Add a `Stop` hook to your `~/.claude/settings.json` that runs a command like `afplay /System/Library/Sounds/Glass.aiff`. The `Stop` event fires every time Claude finishes responding, so the sound plays each time a turn completes.'
+  - question: 'How do I get notified when Claude Code is waiting for a permission prompt?'
+    answer: 'Add a `Notification` hook with the matcher `permission_prompt`. That event fires when Claude is blocked waiting for you to approve a tool call. Point it at a different sound (for example `Ping.aiff`) and an `osascript` banner so you can tell it apart from the finished sound by ear.'
+  - question: 'How do I show the project name in the Claude Code notification?'
+    answer: 'Each hook receives a JSON payload on standard input that includes a `cwd` field. Pipe it through `jq -r ''.cwd'' | xargs basename` to reduce the working directory to just the folder name, then pass that into the `osascript` banner title. The banner then reads something like `Claude Code — my-mule-app`, which helps when several sessions are open at once.'
+  - question: 'Do Claude Code hook alerts work in any terminal?'
+    answer: 'Yes. The banner is posted with `osascript -e ''display notification ...''`, which goes through macOS Notification Center independently of the terminal. Terminal.app, iTerm2, and the VS Code integrated terminal all behave the same.'
+  - question: 'Can I control how long the macOS notification banner stays on screen?'
+    answer: 'No, not from the hook. The `display notification` command has no duration parameter. How long a banner lingers is a macOS-wide setting under System Settings > Notifications, chosen per app as either "Banners" (auto-dismiss) or "Alerts" (stay until dismissed).'
+  - question: 'Do these Claude Code alerts work on Linux?'
+    answer: 'The exact commands are macOS-specific, but the hook wiring in `settings.json` is identical everywhere. On Linux you would swap `afplay` for something like `paplay` or `aplay` for sound, and `osascript` for `notify-send` for the desktop banner. The `Stop` and `Notification` events, the matcher, and the `jq` payload trick stay the same.'
+---
+
+If you use Claude Code for anything that runs for a while, you know the feeling. You kick off a long task, tab away to read something or answer a message, and then forget to check back. Minutes later you realize Claude finished ages ago. Or worse, it's been sitting there the whole time, blocked on a permission prompt, waiting for you to click "yes."
+
+I wanted a nudge. A sound and a little desktop banner that tells me two things: "Claude is done" and "Claude needs you." So I wired it up with the hooks system, and it took about five minutes. Let me show you how.
+
+This is especially handy for long-running work, the kind where you kick off a big task and step away instead of staring at the terminal the whole time.
+
+## TL;DR
+
+- Add two hooks to `~/.claude/settings.json`: a `Stop` hook (fires when Claude finishes a turn) and a `Notification` hook with the `permission_prompt` matcher (fires when Claude is blocked on your approval).
+- Each hook plays a different macOS sound with `afplay` (so you can tell "done" from "needs you" by ear) and posts a Notification Center banner with `osascript`.
+- `jq -r '.cwd' | xargs basename` puts the project folder name in the banner title, so you know which session is calling when several are open.
+- The commands are macOS-specific, but the hook wiring in `settings.json` is identical on any OS. The full config is below.
+
+## What are hooks?
+
+Claude Code has a hooks system in `settings.json`. Hooks are just shell commands that fire on certain lifecycle events. You tell Claude "when X happens, run this command," and it runs it.
+
+Two events matter for our alerts:
+
+- **`Stop`** fires every time Claude finishes responding.
+- **`Notification`** (with the matcher `permission_prompt`) fires when Claude is blocked waiting for you to approve a tool call.
+
+Each hook receives a JSON payload on standard input with fields like `cwd` (the project directory) and `session_id`. A shell command can read that payload to add some context, which we'll use to put the project name in the banner.
+
+## The config
+
+Here's what I added to `~/.claude/settings.json`. I put it at the user level (that `~` path) so it applies to every project and every session globally, not just one repo.
+
+```json title="~/.claude/settings.json"
+"hooks": {
+  "Stop": [
+    { "hooks": [
+      { "type": "command", "command": "afplay /System/Library/Sounds/Glass.aiff" },
+      { "type": "command", "command": "proj=$(jq -r '.cwd' | xargs basename); osascript -e \"display notification \\\"Claude finished\\\" with title \\\"Claude Code — $proj\\\"\"" }
+    ]}
+  ],
+  "Notification": [
+    { "matcher": "permission_prompt", "hooks": [
+      { "type": "command", "command": "afplay /System/Library/Sounds/Ping.aiff" },
+      { "type": "command", "command": "proj=$(jq -r '.cwd' | xargs basename); osascript -e \"display notification \\\"Claude needs your permission\\\" with title \\\"Claude Code — $proj\\\"\"" }
+    ]}
+  ]
+}
+```
+
+If your `settings.json` already has other keys, add the `hooks` block alongside them (don't paste a second top-level object). And since it's JSON, watch the commas.
+
+## How it works, piece by piece
+
+There are only three moving parts here, so let's break them down.
+
+**`afplay` plays a built-in macOS sound.** I use `Glass.aiff` when Claude finishes and `Ping.aiff` when it needs permission. Two different tones on purpose, so I can tell by ear which situation it is without looking. Those files live in `/System/Library/Sounds/`, so go poke around in there and pick whatever you like.
+
+**`osascript -e 'display notification ...'` posts a native Notification Center banner.** The nice thing about going through AppleScript is that it's independent of which terminal you're using. Terminal.app, iTerm2, and the VS Code integrated terminal all behave exactly the same.
+
+**`jq -r '.cwd' | xargs basename` pulls the project name out of the hook's payload.** Remember that JSON on standard input? `jq` grabs the `cwd` field, and `basename` trims it down to just the folder name. So instead of a generic "Claude finished," the banner title reads something like `Claude Code — my-mule-app`. That is genuinely useful when you've got a few sessions open in different terminals and need to know which one is calling.
+
+## A few gotchas I hit
+
+Nothing here was hard, but a couple of things tripped me up on the way, and they're worth knowing.
+
+If you test `afplay` or `osascript` through Claude's normal Bash tool, they'll fail with errors like `AudioQueueStart failed` or `nice() failed: operation not permitted`. That's the sandbox blocking audio and AppleEvents. To pipe-test the real commands, you have to explicitly bypass the sandbox. The good news: the actual hooks aren't sandboxed the same way at runtime. Hooks run as regular subprocesses, so they work fine once they're wired into `settings.json`.
+
+The second thing: **you can't control how long the banner stays on screen from the hook.** `display notification` has no duration parameter. Whether a banner disappears after a few seconds or sticks around is a macOS-wide choice, set per app under **System Settings** > **Notifications** (the "Banners" vs. "Alerts" style). It's not something the hook script can override.
+
+> [!TIP]
+> If you want the alert to stay put until you dismiss it, set your terminal app (or `osascript`) to "Alerts" instead of "Banners" in **System Settings** > **Notifications**.
+
+## Why I kept it simple
+
+I originally wanted to put a snippet of Claude's last message into the banner for extra context. The `Stop` hook's payload has a `last_assistant_message` field available, so it's doable. But once I started wrestling with the `jq` and shell-escaping to get a clean one-liner, the complexity wasn't worth the payoff. The project name alone already answers the only question I actually have in that moment, which is "which session is this?" So I left it out. Sometimes the simple version is just the right version.
+
+## One caveat: this is macOS-specific
+
+`afplay` and `osascript` are macOS tools, so this exact config won't work on Linux. The good news is that the hook wiring in `settings.json` is identical everywhere. You'd only swap the commands:
+
+- For sound, use something like `paplay` or `aplay`.
+- For the desktop banner, use `notify-send`.
+
+Everything else (the `Stop` and `Notification` events, the matcher, the `jq` payload trick) stays exactly the same.
+
+That's it. Five minutes of setup, and now I actually notice when Claude is done or waiting on me. Go tab away with confidence. :-)
