@@ -269,6 +269,63 @@ export function card({ title, bg }: { title: string; bg?: string | null }) {
 }
 
 /**
+ * The homepage / fallback OG card: a centered brand cover — the rocket logo + big `ProstDev.com`
+ * wordmark, with the tagline as a smaller subheading beneath it. Distinct from card() (which fronts
+ * a specific post/video title); this one sells the brand itself, so it's kept separate and the
+ * per-post/per-video cards are untouched.
+ * @param tagline Small subheading under the wordmark.
+ */
+export function defaultCard({ tagline }: { tagline: string }) {
+  const logo = loadLogo();
+  return {
+    type: 'div',
+    props: {
+      style: { display: 'flex', position: 'relative', width: OG_WIDTH, height: OG_HEIGHT, backgroundColor: BRAND_DEEP, fontFamily: 'Inter' },
+      children: [
+        { type: 'div', props: { style: { position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT, backgroundImage: STARFIELD } } },
+        ...starLayer(),
+        {
+          type: 'div',
+          props: {
+            style: { position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', padding: '64px 72px', color: '#ffffff' },
+            children: [
+              {
+                // Big brand wordmark: rocket logo + `ProstDev` (cyan) `.com` (white).
+                type: 'div',
+                props: {
+                  style: { display: 'flex', alignItems: 'center', gap: 28, fontSize: 128, fontWeight: 800, letterSpacing: -3 },
+                  children: [
+                    logo ? { type: 'img', props: { src: logo, width: 132, height: 132, style: { width: 132, height: 132 } } } : null,
+                    {
+                      type: 'div',
+                      props: {
+                        style: { display: 'flex' },
+                        children: [
+                          { type: 'span', props: { style: { color: BRAND_300 }, children: 'ProstDev' } },
+                          { type: 'span', props: { style: { color: '#ffffff' }, children: '.com' } },
+                        ],
+                      },
+                    },
+                  ].filter(Boolean),
+                },
+              },
+              {
+                // Tagline subheading.
+                type: 'div',
+                props: {
+                  style: { display: 'flex', marginTop: 28, fontSize: 48, fontWeight: 400, color: '#ffffff', letterSpacing: -0.5 },
+                  children: tagline,
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+/**
  * Build a "bare" card: a full-bleed background image with NO title or wordmark overlay.
  * Used for videos, whose YouTube thumbnails ALREADY bake in their own title + branding — overlaying
  * our card's title on top produced unreadable text-on-text. The image is `objectFit: cover`'d to the
@@ -297,6 +354,6 @@ export function bareImageCard({ title, bg }: { title: string; bg?: string | null
 }
 
 /** Render a card element tree to a 1200×630 PNG `ImageResponse` (a `Response` subclass). */
-export function renderCard(element: ReturnType<typeof card> | ReturnType<typeof bareImageCard>): ImageResponse {
+export function renderCard(element: ReturnType<typeof card> | ReturnType<typeof bareImageCard> | ReturnType<typeof defaultCard>): ImageResponse {
   return new ImageResponse(element as any, { width: OG_WIDTH, height: OG_HEIGHT, fonts: loadFonts() });
 }
