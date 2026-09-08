@@ -14,5 +14,5 @@ export async function getStaticPaths() {
 export const GET: APIRoute = ({ props }) => {
   const { post } = props as { post: Awaited<ReturnType<typeof getRenderablePosts>>[number] };
   const bg = loadPostHero(post.filePath ?? '');
-  return renderCard(card({ title: post.data.title, eyebrow: post.data.category, bg }));
+  return renderCard(card({ title: post.data.title, bg }));
 };

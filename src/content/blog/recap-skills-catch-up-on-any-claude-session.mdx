@@ -1,0 +1,105 @@
+---
+title: 'Recap skills: catch up on any Claude session'
+description: 'Two agent skills that catch you up when you reopen a Claude session cold: a read-only snapshot of the goal, where things stand, and what is on you next.'
+pubDate: 2026-09-01
+category: Guides
+tags: [AI, Claude Code, Markdown]
+heroImage: ../../assets/blog/recap-skills-catch-up-on-any-claude-session.jpeg
+faqs:
+  - question: "What does the recap skill do?"
+    answer: "When you reopen a Claude session with no context loaded, recap gives you a short read-only report: the goal in one line, where things actually stand, anything blocked on you, and a next-steps list where every line is tagged `[You]` or `[Me]`. It is designed as a 30 to 60 second read so you can decide what to do next."
+  - question: "Why are there two recap skills?"
+    answer: "Because the state that goes stale is different across Claude products. In Claude Code the things that drift are agents, background jobs, pull requests, and your git tree, so the `dev` plugin recap checks those. In the Claude app, on claude.ai, and in Cowork none of those exist, so the `general` plugin recap checks artifacts, project files, background generations, and connector actions instead. Splitting them keeps each refresh step precise instead of full of if-this-otherwise-that branches."
+  - question: "Will recap resume or fix my work while catching me up?"
+    answer: "No. Both recaps are strictly read-only. During a recap they will not fix a failing check, push a commit, finish an artifact, or resume an unfinished task, even when the fix looks small. Anything actionable is reported under \"needs from you\" or as a `[Me]` next step so you decide, because a recap's whole job is a truthful snapshot."
+  - question: "How do I trigger a recap?"
+    answer: "Once the skill is installed you do not need to remember a command. Just ask for a recap, or say something like \"catch me up\" or \"where did we leave off,\" and the skill's description takes it from there."
+  - question: "How do I install the recap skills?"
+    answer: "They live in the public ProstDev/skills repo. In Claude Code, run `/plugin marketplace add ProstDev/skills` once, then `/plugin install dev@prostdev` for the Claude Code recap or `/plugin install general@prostdev` for the app, claude.ai, and Cowork. The Claude desktop app and claude.ai support only the `general` plugin. In any other agent, `npx skills add ProstDev/skills` copies the files into your repo."
+---
+
+You step away from a session. A meeting, lunch, the end of the day. When you come back, the context is gone. You are staring at a wall of earlier messages trying to remember what you were even doing, whether the thing you kicked off ever finished, and what the agent was waiting on you to decide.
+
+I got tired of reconstructing that by hand every time, so I wrote a skill for it: `recap`. You open the session, type the trigger, and get a 30 to 60 second read that tells you the goal, where things actually stand, and what is on you versus what the agent will pick up once you say go. It is read-only on purpose, so it never surprises you by resuming work while your back was turned.
+
+There are actually two versions of it, because a recap means something different depending on where you are working. Let me show you both and when each one fits.
+
+## TL;DR
+
+- `recap` catches you up when you reopen a Claude session cold: it gives a short, read-only report of the goal, where things stand, and a next-steps list split into `[You]` and `[Me]`.
+- There are two versions because the state that goes stale differs by product. The Claude Code one (`dev` plugin) refreshes agents, background jobs, PRs, and your git tree; the other (`general` plugin) refreshes artifacts, project files, and connector actions in the Claude app, claude.ai, and Cowork.
+- Both are strictly read-only. A recap never resumes work, pushes a commit, or finishes an artifact while catching you up, so it stays a truthful snapshot.
+- Install from [ProstDev/skills](https://github.com/ProstDev/skills) with `/plugin marketplace add ProstDev/skills` in Claude Code, or `npx skills add ProstDev/skills` in any other agent.
+
+## Why two recaps
+
+A recap is only useful if it checks the *real* current state, not what the conversation last claimed. Earlier messages go stale the moment something finishes in the background or you push a commit yourself. So the skill has to go look.
+
+The problem is that "what to go look at" is completely different across Claude products.
+
+In Claude Code, the things that drift are agents, background jobs, pull requests, and your git working tree. In the Claude app, on claude.ai, or in Cowork, none of those exist. What drifts there is an artifact you were editing, a file in your project, a long generation that was still running, or a connector action that may or may not have actually landed.
+
+One skill trying to cover both would either be vague or full of "if you are in Claude Code, do this, otherwise do that" branches. So I split it in two. Same shape, same report, different refresh step.
+
+## What they share
+
+Both skills follow the same three steps, and the report at the end is identical:
+
+- **Refresh (read-only).** Go check whatever this session actually put in flight. Skip anything that does not apply.
+- **Reconstruct the goal.** State it in one line, in your terms, not in tool or implementation language. If it is genuinely unclear, say so instead of guessing and presenting the guess as fact.
+- **Report.** Plain language, skimmable in under a minute: the **goal**, the **status** in a few lines, anything **needed from you**, and a **next-steps** list where every line is tagged `[You]` or `[Me]`.
+
+That last part is the piece I use the most. The mine-versus-yours split means I can glance at the report and immediately see what I have to unblock versus what the agent will handle on its own the moment I give the word.
+
+> [!NOTE]
+> Both skills are strictly read-only. During a recap they will not fix a failing check, push a commit, finish an artifact, or resume an unfinished task, even when the fix looks small and obviously right. A recap's whole job is a truthful snapshot. Mixing in new work defeats the point, so anything actionable shows up under "needs from you" or as a `[Me]` next step, not something done on the spot.
+
+## The Claude Code recap
+
+This one lives in the `dev` plugin. Its refresh step knows about the things a coding session leaves running:
+
+- **Background agents and subagents** it spawned. If one is still going, it gets reported as in-progress, not waited on.
+- **Background shell or workflow jobs** started with `run_in_background`.
+- **Scheduled work** like a cron routine or a loop the session set up.
+- **An open pull request** it opened or is waiting on. It pulls the live CI and review state with `gh pr view` and `gh pr checks` rather than trusting what the conversation last said.
+- **Uncommitted work.** It runs `git status` and `git diff` in every repo the session touched, so an earlier "done" claim gets checked against what is actually on disk.
+
+That git check is the one that saves me most often. It is very easy to believe a task is finished because the conversation said so, then find out the changes were never actually written or were half-applied. The recap catches that gap.
+
+## The recap for the rest of Claude
+
+This one lives in the `general` plugin, and it is the one that runs in the Claude app, on claude.ai, and in Cowork. Its refresh step looks at a different world:
+
+- **Artifacts and documents** produced this session. Is the latest version really the one being described, and is it finished or mid-edit?
+- **Project or uploaded files.** It reads the current file instead of trusting an earlier paste of it. On a filesystem-backed surface like Cowork, that includes anything written to disk.
+- **Async or background work**, like a long generation or export the session kicked off.
+- **Connector state.** If the session acted through Slack, Google, GitHub, or another connector, it checks whether the action actually landed (message sent, doc saved, issue opened) instead of assuming.
+- **Nothing but the thread to inspect?** Then the conversation itself is the source, and the report says so plainly rather than implying it verified something it could not.
+
+## When a recap needs a decision from you
+
+Sometimes the honest status is "this is blocked on you." When that happens, the skill does not dump three paragraphs of context and make you parse it. It hands off to another skill, [`clarify-request`](https://github.com/ProstDev/skills/blob/main/plugins/general/skills/clarify-request/SKILL.md), so the decision arrives as one clear question at a time with a recommended answer.
+
+If nothing is actually blocked, it says so. It will not invent a question just to fill the slot. That restraint is deliberate. A recap you can trust to be honest about "nothing needed from you, here is where things stand" is worth far more than one that manufactures busywork.
+
+## How to install them
+
+Both recaps live in my public skills repo, [ProstDev/skills](https://github.com/ProstDev/skills), alongside the rest of the skills I use on every session.
+
+If you are in Claude Code, add the marketplace once and install the plugin that has the recap you want:
+
+```bash
+/plugin marketplace add ProstDev/skills
+/plugin install dev@prostdev       # the Claude Code recap
+/plugin install general@prostdev   # the recap for the app, claude.ai, and Cowork
+```
+
+The Claude desktop app and claude.ai support only the `general` plugin, so that is the one to add there through Settings, then Plugins, then Add. And if you are in any other agent, `npx skills add ProstDev/skills` copies the files straight into your repo.
+
+Once installed, you do not have to remember a command. Just ask for a recap, or say something like "catch me up" or "where did we leave off," and the skill's description takes it from there.
+
+## Wrapping up
+
+The recap skills exist because returning to a session with zero loaded context is a tax I pay constantly, and reconstructing it by hand is slow and error-prone. Two versions, one for Claude Code and one for everywhere else, because the thing worth checking is genuinely different in each place. Both give you the same honest, read-only snapshot: here is the goal, here is where it really stands, here is what is on you.
+
+If you want the background on what agent skills even are and how they load, I wrote a [beginner's guide to AI agent skills](/post/what-are-ai-agent-skills-and-how-to-use-them/) that covers the `SKILL.md` format and how an agent picks the right one for your task.

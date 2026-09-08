@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { publishedVideos, getPlaylist, thumbnail, type Video } from '@/data/videos';
+import { publishedVideos, thumbnail, type Video } from '@/data/videos';
 import { bareImageCard, renderCard, fetchRemoteImage } from '@/lib/og-image';
 
 export async function getStaticPaths() {
@@ -18,6 +18,5 @@ export const GET: APIRoute = async ({ props }) => {
   const bg =
     (await fetchRemoteImage(thumbnail(video.youtubeId, 'max'))) ??
     (await fetchRemoteImage(thumbnail(video.youtubeId, 'hq')));
-  const eyebrow = getPlaylist(video.playlists[0])?.title ?? 'Video';
-  return renderCard(bareImageCard({ title: video.title, eyebrow, bg }));
+  return renderCard(bareImageCard({ title: video.title, bg }));
 };
