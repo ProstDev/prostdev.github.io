@@ -110,6 +110,7 @@ export const AUTHORS = {
     url: 'https://www.linkedin.com/in/manisha-patil-338078a0/',
     isAmbassador: true,
   },
+  'matias-ledesma': { name: 'Matias Ledesma', url: 'https://www.linkedin.com/in/matias-ledesma' },
   'matt-pocock': { name: 'Matt Pocock', url: 'https://www.linkedin.com/in/mapocock/' },
   'matthias-transier': {
     name: 'Matthias Transier',

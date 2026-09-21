@@ -43,6 +43,7 @@ import aiPickedAlexApproved from '@/assets/community/ai-picked-alex-approved.jpg
 import anotherIntegrationBlog from '@/assets/community/another-integration-blog.png';
 import betweenTwoMulesYoutube from '@/assets/community/between-two-mules-youtube.jpg';
 import bridgingTheGapYoutube from '@/assets/community/bridging-the-gap-youtube.jpg';
+import codebymatYoutube from '@/assets/community/codebymat-youtube.jpg';
 import exploreAndLearnByNkYoutube from '@/assets/community/explore-and-learn-by-nk-youtube.jpg';
 import flowState from '@/assets/community/flow-state.png';
 import iamuTechYoutube from '@/assets/community/iamu-tech-youtube.jpg';
@@ -220,6 +221,20 @@ export const COMMUNITY: CommunityLink[] = [
     authors: [AUTHORS['karol-skrzymowski']],
     image: bridgingTheGapYoutube,
     coverGradient: ['#ffffff', '#ffffff'],
+  },
+  {
+    id: 'codebymat-youtube',
+    title: 'CodeByMat',
+    type: 'youtube',
+    url: 'https://www.youtube.com/@codebymat',
+    description:
+      'Matias Ledesma’s MuleSoft channel — a Spanish-language "MuleSoft: Curso Básico" beginner series covering Anypoint Studio and Code Builder setup, transformers, and flow-control scopes, alongside an introduction to DataWeave fundamentals.',
+    authors: [AUTHORS['matias-ledesma']],
+    image: codebymatYoutube,
+    coverStyle: 'avatar',
+    // White square, cyan "{ Code mat; }" wordmark — the backdrop is a cyan→deep-navy tile pulled
+    // from the logo's own cyan.
+    coverGradient: ['#50e0e0', '#0a2a2a'],
   },
   {
     id: 'decipher-middleware',
