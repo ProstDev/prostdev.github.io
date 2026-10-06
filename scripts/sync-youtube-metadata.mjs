@@ -248,6 +248,11 @@ async function discover(key, knownIds) {
 }
 
 // ---- diff (pure) ----
+// The Data API ROUNDS UP the true length while the player (and the catalog, copied from it)
+// floors it — a 920.95–921.11s video is `PT15M22S` in the API but 15:21 on YouTube. So a
+// ±1s gap is rounding, not drift; only a bigger difference means the video was re-cut.
+const DURATION_TOLERANCE_SECONDS = 1;
+
 // A catalog publishedAt strictly in the future = a SCHEDULED premiere. YouTube's API doesn't
 // return a not-yet-public video, so `apiMap` won't have it — that's expected, NOT a dead embed.
 // `now` is injected (not read inside) so this stays a pure function and the caller owns the clock.
@@ -273,7 +278,7 @@ function computeDiff(catalog, apiMap, now = new Date()) {
     if (apiSecs != null) {
       if (catSecs == null) {
         findings.push({ kind: 'duration_fill', youtubeId: v.youtubeId, slug: v.slug, to: secondsToDisplay(apiSecs) });
-      } else if (catSecs !== apiSecs) {
+      } else if (Math.abs(catSecs - apiSecs) > DURATION_TOLERANCE_SECONDS) {
         findings.push({ kind: 'duration_drift', youtubeId: v.youtubeId, slug: v.slug, from: v.duration, to: secondsToDisplay(apiSecs) });
       }
     }
