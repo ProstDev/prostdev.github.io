@@ -1,0 +1,229 @@
+---
+title: '4 Claude Code slash commands I use the most (and 8 more)'
+description: 'Name and color your Claude Code sessions, ask side questions with /btw, and pick up old work with /resume. Plus /recap, /branch, /rewind, and a few more.'
+pubDate: 2026-10-08T12:00:00Z
+category: Guides
+tags: [AI, Claude Code]
+heroImage: ../../assets/blog/claude-code-slash-commands.jpeg
+faqs:
+  - question: "How do I rename a session in Claude Code?"
+    answer: "Type `/rename` followed by the name you want, like `/rename mule-api-refactor`, and the name shows up on the prompt bar right away. Run `/rename` with no name to have Claude Code generate one from the conversation, or name the session when you start it with `claude -n mule-api-refactor`."
+  - question: "What colors can I use with /color in Claude Code?"
+    answer: "You can choose `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, or `cyan`, as in `/color purple`. Run `/color default` to go back to normal, or `/color` with no argument to get a random color. The color applies to the prompt bar of the current session."
+  - question: "What does /btw do in Claude Code?"
+    answer: "`/btw` asks a side question about the current session without adding it to the conversation history. The answer shows up in an overlay, it works even while Claude is in the middle of a response, and it costs little while the prompt cache is warm. It has no tools, though, so it can only answer from what's already in the conversation."
+  - question: "How do I resume a previous Claude Code session?"
+    answer: "Inside a session, run `/resume` to open the session picker, or `/resume <name>` to jump straight to a named session. From your shell, `claude --continue` reopens the most recent session in the current folder, and `claude --resume <name>` resumes a named session directly. By default, saved sessions are deleted after 30 days."
+  - question: "Can I undo changes Claude Code made to my files?"
+    answer: "Yes. Run `/rewind`, or press `Esc` twice on an empty prompt, then pick an earlier prompt and choose to restore the code, the conversation, or both. Rewind only tracks edits made through Claude's file editing tools, so changes made by shell commands and edits from most subagents aren't restored. Keep using git."
+  - question: "What's the difference between /clear and /compact?"
+    answer: "`/clear` starts a new conversation with an empty context, and the old one stays saved so you can `/resume` it later. `/compact` keeps the same conversation going but summarizes it to free up space, and you can pass instructions to focus the summary."
+---
+
+If you use Claude Code for real work, you probably don't have just one session open. I usually have a few going at once, in different terminals, for different projects. And that's where the little annoyances start. Which terminal is the blog one? What was that port number Claude found 20 minutes ago? And where did yesterday's conversation go after I closed the window?
+
+Claude Code has built-in slash commands for all of that. In this post I'll show you the four I reach for the most: `/rename` and `/color` to tell your sessions apart, `/btw` to ask a quick question without derailing the work, and `/resume` to pick up where you left off. Then I'll share a few more worth knowing, like `/recap`, `/branch`, and `/rewind`, plus a quick-reference table at the end.
+
+> [!NOTE]
+> I'm on Claude Code v2.1.292 as I write this (October 2026). Commands change often, so if one doesn't show up for you, update Claude Code or check the official [commands reference](https://code.claude.com/docs/en/commands).
+
+## TL;DR
+
+- `/rename <name>` names the current session and shows the name on the prompt bar.
+- `/color <color>` paints the prompt bar, so you can tell sessions apart at a glance.
+- `/btw <question>` asks a side question about the session without adding it to the conversation. It works even while Claude is busy, but it has no tools.
+- `/resume` opens a session picker, or jumps straight to a session by name. From your shell, use `claude --continue` or `claude --resume <name>`.
+- Also worth knowing: `/recap` for a one-line summary, `/branch` to try a different direction, `/rewind` (or `Esc` twice) to roll back, and `/clear <name>` to start fresh without losing the old conversation.
+
+## What are Claude Code slash commands?
+
+A slash command is a shortcut you type at the very start of your message, beginning with `/`, that controls Claude Code itself: switching models, clearing context, managing sessions, and so on. Anything you type after the command name becomes its arguments, like the name in `/rename my-session`.
+
+You don't need to memorize them. Type `/` to see the commands available to you, or type `/` plus a few letters to filter the list. The skills you install show up in that menu too. If you're curious how those work, I wrote a [beginner's guide to AI agent skills](/post/what-are-ai-agent-skills-and-how-to-use-them/).
+
+## Tell your sessions apart with /rename and /color
+
+When three terminals all say "Claude Code," it's way too easy to type into the wrong one. These two commands fix that.
+
+### /rename: give the session a name
+
+Type `/rename` followed by the name you want, and the name shows up on the prompt bar right away. Watch the label in the top-right corner switch from `claude code` to `mule-api-refactor`:
+
+```claude-code
+label: claude code
+> /rename mule-api-refactor
+  ⎿  Session renamed to: mule-api-refactor
+label: mule-api-refactor
+```
+
+A good name pays off later too, because you can resume a session by its name (more on that in the `/resume` section). A few things to know:
+
+- Run `/rename` with no name and Claude Code generates one from the conversation so far.
+- You can name a session as you start it with `claude -n mule-api-refactor`.
+- If another live session on your machine already uses that name, Claude Code gives yours a variant with a two-word suffix (something like `mule-api-refactor-graceful-unicorn`) and tells you.
+
+### /color: paint the prompt bar
+
+`/color` sets the prompt bar color for the current session. Pass it one of the available colors, and the lines around the prompt and the session name switch to it:
+
+```claude-code
+label: mule-api-refactor
+> /color pink
+  ⎿  Session color set to: pink
+color: pink
+pause: 1s
+> /color cyan
+  ⎿  Session color set to: cyan
+color: cyan
+pause: 1s
+> /color purple
+  ⎿  Session color set to: purple
+color: purple
+```
+
+You can choose from `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, and `cyan`. Run `/color default` to go back to normal, or just `/color` with no argument to get a random one.
+
+The real magic is using both together. A colored bar with a name on it is something you can spot without reading a single line of the conversation.
+
+> [!TIP]
+> Give each project its own color and stick with it, for example purple for your blog and blue for a MuleSoft API. After a couple of days you'll recognize the session before you even read the name. And if you've set up [sound and desktop alerts for Claude Code](/post/sound-and-desktop-alerts-for-claude-code-with-hooks/), the banner tells you which project is calling and the color tells you which terminal to jump to.
+
+## Ask a side question with /btw
+
+Say Claude is halfway through a long task, and you need a quick fact it already knows, like the port it read from a config file earlier. If you ask in the main chat, that little detour becomes part of the conversation for the rest of the session, taking up context Claude carries around forever.
+
+`/btw` (as in "by the way") is the fix. It asks a side question about the current session, and neither the question nor the answer ever enters the conversation history. Here Claude is busy moving flows to a new error handler, and the side question gets its own panel instead of joining the conversation:
+
+```claude-code
+label: mule-api-refactor
+> move the order flows to the new global error handler
+● Starting with the order flows. Reading orders.xml first.
+pause: 800ms
+> /btw which port did we set the HTTP listener to?
+btw: `8081`. It comes from the `http.port` property in `config-dev.yaml`, and the listener config reads it as `${http.port}`, so changing the property changes the port.
+```
+
+The answer shows up in an overlay that you dismiss with `Space`, `Enter`, or `Esc`. Here's why I love it:
+
+- **It works while Claude is busy.** You can run `/btw` in the middle of a response, and it doesn't interrupt the main turn.
+- **It's cheap.** While the conversation's prompt cache is warm, a side question costs little beyond the answer itself.
+- **It keeps the conversation clean.** Nothing you ask with `/btw` gets added to the history.
+
+The catch: `/btw` has no tools. It only answers from what's already in the conversation, so it can't read a file, run a command, or search for you. If the answer isn't in the session yet, `/btw` won't find it.
+
+Two keys in the overlay are worth remembering. Press `c` to copy the answer as Markdown. Press `f` to fork the question and answer into a background subagent with full tool access, for when you realize your "quick question" needs real work after all. And if you dismissed an answer too fast, run `/btw` with no question to bring it back.
+
+> [!TIP]
+> Here's the rule of thumb from the docs: use `/btw` to ask about what Claude already knows from this session, and use a subagent to go find out something new.
+
+## Pick up where you left off with /resume
+
+You closed the terminal or restarted your laptop, and the conversation is gone. Except it isn't! Claude Code saves every session locally as you work, so you can go back to it later.
+
+From inside a session, run `/resume` to open the session picker, or add a name to jump straight to that session:
+
+```text
+/resume mule-api-refactor
+```
+
+The picker has a few keyboard shortcuts worth knowing:
+
+| Key | What it does |
+| --- | --- |
+| `↑` / `↓` | Move between sessions |
+| `Enter` | Resume the highlighted session |
+| `Space` | Preview the session before you open it |
+| `Ctrl+R` | Rename the highlighted session |
+| `Ctrl+A` | Show sessions from every project on your machine |
+| `Ctrl+B` | Show only sessions from your current git branch |
+
+Press `/` to search, or just start typing a session's name.
+
+If you haven't started Claude Code yet, you can resume straight from your shell:
+
+```bash
+claude --continue                  # reopen the most recent session in this folder
+claude --resume                    # open the session picker
+claude --resume mule-api-refactor  # resume a named session directly
+```
+
+This is where `/rename` really pays off. Resuming `mule-api-refactor` by name beats scrolling through a list of sessions. If you never name a session, Claude Code generates a title from your first prompt, and that title works with `--resume` too. It's just a lot harder to remember.
+
+> [!NOTE]
+> The picker starts with sessions from the project you're in. If the one you want lives in a different project, press `Ctrl+A` to see them all. Also, saved sessions don't live forever: by default Claude Code deletes them after 30 days. You can change that with the `cleanupPeriodDays` setting.
+
+## More Claude Code commands worth knowing
+
+Those four cover most of my day, but these are the next ones I'd learn.
+
+### /recap: a one-line catch-up
+
+When you come back to a session after stepping away, Claude Code can show a one-line recap of what happened so far. It kicks in on its own once at least three minutes have passed since the last turn while your terminal is out of focus, as long as the session has at least three turns. You can also run `/recap` to get one on demand. To turn the automatic ones off, open `/config` and turn off **Session recap**.
+
+The built-in recap is capped at 400 characters, so it's a quick reminder, not a full report. When I need more (the goal, what's blocked on me, and what's next), I use my [recap skills](/post/recap-skills-catch-up-on-any-claude-session/) instead.
+
+### /branch: try a different direction
+
+`/branch` makes a copy of the conversation at this point and switches you into it, so you can try a different approach without losing the path you were on. Give the branch a name that describes the experiment:
+
+```text
+/branch try-dataweave-instead
+```
+
+The original conversation stays untouched, and you can return to it any time with `/resume`. From your shell, `claude --continue --fork-session` resumes your most recent session as a new copy instead.
+
+### /rewind: undo Claude's changes
+
+Took a wrong turn? Run `/rewind`, or press `Esc` twice on an empty prompt, to open the rewind menu. Pick one of the prompts you sent earlier, then choose what to roll back:
+
+- **Restore code and conversation**: go back to that point completely.
+- **Restore conversation**: rewind the chat but keep the current code.
+- **Restore code**: undo the file changes but keep the chat.
+- **Summarize from here** or **Summarize up to here**: compress part of the conversation to free up context.
+
+> [!WARNING]
+> Rewind only tracks edits made through Claude's file editing tools. Changes made by shell commands (like a script that deletes files) can't be undone this way, and edits from most subagents aren't restored either. It's a handy undo button, not a replacement for git.
+
+### /clear, /compact, and /context: manage a long session
+
+These three help when a session gets long:
+
+- `/clear` starts a new conversation with an empty context. The old one isn't deleted, so you can still `/resume` it. Pass a name, like `/clear release-prep`, to label the conversation you're leaving so it's easy to find in the picker.
+- `/compact` keeps the same conversation going but summarizes it to free up space. You can add instructions for the summary, like `/compact focus on the API changes`.
+- `/context` shows what's filling your context window as a colored grid, with suggestions for what's taking up the most space.
+
+### /copy and /export: get the output out
+
+- `/copy` copies Claude's last response to your clipboard. If the response has code blocks, you get a picker to grab just the block you need. `/copy 2` copies the second-to-last response.
+- `/export` saves the whole conversation as plain text. Add a filename, like `/export notes.txt`, to write it straight to a file.
+
+## Quick reference
+
+Here's every command from this post in one place:
+
+| Command | What it does | Example |
+| --- | --- | --- |
+| `/rename [name]` | Names the session and shows it on the prompt bar | `/rename mule-api-refactor` |
+| `/color [color]` | Colors the prompt bar for this session | `/color purple` |
+| `/btw [question]` | Asks a side question that never enters the conversation | `/btw which port did we use?` |
+| `/resume [session]` | Opens the session picker, or resumes a session by name | `/resume mule-api-refactor` |
+| `/recap` | Shows a one-line summary of the session | `/recap` |
+| `/branch [name]` | Copies the conversation so you can try another approach | `/branch try-dataweave-instead` |
+| `/rewind` | Rolls code and/or conversation back (or press `Esc` twice) | `/rewind` |
+| `/clear [name]` | Starts fresh, and the old conversation stays resumable | `/clear release-prep` |
+| `/compact [instructions]` | Summarizes the conversation to free up context | `/compact focus on the API changes` |
+| `/context` | Shows what's filling the context window | `/context` |
+| `/copy [N]` | Copies the last (or Nth-latest) response | `/copy 2` |
+| `/export [filename]` | Saves the conversation as plain text | `/export notes.txt` |
+
+## Wrapping up
+
+None of these commands are flashy, but together they take the friction out of working with several Claude sessions at once. You name and color sessions so you never type into the wrong one, ask quick questions without derailing the work, and get back to any conversation by name. Each one takes five seconds, and those seconds add up fast.
+
+Here's where to go next:
+
+- Open a session and run `/rename` and `/color` right now. Seriously, it takes five seconds.
+- Type `/` in Claude Code to browse every command available to you, or read the full [commands reference](https://code.claude.com/docs/en/commands).
+- Set up [sound and desktop alerts with hooks](/post/sound-and-desktop-alerts-for-claude-code-with-hooks/) so Claude tells you when a session is done or needs you.
+
+Happy session juggling! :-)

@@ -32,6 +32,8 @@ export type IconName =
   | 'terminal'
   | 'trophy'
   | 'play'
+  | 'pause'
+  | 'rotate-ccw'
   | 'file-text'
   | 'sparkles'
   | 'info'

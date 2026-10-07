@@ -69,6 +69,28 @@
   --code-border: var(--color-brand-500); /* #1593cc — 3.46:1 vs page #fff, a crisp visible edge (WCAG 1.4.11) */
   --code-text: var(--text);
 
+  /* Animated terminal demos (light) — the same surface as a code block (--bg-subtle), so a
+     demo reads as a light terminal next to the light code blocks. Ratios are vs --term-bg.
+     --term-rule is decorative (the prompt bar's horizontal lines), no ratio needed. See the
+     `.term*` section below + src/lib/remark-terminal.mjs. */
+  --term-bg: var(--bg-subtle);
+  --term-text: var(--text);       /* 16.4:1 */
+  --term-muted: var(--text-muted); /* 5.2:1 — prompt bar label, output glyphs */
+  --term-status: #8a5a00;         /* 5.6:1 — amber status line, echoes Claude Code's yellow */
+  --term-rule: #c3ccd5;
+  --term-cursor: var(--text);
+  /* `/color` tints (light) — GitHub Primer's fg colors. Each clears AA both as the label chip's
+     fill under --term-chip-text (4.9–5.4:1) and as a line on --term-bg (4.6–5.0:1). */
+  --term-chip-text: #ffffff;
+  --term-color-red: #cf222e;
+  --term-color-orange: #bc4c00;
+  --term-color-yellow: #9a6700;
+  --term-color-green: #1a7f37;
+  --term-color-cyan: #1b7c83;
+  --term-color-blue: #0969da;
+  --term-color-purple: #8250df;
+  --term-color-pink: #bf3989;
+
   /* Callout/admonition status colors (light). Each type: pale tint bg + a saturated
      border/icon accent + a dark label that clears WCAG AA (>=4.5:1) on the tint. Body text
      inside a callout stays --text (>=14:1 on these near-white tints). See .callout* below
@@ -106,6 +128,26 @@
   --code-bg: #0e2230;
   --code-border: #3a6e8a; /* 3.44:1 vs page #0b1015 — a crisp visible edge (WCAG 1.4.11) */
   --code-text: var(--text);
+
+  /* Animated terminal demos (dark) — github-dark's #24292e, the same fill Shiki repaints dark
+     code blocks with, so a demo and a code block sit side by side as one surface. */
+  --term-bg: #24292e;
+  --term-text: #e1e4e8;   /* 11.5:1 */
+  --term-muted: #a0aab4;  /* 6.2:1 */
+  --term-status: #d1b85c; /* 7.5:1 */
+  --term-rule: #4b545e;
+  --term-cursor: #e1e4e8;
+  /* `/color` tints (dark) — github-dark's bright set, with the screen color as chip text (dark on
+     a light chip, like Claude Code's): 5.8–8.3:1. */
+  --term-chip-text: var(--term-bg);
+  --term-color-red: #ff7b72;
+  --term-color-orange: #ffa657;
+  --term-color-yellow: #e3b341;
+  --term-color-green: #56d364;
+  --term-color-cyan: #56d4dd;
+  --term-color-blue: #79c0ff;
+  --term-color-purple: #d2a8ff;
+  --term-color-pink: #ff9bce;
 
   /* Callout status colors (dark). Deep-but-subtle tint + a brighter border/icon + a light
      label that clears AA (>=8:1) on the tint. Body text stays --text (>=13:1). */
@@ -338,6 +380,234 @@ summary,
 .code-block__toggle:focus-visible {
   outline: none;
   box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* ── Animated terminal demos (src/lib/remark-terminal.mjs + TerminalPlayer.astro) ──
+   A ```claude-code / ```terminal fence renders as a <figure class="term not-prose">: a window
+   bar (traffic-light dots + title + the Pause/Replay control) over a monospace screen. The
+   frame mirrors .code-block (border, radius, --bg-card bar) and every color is a --term-*
+   token, so it flips with the theme like the code blocks around it. `not-prose` opts the
+   figure out of the typography plugin's figure/ol/li spacing. */
+.term {
+  margin: 1.25rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--term-bg);
+}
+/* Undo the centering `.prose :where(figure)` gives body-image figures. Needs the .prose
+   prefix: that rule comes later in this file at the same (0,1,0) specificity. */
+.prose .term { text-align: left; }
+.term__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.85rem;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+/* Decorative window dots in the macOS colors (no text on them, so no contrast ratio). */
+.term__dots {
+  display: inline-flex;
+  flex: none;
+  gap: 0.4rem;
+}
+.term__dots span {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background-color: #ff5f57;
+}
+.term__dots span:nth-child(2) { background-color: #febc2e; }
+.term__dots span:nth-child(3) { background-color: #28c840; }
+.term__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+/* Pause / Play / Replay — same treatment as the code block's Copy button. */
+.term__control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-strong); /* AA in both themes (5.0:1 light / 8.6:1 dark on --bg-card) */
+  background-color: transparent;
+  border: 1px solid transparent;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.term__control:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--border);
+}
+.term__control:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--bg-card);
+}
+.term__control-icon { display: inline-flex; }
+
+/* A column pinned to the bottom, like a real terminal: while the demo plays, the screen holds
+   the final frame's height (TerminalPlayer sets min-height), so the prompt bar stays put at the
+   bottom and the history grows in above it. */
+.term__screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.9rem 1.1rem 1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--term-text);
+}
+/* Long commands wrap instead of scrolling sideways on a phone; leading spaces in output
+   (indented Claude Code replies) are kept. */
+.term__line {
+  min-height: 1.6em; /* a blank output line still takes a row */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.term__line--out { color: var(--term-muted); }
+.term__prompt {
+  color: var(--term-muted);
+  user-select: none;
+}
+
+/* The input row. The typed span grows; the cursor block blinks only while idle (a real
+   terminal holds the cursor solid while keys are landing). */
+.term__input {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.term__cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.15em;
+  margin-left: 1px;
+  vertical-align: -0.2em;
+  background-color: var(--term-cursor);
+  animation: term-blink 1.1s steps(1) infinite;
+}
+.term.is-typing .term__cursor { animation: none; }
+@keyframes term-blink {
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .term__cursor { animation: none; }
+}
+
+/* claude-code: Claude Code's prompt bar — a rule with the session label at its right end,
+   the input, a plain rule, then the optional status line. */
+.term__promptbar { margin-top: 0.75rem; }
+.term__history:empty + .term__promptbar { margin-top: 0; }
+/* No flex gap: the label's own padding spaces it from the line, so a rule with no label (the
+   bottom one, or an empty label) reads as one continuous line. */
+.term__rule {
+  display: flex;
+  align-items: center;
+  margin: 0.15rem 0;
+}
+.term__rule::before,
+.term__rule::after {
+  content: '';
+  height: 1px;
+  background-color: var(--term-rule);
+}
+.term__rule::before { flex: 1; }
+.term__rule::after { flex: none; width: 1rem; }
+.term__label {
+  padding-inline: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--term-muted);
+  white-space: nowrap;
+}
+.term__label:empty { display: none; }
+.term__status {
+  padding-left: 1.5ch;
+  font-size: 0.8125rem;
+  color: var(--term-status);
+}
+.term__status:empty { display: none; }
+/* `/color` (`data-color` on the prompt bar): both rules take the color and the label becomes a
+   filled chip, the way Claude Code paints it. */
+.term__promptbar[data-color='red'] { --term-tint: var(--term-color-red); }
+.term__promptbar[data-color='orange'] { --term-tint: var(--term-color-orange); }
+.term__promptbar[data-color='yellow'] { --term-tint: var(--term-color-yellow); }
+.term__promptbar[data-color='green'] { --term-tint: var(--term-color-green); }
+.term__promptbar[data-color='cyan'] { --term-tint: var(--term-color-cyan); }
+.term__promptbar[data-color='blue'] { --term-tint: var(--term-color-blue); }
+.term__promptbar[data-color='purple'] { --term-tint: var(--term-color-purple); }
+.term__promptbar[data-color='pink'] { --term-tint: var(--term-color-pink); }
+.term__promptbar[data-color] .term__rule::before,
+.term__promptbar[data-color] .term__rule::after { background-color: var(--term-tint); }
+.term__promptbar[data-color] .term__label {
+  color: var(--term-chip-text);
+  background-color: var(--term-tint);
+  border-radius: 2px;
+}
+/* `/btw` side-question panel. Hidden until the prompt bar gets `data-btw`; then, like Claude
+   Code's, it takes the prompt bar's place: a rule, the amber `/btw` + muted question, then the
+   spinner (`answering`) or the answer (`answered`), and the key hints. */
+.term__btw { display: none; }
+.term__promptbar[data-btw] > :not(.term__btw) { display: none; }
+.term__promptbar[data-btw] > .term__btw { display: block; }
+.term__promptbar[data-btw='answering'] .term__btw-answer,
+.term__promptbar[data-btw='answering'] .term__btw-hint--answered,
+.term__promptbar[data-btw='answered'] .term__btw-spinner,
+.term__promptbar[data-btw='answered'] .term__btw-hint--answering { display: none; }
+.term__btw-body { padding: 0.6rem 0 0 1.5ch; }
+.term__btw-q { margin-bottom: 0.6rem; }
+.term__btw-cmd {
+  font-weight: 700;
+  color: var(--term-status);
+}
+.term__btw-question { color: var(--term-muted); }
+.term__btw-spinner,
+.term__btw-answer { padding-left: 1.5ch; }
+.term__btw-spinner { color: var(--term-status); }
+.term__btw-line {
+  min-height: 1.6em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* `code` in an answer, blue like Claude Code's (AA in both themes: 4.9:1 light / 7.5:1 dark). */
+.term__code { color: var(--term-color-blue); }
+.term__btw-hint {
+  margin-top: 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--term-muted);
+}
+/* The spinner glyph cycles like Claude Code's. A fixed-width box keeps "Answering…" from
+   shifting as the glyph changes; browsers that can't animate `content` show a steady ✻. */
+.term__btw-glyph {
+  display: inline-block;
+  width: 2ch;
+}
+.term__btw-glyph::before {
+  content: '✻';
+  animation: term-spin 1.2s steps(1) infinite;
+}
+@keyframes term-spin {
+  0% { content: '·'; }
+  17% { content: '✢'; }
+  33% { content: '✳'; }
+  50% { content: '✶'; }
+  67% { content: '✻'; }
+  83% { content: '✽'; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .term__btw-glyph::before { animation: none; }
 }
 
 /* Don't let @tailwindcss/typography inject curly quotes around blockquotes.

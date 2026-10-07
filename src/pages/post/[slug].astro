@@ -4,6 +4,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
 import DocActions from '@/components/DocActions.astro';
 import CodeBlockEnhancer from '@/components/CodeBlockEnhancer.astro';
+import TerminalPlayer from '@/components/TerminalPlayer.astro';
 import ReportIssue from '@/components/ReportIssue.astro';
 import LiteYouTube from '@/components/LiteYouTube.astro';
 import CategoryBadge from '@/components/CategoryBadge.astro';
@@ -190,6 +191,7 @@ if (!scheduled) {
             <Content />
           </div>
           <CodeBlockEnhancer />
+          <TerminalPlayer />
 
           {readerNotes && readerNotes.length > 0 && (
             <ReaderNotes notes={readerNotes} />

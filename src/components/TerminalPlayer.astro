@@ -1,0 +1,278 @@
+---
+/**
+ * TerminalPlayer — plays back the animated terminal demos that src/lib/remark-terminal.mjs
+ * builds from ```claude-code / ```terminal fences.
+ *
+ * Renders NOTHING visible. Like CodeBlockEnhancer, it ships hidden <template>s (icons
+ * single-sourced from Icon.astro) plus an inline script. The server already rendered each
+ * demo's FINAL frame as real text, so with JS off (or reduced motion) the reader sees the
+ * finished screen. With JS, each demo rewinds to its first frame, types itself out once when
+ * it scrolls into view, then holds the final frame. A Pause / Play / Replay control in the
+ * window bar covers WCAG 2.2.2 (auto-playing motion must be pausable). Under
+ * prefers-reduced-motion nothing auto-plays; the control offers an opt-in Play instead.
+ *
+ * Styling lives in src/styles/global.css under the `.term*` section.
+ */
+import Icon from './Icon.astro';
+---
+<template id="term-icon-pause"><Icon name="pause" class="h-4 w-4" /></template>
+<template id="term-icon-play"><Icon name="play" class="h-4 w-4" /></template>
+<template id="term-icon-replay"><Icon name="rotate-ccw" class="h-4 w-4" /></template>
+
+<script>
+  // Mirrors the steps parseTerminalScript() emits in src/lib/remark-terminal.mjs.
+  type Part = { text: string; code?: boolean };
+  type Step =
+    | { t: 'type'; text: string; line?: number } // no line = a /btw question (skips the history)
+    | { t: 'out'; line: number }
+    | { t: 'label' | 'status'; text: string }
+    | { t: 'color'; color: string }
+    | { t: 'btw'; question: string }
+    | { t: 'btw-answer'; parts: Part[] }
+    | { t: 'btw-close' }
+    | { t: 'pause'; ms: number };
+  interface Script {
+    label: string;
+    status: string;
+    color: string;
+    steps: Step[];
+  }
+  type Control = 'pause' | 'play' | 'replay';
+
+  // Timing (ms). Keystrokes land at uneven intervals so the typing reads as human.
+  const START_DELAY = 600; // before the first keystroke
+  const KEY_MIN = 45;
+  const KEY_MAX = 110;
+  const BEFORE_ENTER = 500; // a beat to read the command before "Enter"
+  const AFTER_ENTER = 350;
+  const AFTER_OUTPUT = 140;
+  const AFTER_BAR = 400; // after a label/status change
+  const BTW_THINK = 1400; // the /btw "Answering…" spinner before the answer lands
+
+  const CONTROL_TEXT: Record<Control, { text: string; aria: string }> = {
+    pause: { text: 'Pause', aria: 'Pause the terminal demo' },
+    play: { text: 'Play', aria: 'Play the terminal demo' },
+    replay: { text: 'Replay', aria: 'Replay the terminal demo' },
+  };
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function iconFrom(id: string): Node {
+    const tpl = document.getElementById(id) as HTMLTemplateElement | null;
+    return tpl ? tpl.content.cloneNode(true) : document.createElement('span');
+  }
+
+  function setup(root: HTMLElement, observer: IntersectionObserver | null) {
+    let script: Script;
+    try {
+      script = JSON.parse(root.dataset.term ?? '');
+    } catch {
+      return; // malformed data — leave the static final frame alone
+    }
+    const screen = root.querySelector<HTMLElement>('.term__screen');
+    const typed = root.querySelector<HTMLElement>('.term__typed');
+    const bar = root.querySelector<HTMLElement>('.term__bar');
+    if (!screen || !typed || !bar) return;
+    const lines = Array.from(root.querySelectorAll<HTMLElement>('.term__line'));
+    const label = root.querySelector<HTMLElement>('.term__label'); // claude-code only
+    const status = root.querySelector<HTMLElement>('.term__status'); // claude-code only
+    const promptbar = root.querySelector<HTMLElement>('.term__promptbar'); // claude-code only
+
+    // `/color`: '' clears it (default), anything else tints the prompt bar via [data-color].
+    function setColor(color: string) {
+      if (!promptbar) return;
+      if (color) promptbar.dataset.color = color;
+      else delete promptbar.dataset.color;
+    }
+
+    // The /btw panel (claude-code scripts that use it). '' closes it; 'answering' / 'answered'
+    // open it on the spinner / the answer — global.css swaps it in for the prompt bar.
+    const btwQuestion = root.querySelector<HTMLElement>('.term__btw-question');
+    const btwAnswer = root.querySelector<HTMLElement>('.term__btw-answer');
+    function setBtw(state: '' | 'answering' | 'answered') {
+      if (!promptbar) return;
+      if (state) promptbar.dataset.btw = state;
+      else delete promptbar.dataset.btw;
+    }
+    // Same markup as btwLine() in remark-terminal.mjs.
+    function btwLine(parts: Part[]) {
+      const line = document.createElement('div');
+      line.className = 'term__btw-line';
+      for (const part of parts) {
+        const span = document.createElement('span');
+        if (part.code) span.className = 'term__code';
+        span.textContent = part.text;
+        line.appendChild(span);
+      }
+      return line;
+    }
+
+    // ── Pause / Play / Replay control (in the window bar) ──
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'term__control';
+    const icons: Record<Control, HTMLSpanElement> = {
+      pause: document.createElement('span'),
+      play: document.createElement('span'),
+      replay: document.createElement('span'),
+    };
+    for (const [kind, span] of Object.entries(icons)) {
+      span.className = 'term__control-icon';
+      span.appendChild(iconFrom(`term-icon-${kind}`));
+      btn.appendChild(span);
+    }
+    const btnText = document.createElement('span');
+    btn.appendChild(btnText);
+    bar.appendChild(btn);
+
+    function setControl(kind: Control) {
+      for (const [k, span] of Object.entries(icons)) span.hidden = k !== kind;
+      btnText.textContent = CONTROL_TEXT[kind].text;
+      btn.setAttribute('aria-label', CONTROL_TEXT[kind].aria);
+    }
+
+    // idle = static final frame, never played (reduced motion, or not scrolled to yet).
+    let state: 'idle' | 'playing' | 'paused' | 'done' = 'idle';
+    let i = 0; // current step
+    let c = 0; // characters typed so far in the current `type` step
+    let timer: number | undefined;
+
+    // Rewind to the first frame. The screen keeps the final frame's height while it plays, so
+    // lines appearing don't push the rest of the post down mid-read.
+    function reset() {
+      window.clearTimeout(timer);
+      screen!.style.minHeight = `${screen!.offsetHeight}px`;
+      lines.forEach((l) => (l.hidden = true));
+      typed!.textContent = '';
+      if (label) label.textContent = script.label;
+      if (status) status.textContent = script.status;
+      setColor(script.color ?? '');
+      setBtw('');
+      i = 0;
+      c = 0;
+    }
+
+    function schedule(ms: number) {
+      timer = window.setTimeout(tick, ms);
+    }
+
+    function tick() {
+      const step = script.steps[i];
+      if (!step) return finish();
+      switch (step.t) {
+        case 'type':
+          if (c < step.text.length) {
+            c += 1;
+            typed!.textContent = step.text.slice(0, c);
+            root.classList.add('is-typing');
+            const last = c === step.text.length;
+            return schedule(last ? BEFORE_ENTER : KEY_MIN + Math.random() * (KEY_MAX - KEY_MIN));
+          }
+          // "Enter": the command moves up into the history and the input clears. A /btw
+          // question has no history line; its panel opens on the very next step, right away.
+          root.classList.remove('is-typing');
+          typed!.textContent = '';
+          i += 1;
+          c = 0;
+          if (step.line === undefined) return schedule(0);
+          lines[step.line].hidden = false;
+          return schedule(AFTER_ENTER);
+        case 'out':
+          lines[step.line].hidden = false;
+          i += 1;
+          return schedule(AFTER_OUTPUT);
+        case 'label':
+        case 'status': {
+          const target = step.t === 'label' ? label : status;
+          if (target) target.textContent = step.text;
+          i += 1;
+          return schedule(AFTER_BAR);
+        }
+        case 'color':
+          setColor(step.color);
+          i += 1;
+          return schedule(AFTER_BAR);
+        case 'btw':
+          if (btwQuestion) btwQuestion.textContent = step.question;
+          btwAnswer?.replaceChildren();
+          setBtw('answering');
+          i += 1;
+          return schedule(BTW_THINK);
+        case 'btw-answer':
+          btwAnswer?.appendChild(btwLine(step.parts));
+          setBtw('answered');
+          i += 1;
+          return schedule(AFTER_OUTPUT);
+        case 'btw-close':
+          setBtw('');
+          i += 1;
+          return schedule(AFTER_ENTER);
+        case 'pause':
+          i += 1;
+          return schedule(step.ms);
+      }
+    }
+
+    function play() {
+      state = 'playing';
+      setControl('pause');
+      schedule(i === 0 && c === 0 ? START_DELAY : 0);
+    }
+
+    function pause() {
+      window.clearTimeout(timer);
+      state = 'paused';
+      root.classList.remove('is-typing');
+      setControl('play');
+    }
+
+    function finish() {
+      state = 'done';
+      root.classList.remove('is-typing');
+      screen!.style.minHeight = '';
+      setControl('replay');
+    }
+
+    btn.addEventListener('click', () => {
+      if (state === 'playing') pause();
+      else if (state === 'paused') play();
+      else {
+        reset();
+        play();
+      }
+    });
+
+    if (observer) {
+      // Show the first frame right away (not the final one), then play when scrolled into view.
+      reset();
+      state = 'paused';
+      setControl('play');
+      root.addEventListener('term:visible', () => {
+        if (state === 'paused' && i === 0 && c === 0) play();
+      }, { once: true });
+      observer.observe(root);
+    } else {
+      setControl('play');
+    }
+  }
+
+  const demos = document.querySelectorAll<HTMLElement>('.prose .term[data-term]');
+  if (demos.length) {
+    const observer =
+      reducedMotion || !('IntersectionObserver' in window)
+        ? null
+        : new IntersectionObserver(
+            (entries, obs) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                obs.unobserve(entry.target);
+                entry.target.dispatchEvent(new Event('term:visible'));
+              }
+            },
+            // Start once the demo's top edge is in the upper 3/4 of the viewport. (A ratio
+            // threshold would never fire for a demo taller than the screen.)
+            { rootMargin: '0px 0px -25% 0px' }
+          );
+    demos.forEach((root) => setup(root, observer));
+  }
+</script>

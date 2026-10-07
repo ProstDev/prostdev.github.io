@@ -4,6 +4,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import remarkCallouts from './src/lib/remark-callouts.mjs';
+import remarkTerminal from './src/lib/remark-terminal.mjs';
 import rehypeTables from './src/lib/rehype-tables.mjs';
 import rehypeLinkExternal from './src/lib/rehype-link-external.mjs';
 import shikiCodeTitle from './src/lib/shiki-code-title.mjs';
@@ -48,7 +49,9 @@ export default defineConfig({
   markdown: {
     // Transform GitHub alert blockquotes (`> [!NOTE]`) into styled callout boxes at build time.
     // See src/lib/remark-callouts.mjs + the `.callout*` styles in src/styles/global.css.
-    remarkPlugins: [remarkCallouts],
+    // Then turn ```claude-code / ```terminal fences into animated terminal demos (played back by
+    // TerminalPlayer.astro). See src/lib/remark-terminal.mjs + the `.term*` styles in global.css.
+    remarkPlugins: [remarkCallouts, remarkTerminal],
     // Wrap GFM tables in a responsive scroll container + add scope="col" to headers.
     // See src/lib/rehype-tables.mjs + the `.table-wrap` / `.prose table` styles in global.css.
     // Then decorate EXTERNAL links with target="_blank" rel="noopener" + the external-arrow
