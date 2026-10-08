@@ -139,6 +139,16 @@ export const SECTIONS: Section[] = [
       },
     ],
   },
+  {
+    slug: 'online-security-tips',
+    seoTitle: 'Online Security Tips: Data Breaches, Passwords & 2FA',
+    blocks: [
+      {
+        playlistId: 'online-security-tips',
+        hook: 'Protect your accounts in minutes, not hours.',
+      },
+    ],
+  },
 ];
 
 /** A block with its playlist + videos resolved. `videos` respects the scheduling gate. */

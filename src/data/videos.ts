@@ -189,6 +189,17 @@ export const PLAYLISTS: Playlist[] = [
       'Standalone MuleSoft and DataWeave videos that don\'t belong to a multi-part series — one-off tutorials, tips, and walkthroughs worth a watch on their own.',
     tier: 'more',
   },
+  {
+    // Lower-priority ('more' tier): the channel's first non-MuleSoft topic (Oct 2026) —
+    // a test series, so it stays off the homepage + nav until it proves itself.
+    id: 'online-security-tips',
+    slug: 'online-security-tips',
+    title: 'Online Security Tips',
+    years: '2026',
+    description:
+      'Practical, no-jargon security tips for everyday people and developers — check if your email was in a data breach, lock down your passwords and 2FA, and spot the scams that follow a leak.',
+    tier: 'more',
+  },
 ];
 
 export const VIDEOS: Video[] = [
@@ -1392,6 +1403,24 @@ export const VIDEOS: Video[] = [
       },
     ],
   },
+  {
+    youtubeId: 'QqrIKFAuNMs',
+    slug: 'check-if-your-email-was-leaked-have-i-been-pwned',
+    title: 'How to Check if Your Email Was Leaked (Have I Been Pwned)',
+    description:
+      'Check if your email was in a data breach in 30 seconds with Have I Been Pwned — read your results, the two features of the site I skip (the password check and Notify Me), what to do if you got pwned, and how to look up data breach class action settlements.',
+    playlists: ['online-security-tips'],
+    duration: '4:04',
+    publishedAt: '2026-10-13T13:05:00Z', // 9:00am Toronto (EDT, UTC−4) + 5 min — reveals after the YouTube drop
+    links: [
+      {
+        label: 'Read the article',
+        url: 'https://www.prostdev.com/post/have-i-been-pwned-check-if-you-were-in-a-data-breach',
+      },
+      { label: 'Have I Been Pwned', url: 'https://haveibeenpwned.com/' },
+      { label: 'IdentityTheft.gov', url: 'https://www.identitytheft.gov/' },
+    ],
+  },
 ];
 
 /**
@@ -1404,6 +1433,7 @@ export const VIDEOS: Video[] = [
  * instead. When you publish a video, add its slug to the TOP of this list.
  */
 export const LATEST_SLUGS: string[] = [
+  'check-if-your-email-was-leaked-have-i-been-pwned', // Have I Been Pwned (Online Security Tips, 'more' tier — force-added at Alex's request)
   'enable-mulesoft-vibes-in-vs-code', // MuleSoft Vibes in VS Code setup guide (standalone)
   'ai-showdown-api-led-claude-curietech-vibes', // API-led architecture (AI Showdown, Round 2)
   'claude-code-vs-curietech-advent-of-code-dataweave', // Advent of Code (AI Showdown)
