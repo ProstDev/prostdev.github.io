@@ -16,9 +16,9 @@
  *   4. Commit & push — the deploy rebuilds the site.
  *
  * LOWER-PRIORITY ("MORE FROM THE CHANNEL") PLAYLISTS:
- *   Mark a back-catalog/niche playlist with `tier: 'more'` (see the Playlist type) and
- *   append it to the END of PLAYLISTS. Such playlists are kept OFF the homepage and only
- *   surfaced on /videos (search, sitemap, and llms.txt still index every video). Their
+ *   Mark a back-catalog/niche playlist with `tier: 'more'` (see the Playlist type). Such
+ *   playlists are kept OFF the homepage and only surfaced on /videos (which renders
+ *   PLAYLISTS in ARRAY order regardless of tier — place the entry where it should appear) (search, sitemap, and llms.txt still index every video). Their
  *   videos are findable, not focal — so do NOT add their slugs to LATEST_SLUGS (that list
  *   feeds the homepage Latest row, which would make them focal).
  */
@@ -68,6 +68,18 @@ export interface Video {
 
 export const PLAYLISTS: Playlist[] = [
   {
+    // Lower-priority ('more' tier): the channel's first non-MuleSoft topic (Oct 2026) —
+    // a test series, so it stays off the homepage + nav until it proves itself.
+    id: 'online-security-tips',
+    slug: 'online-security-tips',
+    title: 'Online Security Tips',
+    years: '2026',
+    description:
+      'Practical, no-jargon security tips for everyday people and developers — check if your email was in a data breach, lock down your passwords and 2FA, and spot the scams that follow a leak.',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PLX7pw-kvcU1s',
+    tier: 'more',
+  },
+  {
     id: 'ai-showdown',
     slug: 'mulesoft-ai',
     title: 'AI Showdown: MuleSoft Edition (2026)',
@@ -98,18 +110,8 @@ export const PLAYLISTS: Playlist[] = [
       'https://www.youtube.com/playlist?list=PLb61lESgk6hhX9c0mNlV68IONicyEh4fo',
   },
   {
-    id: 'mulesoft-from-start',
-    slug: 'mulesoft-from-start',
-    title: "MuleSoft from Start: A Beginner's Guide",
-    years: '2023',
-    description:
-      'We walk through the basics of MuleSoft, API-led connectivity, and how to start building integrations using Anypoint Platform and Anypoint Studio.',
-    playlistUrl:
-      'https://www.youtube.com/playlist?list=PLb61lESgk6hhqwnhkIlyhbgra4kPZKc9x',
-  },
-  {
-    // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos
-    // (listed after the primary series). Its /curietech section page is still reachable
+    // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
+    // Its /curietech section page is still reachable
     // (the /videos row heading links to it via sectionHref) — see SECTIONS in sections.ts.
     id: 'curietech',
     slug: 'curietech',
@@ -119,6 +121,20 @@ export const PLAYLISTS: Playlist[] = [
       'A step-by-step series that goes from absolutely nothing to a fully functional MuleSoft API — with the help of CurieTech AI and Anypoint Code Builder (ACB). Watch how AI accelerates every part of the development process, from API spec generation to implementation, testing, and deployment.',
     playlistUrl:
       'https://www.youtube.com/playlist?list=PLb61lESgk6hi6woWDZhkLHU-ZudF9k5kW',
+    tier: 'more',
+  },
+  {
+    // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
+    // Has a /datacloud-mulesoft section page (in SECTIONS, sections.ts) so its videos'
+    // breadcrumbs resolve — reachable but NOT in the nav.
+    id: 'datacloud-mulesoft',
+    slug: 'datacloud-mulesoft',
+    title: 'Data Cloud + MuleSoft Integration',
+    years: '2024',
+    description:
+      'Integrate Salesforce Data Cloud with MuleSoft end to end — set up the Connected App, Ingestion API, and Data Stream, deploy a ready-made Mule app to CloudHub, call it from Postman, secure it with basic authentication in API Manager, and load data with the bulk operations.',
+    playlistUrl:
+      'https://www.youtube.com/playlist?list=PLb61lESgk6himjzGQytbUTg0rkMmbO6uC',
     tier: 'more',
   },
   {
@@ -136,18 +152,14 @@ export const PLAYLISTS: Playlist[] = [
     tier: 'more',
   },
   {
-    // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
-    // Has a /datacloud-mulesoft section page (in SECTIONS, sections.ts) so its videos'
-    // breadcrumbs resolve — reachable but NOT in the nav.
-    id: 'datacloud-mulesoft',
-    slug: 'datacloud-mulesoft',
-    title: 'Data Cloud + MuleSoft Integration',
-    years: '2024',
+    id: 'mulesoft-from-start',
+    slug: 'mulesoft-from-start',
+    title: "MuleSoft from Start: A Beginner's Guide",
+    years: '2023',
     description:
-      'Integrate Salesforce Data Cloud with MuleSoft end to end — set up the Connected App, Ingestion API, and Data Stream, deploy a ready-made Mule app to CloudHub, call it from Postman, secure it with basic authentication in API Manager, and load data with the bulk operations.',
+      'We walk through the basics of MuleSoft, API-led connectivity, and how to start building integrations using Anypoint Platform and Anypoint Studio.',
     playlistUrl:
-      'https://www.youtube.com/playlist?list=PLb61lESgk6himjzGQytbUTg0rkMmbO6uC',
-    tier: 'more',
+      'https://www.youtube.com/playlist?list=PLb61lESgk6hhqwnhkIlyhbgra4kPZKc9x',
   },
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
@@ -187,17 +199,6 @@ export const PLAYLISTS: Playlist[] = [
     title: 'Other MuleSoft videos',
     description:
       'Standalone MuleSoft and DataWeave videos that don\'t belong to a multi-part series — one-off tutorials, tips, and walkthroughs worth a watch on their own.',
-    tier: 'more',
-  },
-  {
-    // Lower-priority ('more' tier): the channel's first non-MuleSoft topic (Oct 2026) —
-    // a test series, so it stays off the homepage + nav until it proves itself.
-    id: 'online-security-tips',
-    slug: 'online-security-tips',
-    title: 'Online Security Tips',
-    years: '2026',
-    description:
-      'Practical, no-jargon security tips for everyday people and developers — check if your email was in a data breach, lock down your passwords and 2FA, and spot the scams that follow a leak.',
     tier: 'more',
   },
 ];

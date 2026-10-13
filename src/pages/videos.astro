@@ -2,11 +2,11 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PlaylistRow from '@/components/PlaylistRow.astro';
 import ExternalPlaylistCard from '@/components/ExternalPlaylistCard.astro';
-import { videosInPlaylist, primaryPlaylists, morePlaylists, FUN_PLAYLISTS, COMMUNITY_PLAYLISTS } from '@/data/videos';
+import { videosInPlaylist, PLAYLISTS, FUN_PLAYLISTS, COMMUNITY_PLAYLISTS } from '@/data/videos';
 import { sectionHref } from '@/data/sections';
 
-// Featured series first, then the rest — one uniform list, no visual separation.
-const playlists = [...primaryPlaylists(), ...morePlaylists()];
+// PLAYLISTS array order, verbatim — hand-ordered (tier only gates the homepage), one uniform list.
+const playlists = PLAYLISTS;
 ---
 <BaseLayout
   title="All Videos"
