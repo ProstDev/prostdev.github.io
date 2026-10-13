@@ -1,0 +1,537 @@
+---
+title: 'Agentforce Voice: Let Callers Type Their Email Mid-Call'
+description: 'Build an Agentforce Voice agent that texts callers a one-field form link, so they type their email instead of spelling it. Full steps, commands and fixes.'
+pubDate: 2026-10-13
+category: Tutorials
+tags: [Salesforce, AI, Security]
+heroImage: ../../assets/blog/agentforce-voice-agent-type-email-mid-call.png
+faqs:
+  - question: "What is Typeback?"
+    answer: "Typeback is a pattern for Agentforce Voice agents. When the caller needs to give a value that's hard to say out loud, like an email address, the agent makes a link to a one-field form instead of asking them to spell it. The caller types the value on their phone, says \"done\", and the agent reads back a masked hint on the same call."
+  - question: "Does the agent's language model ever see the full email address?"
+    answer: "No. The typed value is saved on a Salesforce record that the agent user can't read, because the `Typeback_Agent` permission set has no access to the `Value__c` field (and an Apex test proves it). The agent only gets a masked hint such as \"starting with C, at example dot com\"."
+  - question: "Why does the agent check for the email on the caller's next turn instead of being notified?"
+    answer: "There's no API to push an event into a live voice session. So Typeback is pull-based: a router guard in the agent runs the check action at the start of every turn while a link is out, before any LLM routing pass."
+  - question: "Does Typeback send the link by SMS?"
+    answer: "Not yet. The org I built it in couldn't send SMS (registering a 10DLC brand needs a brand license), so the Log sender saves the link on the request record and `scripts/link.sh` prints it during the call. The code has a `TypebackSms.Sender` interface for adding a real SMS sender later."
+  - question: "Can an AI coding agent follow this tutorial?"
+    answer: "Yes. Every step is tagged [HUMAN] or [AI]. An AI agent can run the [AI] commands and should stop at every [HUMAN] step, tell you what to do, and wait. The tutorial includes a list of rules to give the agent, like never printing access tokens and never activating a site without your go-ahead."
+  - question: "How long does a Typeback capture take on a live call?"
+    answer: "On my second live call, the agent made the link 21 seconds into the call, the form was sent at 59 seconds, and the agent read back the hint at 62 seconds, 3 seconds after the form was sent. The whole call ended at 84 seconds."
+---
+
+Have you ever tried to spell your email address to a voice agent? "C as in cat, H, R..." and then it reads back something completely different. Email addresses, name spellings and booking codes are some of the hardest things for a voice agent to hear correctly.
+
+**Typeback** is a pattern I built for Agentforce Voice to fix that: when the caller wants something emailed, the agent makes a link to a one-field form instead of asking them to spell it. The caller types the email on their phone, says "done", and the agent reads back a masked hint ("starting with C, at example dot com") on the same call. The agent's language model never sees the full email.
+
+In this tutorial I'll walk you through every step to rebuild it in your own Salesforce org, in order, plus every problem I hit along the way and how I fixed it. You can follow it by hand, or hand it to an AI coding agent and do only the steps that need a person.
+
+## TL;DR
+
+- You'll build a phone number that reaches an Agentforce Voice agent (a resort concierge) that captures the caller's email through a form link instead of speech.
+- The code (Apex, a Lightning Web Component form, an Agent Script agent and setup scripts) is in the [agentforce-typeback GitHub repo](https://github.com/ProstDev/agentforce-typeback). Most steps are one script.
+- The Setup click paths (site activation, phone number, Omni-Channel flow, voice channel) have to be done by a person.
+- The full loop works on a live call from a mobile phone. What's not done: texting the link automatically. For now the link reaches the phone by hand.
+- Every gotcha I hit is in the [troubleshooting tables](#troubleshooting-every-problem-i-hit-and-the-fix) at the end.
+
+## What you'll build
+
+Here's how a call flows from the caller's phone to the agent and back, one step at a time:
+
+1. **The call reaches the agent.** The caller dials the phone number. An Omni-Channel flow with a single **Route Work** element sends the call to `TypebackDemoVoice`, the Agent Script agent.
+1. **The caller asks for an email.** For example: "Can you email me my booking confirmation?"
+1. **The agent makes a link.** `TypebackRequestAction` creates a random token and saves only its hash on a new `Typeback_Request__c` record with the status **Pending**. Then it hands the link to the sender.
+1. **The link reaches the caller's phone.** For now, the Log sender saves the link on the record (`Test_Link__c`) and `scripts/link.sh` prints it so you can open it by hand. An SMS sender would text it at this step instead.
+1. **The caller types their email.** They open `https://<site>/typeback/?t=<token>`, which loads the `typebackForm` Lightning Web Component on a guest site. `TypebackFormController` saves the email and sets the record to **Submitted**.
+1. **The caller says "done".** At the start of that turn, a router guard runs `TypebackCheckAction` before any LLM pass.
+1. **The agent reads back a masked hint.** "I have an email starting with C, at example dot com. Is that right?"
+
+### The design rules
+
+These are the rules that make it work. Keep them in mind if you change the code:
+
+- **The agent actions never throw and never return nulls.** Every Typeback line the agent says is written in Apex and spoken word for word.
+- **Only the token's SHA-256 hash is stored.** The link carries a 128-bit random token, so a record can't be used to rebuild its link.
+- **The agent user can't read the typed value.** The `Typeback_Agent` permission set has no access to `Value__c`, and an Apex test proves it.
+- **Send before saving.** Apex can't make a callout after DML in the same transaction.
+- **Links are tied to their call.** The call Id comes from the agent's `VoiceCallId` linked variable, never from what the caller says.
+- **Pull, not push.** There's no API to push an event into a live voice session, so the agent checks for the typed value on the caller's next utterance.
+
+## Get the code
+
+Everything in this tutorial runs from the [agentforce-typeback repo on GitHub](https://github.com/ProstDev/agentforce-typeback) (Apache 2.0 license). Clone it and work from its root:
+
+```sh
+git clone https://github.com/ProstDev/agentforce-typeback.git
+cd agentforce-typeback
+```
+
+Here's what's in it:
+
+| Path | What it is |
+| --- | --- |
+| `force-app-agent/.../TypebackDemoVoice/` | The voice agent, in Agent Script. It's the default package directory because `sf agent publish authoring-bundle` only looks there. |
+| `force-app/.../objects/` | `Typeback_Request__c` (one row per link) and `Typeback_Settings__c` (a hierarchy custom setting). |
+| `force-app/.../classes/` | The two agent actions (`TypebackRequestAction`, `TypebackCheckAction`), the form controller (`TypebackFormController`), helpers and tests. |
+| `force-app/.../lwc/typebackForm/` | The one-field form the caller opens. |
+| `force-app/.../permissionsets/` | `Typeback_Agent` (agent user, no access to the typed value), `Typeback_Guest` (site guest user), `Typeback_Admin` (you). |
+| `scripts/` | Setup, configuration, preview and reporting scripts. Every `scripts/setup.sh` step is safe to re-run. |
+
+## How to follow this tutorial (humans and AI agents)
+
+Every step has one tag:
+
+| Tag | Meaning |
+| --- | --- |
+| **[HUMAN]** | A person has to do it: a Setup click path, something that needs a phone, or something public-facing or hard to undo. |
+| **[AI]** | A command from the repo. An AI agent can run it, and a person can paste the same command into a terminal. Each one says what output means it worked. |
+
+**Doing it all by hand?** Run the [AI] commands yourself, in order. Nothing in them needs an AI.
+
+**Handing it to an AI coding agent?** Give it this page and a prompt like: *"Follow this tutorial from Phase 0. Run the [AI] steps yourself. At each [HUMAN] step, stop, tell me exactly what to do, and wait until I say it's done."* Also give it the rules below.
+
+### Rules for an AI agent
+
+1. **Stop at every [HUMAN] step.** Say what to click, then wait. Don't look for a scripted way around it.
+1. **Never do these without the person's go-ahead at that moment:** activate a site, get a phone number, register an SMS brand or campaign, send an email or SMS (even to the person), or delete anything in the org.
+1. **Keep secrets out of output.** `sf org display` prints an access token, so use `--json` with `jq` and pick out only the fields you need. Never print tokens, session IDs or login URLs. Show phone numbers as their last four digits only.
+1. **Keep org details out of committed files:** usernames, org IDs, domains and phone numbers. `.env.local` and `org-reference/` are gitignored, so those details can go there.
+1. **Before any commit, put the agent user placeholder back:** `node scripts/setup-agent-user.js --username __AGENT_USER_PLACEHOLDER__`
+1. **Live form links are bearer links.** Don't paste one anywhere public. It works until it's used or it expires.
+1. **Run scripts by path,** for example `/bin/bash scripts/report.sh`. Each one moves to the repo root and reads `.env.local` itself. Pass `--json` to `sf` commands in non-interactive shells, because their progress display floods logs otherwise.
+1. **Describe before you query.** Some fields you'd expect aren't queryable (for example `MessagingChannel.SessionHandlerType` and `VoiceCall.IsVoiceMail`). Check with `sf sobject describe -o typeback -s <Object> --json | jq -r '.result.fields[].name'`.
+
+## Prerequisites
+
+**The Salesforce org** needs all of these (Phase 0 checks them):
+
+- Agentforce, with Agentforce Service Agents
+- Agentforce Voice (Agentforce Contact Center), with a way to get a phone number. My org's entitlements included one 10-digit long-code number and inbound voice credits, so the number cost nothing.
+- A free Einstein Agent User license, for the agent user
+- Digital Experiences, for the guest site that hosts the form
+- An admin login
+
+I used an Enterprise Edition trial with these features on Summer '26 (API 67.0).
+
+> [!WARNING]
+> A free Salesforce Developer Edition org doesn't include an Agentforce Voice license, so you can't get a phone number or route calls to the agent there. You need an org that has Agentforce Voice.
+
+**Your machine:**
+
+- Salesforce CLI 2.152 or later (check with `sf --version`), Node.js and jq
+- Optional: `qrencode` (`brew install qrencode`), so `scripts/link.sh` can show the link as a QR code
+- `scripts/link.sh` uses the macOS `date -j`. On Linux, change its `date` line to GNU `date -d`.
+
+**For the test calls:** a real mobile phone on cellular data, plus a laptop next to it.
+
+## Overview of the phases
+
+| Phase | What | Who | Time it took me |
+| --- | --- | --- | --- |
+| 0 | Org, CLI login, recon | HUMAN, then AI | 15 min |
+| 1 | Deploy the object, Apex and permission sets; run the tests | AI | 5 min |
+| 2 | Guest site and form; phone test | AI, then HUMAN | 30 min |
+| 3 | The agent; scripted preview of the whole loop | AI | 10 min |
+| 4 | Phone number, routing flow, voice channel | HUMAN, then AI checks | 30 min, plus a few minutes for the number to go live |
+| 5 | Live test call | HUMAN + AI | 10 min per call |
+| 6 | Clean up | Both | 10 min |
+
+## Phase 0: Connect the Salesforce CLI to your org
+
+**0.1 [HUMAN] Get an org** that meets the [prerequisites](#prerequisites).
+
+**0.2 [HUMAN] Log the CLI in to it.** Replace `<your-domain>` with your org's My Domain:
+
+```sh
+sf org login web -a typeback -r https://<your-domain>.my.salesforce.com
+```
+
+Approve in the browser straight away, because the CLI only waits a few minutes (you'll get an `AuthTimeoutError` if you're slow). Use a browser window that's already logged in to the org. If you get a username and password page instead, paste that tab's URL into the window where you're logged in.
+
+**0.3 [AI] Create the local config:**
+
+```sh
+cp .env.local.example .env.local      # then set ORG if you used an alias other than typeback
+```
+
+**0.4 [AI] Match the API version.** Check the org's API version without printing the access token:
+
+```sh
+sf org display -o typeback --json | jq -r '.result.apiVersion'
+```
+
+If it's lower than `sourceApiVersion` in `sfdx-project.json` (67.0), set `sourceApiVersion` to the org's version. Otherwise every retrieve fails with `UNSUPPORTED_API_VERSION`. A higher org version is fine.
+
+**0.5 [AI] Run the read-only recon:**
+
+```sh
+scripts/recon.sh
+```
+
+It shows the edition, licenses, existing agents, routing flows, calls, sites and credentials, and it copies existing agents and routing flows into `org-reference/`. Look for:
+
+- free Einstein Agent licenses
+- the Omni-Channel **Phone** service channel
+- whether Digital Experiences is on
+
+Built-in routing flows show up by name but can't be copied. That's expected.
+
+**0.6 [AI] Check for a phone number entitlement:**
+
+```sh
+sf data query -o typeback -q "SELECT MasterLabel, AmountUsed, CurrentAmountAllowed FROM TenantUsageEntitlement" --json |
+  jq -r '.result.records[] | select(.MasterLabel | test("Long Code|Voice"; "i")) | "\(.MasterLabel): \(.AmountUsed // 0) of \(.CurrentAmountAllowed)"'
+```
+
+Mine showed one ten-digit long-code number and inbound voice credits. If you see nothing like that, **[HUMAN]** find out how your org gets a number before Phase 4.
+
+## Phase 1: Deploy the Apex, object and permission sets
+
+**1.1 [AI] Deploy and test:**
+
+```sh
+scripts/setup.sh core
+```
+
+This deploys `force-app`, then runs the five Typeback test classes itself, because some orgs accept a `RunSpecifiedTests` deploy without actually running any tests. It also assigns you `Typeback_Admin`.
+
+**It worked when** it prints `0 failed` (I had 49 passing) and every Typeback class is at 75% coverage or more. Mine ranged from 86% to 100%.
+
+## Phase 2: Publish the guest site and the form
+
+**2.1 [HUMAN] Turn on Digital Experiences,** but only if recon said it's off. Go to **Setup → Digital Experiences → Settings → Enable Digital Experiences**, pick a domain, and click **Save**. Treat the domain as permanent.
+
+**2.2 [AI] Create and publish the site:**
+
+```sh
+scripts/setup.sh site
+```
+
+It creates an empty "Build Your Own (LWR)" site at `/typeback`, publishes it, and assigns the site's guest user `Typeback_Guest`. Site creation runs in the background and can take a few minutes. If publish fails because the site is brand new, wait a minute and re-run it.
+
+**It worked when** it prints `SITE_URL=https://<host>/typeback`. Put that line in `.env.local`.
+
+**2.3 [AI] Write the settings:**
+
+```sh
+scripts/configure.sh Log 10      # Log sender, links expire after 10 minutes, at most 3 links per call
+```
+
+**2.4 [HUMAN] Activate the site, with its welcome email off.** Go to **Setup → Digital Experiences → All Sites → Typeback → Workspaces → Administration**:
+
+1. Under **Emails**, clear **Send welcome email**. Do this first: activating sends it to every site member.
+1. Under **Settings**, click **Activate**.
+
+This is a person's step because it makes the site public and can email people.
+
+**[AI] check:** this query should show `Live`:
+
+```sh
+sf data query -o typeback -q "SELECT Status FROM Network WHERE Name = 'Typeback'"
+```
+
+**2.5 [HUMAN] Place the form.** Go to **All Sites → Typeback → Builder → Components (+) → Custom Components**, drag **Typeback Form** onto the Home page, and click **Publish**.
+
+**2.6 [AI] Make a test link** (nothing is texted):
+
+```sh
+scripts/new-link.sh
+```
+
+It prints a request name and a link. Each link works once and lasts 10 minutes. Links to one number are capped at 3 per 30 minutes, so for more, pass another fictional number: `scripts/new-link.sh '415 555 0124'`.
+
+**2.7 [HUMAN] Test the form on your phone,** with Wi-Fi and any VPN off:
+
+| Test | Expected |
+| --- | --- |
+| Open a link, type an email, tap **Continue**, then **Send** | A **Thanks** page that tells you to go back to your call and say "done" |
+| Open the same link again | "This link has been used" |
+| Type `abc@` | Blocked before it can be sent |
+| Run `scripts/configure.sh Log 1`, make a link, wait 70 seconds, open it | "This link has expired". Then run `scripts/configure.sh Log 10` |
+
+> [!NOTE]
+> I haven't run the expiry test (the last row) myself yet. Let me know if it doesn't behave as expected for you.
+
+If the form shows "Something went wrong" as soon as you open a link, the guest user probably can't run the controller. `scripts/setup.sh` tries to give the guest user `Typeback_Guest` (which grants it), but if that didn't work: **[HUMAN]** In **Builder → Settings → General**, click the Guest User Profile link, then **Enabled Apex Class Access → Edit**, add `TypebackFormController`, and click **Save**.
+
+> [!TIP]
+> After any later change to the form, run `scripts/setup.sh core` and then `scripts/setup.sh site`. The site serves its last publish, so your change doesn't show until you republish.
+
+## Phase 3: Publish the Agentforce Voice agent
+
+**3.1 [AI] Set up, publish and activate the agent:**
+
+```sh
+scripts/setup.sh agent
+```
+
+In order, it:
+
+1. Creates an Einstein Agent user, or reuses the one already in the `.agent` file, and writes it into `default_agent_user`.
+1. Assigns that user `Typeback_Agent`.
+1. Validates, publishes and activates the newest version of `TypebackDemoVoice`.
+
+**It worked when** it prints `TypebackDemoVoice version N is active`.
+
+Then put `AGENT_USER=<the printed username>` in `.env.local`, so later runs reuse that user instead of using up another license.
+
+> [!IMPORTANT]
+> Run this before any preview. Without `Typeback_Agent`, the actions are withheld, and the agent improvises instead of saying the Apex lines.
+
+**3.2 [AI] Run the whole loop in a preview** (live actions, Log sender, nothing texted):
+
+```sh
+scripts/preview-loop.sh
+```
+
+It plays a caller who:
+
+1. Asks for an email, then gives a fictional number.
+1. Says "done" too early and asks a side question.
+1. Submits the form through the same controller the page calls.
+1. Says "done", confirms, and asks for a second email.
+
+A second session backs out at the number prompt. The script checks each reply and the request row, and checks that the full email never appears in the preview traces.
+
+**It worked when** the last line is `PASS`. Each preview turn takes 3 to 5 seconds.
+
+A preview has no call, so the agent asks for a mobile number. On a real call it uses caller ID instead.
+
+### How the agent works
+
+If you want to change the agent, here's the shape of `TypebackDemoVoice.agent`:
+
+- **A router guard runs first on every turn.** It clears `tb_line` first. Then, if a link is out (`tb_waiting`), it runs the check action and goes straight to the `email_capture` subagent, with no LLM routing pass.
+- **`email_capture` makes the link on entry,** without the LLM, then says `tb_line` word for word.
+- **Its tools are gated with `available when` on `tb_status`:** `send_to_number`, `resend_link`, `skip_email` and `confirm_email`.
+- **The resort facts live in the system instructions** (check-in, spa hours and so on). They're made up for the demo.
+
+This is the router guard. It's the part that makes the pull model work:
+
+```text title="TypebackDemoVoice.agent"
+start_agent agent_router:
+   reasoning:
+      instructions:->
+         set @variables.tb_line = ""
+         # A link is out: check it and go straight to email_capture, with no routing pass.
+         if @variables.tb_waiting:
+            run @actions.router_check
+               with voiceCallId=@variables.VoiceCallId
+               with requestId=@variables.tb_request_id
+               with cancel=False
+               set @variables.tb_status = @outputs.status
+               set @variables.tb_hint = @outputs.spokenHint
+               set @variables.tb_line = @outputs.agentLine
+               set @variables.tb_waiting = @outputs.waiting
+            transition to @subagent.email_capture
+```
+
+## Phase 4: Route a phone number to the agent
+
+The agent must be active (Phase 3) before you start, so it shows up in the routing picker. I did all of this in Setup. Deploying the flow as metadata wasn't tried.
+
+**4.1 [HUMAN] Get a number.** Go to **Setup → Agentforce Voice Setup → Voice Channels with Agents → New Number**. A wizard opens in a new window:
+
+1. Pick a country.
+1. Number type: **10-Digit Long Code**.
+1. Pick a number.
+1. Click **Review & Save**, then **Finish**.
+
+The number shows as Requested, then Live within minutes. Use the Phone Numbers tab's **Refresh Status** to check. Mine was free because of the org's entitlement. If your org has none, check with whoever owns the org's contract before you go ahead.
+
+**4.2 [HUMAN] Build the routing flow.** Go to **Setup → Flows → New Flow → Omni-Channel Flow**.
+
+1. The flow needs a Text variable named `recordId`, available for input. Salesforce passes the VoiceCall Id in it. Create it if the flow doesn't have one.
+1. Add one **Route Work** element:
+   - Route a single record: `recordId`
+   - Service Channel: **Phone**
+   - Route To: **Agentforce Service Agent → Typeback Demo Voice**
+   - Fallback queue: any queue (I used the contact center's default queue)
+1. Save it as **Typeback Voice Routing**, then click **Activate**.
+
+The built-in voice routing templates are managed and can't be retrieved to copy, so build this one from scratch. It's only one element.
+
+**4.3 [HUMAN] Tie the number to the flow.** Go to **Setup → Agentforce Voice Setup → Voice Channels with Agents → New Channel**. Choose **PSTN Voice**, your number and **Typeback Voice Routing**, then click **Save**.
+
+> [!WARNING]
+> The channel is created **inactive**. Open the channel by clicking its name, then click **Activate**. The channel list has no toggle, and calls won't reach the agent until you do this.
+
+**4.4 [AI] Check the routing:**
+
+```sh
+sf data query -o typeback -q "SELECT ApiName, IsActive FROM FlowDefinitionView WHERE ApiName = 'Typeback_Voice_Routing'"
+sf data query -o typeback -q "SELECT DeveloperName, MessageType, IsActive FROM MessagingChannel"
+```
+
+**It worked when** the flow shows `IsActive` true, and there's a `PstnVoice` channel with `IsActive` true.
+
+Optionally, retrieve the flow read-only to check that it points at the agent. The output folder must be inside the project, and `org-reference/` is gitignored:
+
+```sh
+sf project retrieve start -o typeback -m Flow:Typeback_Voice_Routing --target-metadata-dir org-reference/typeback-flow --unzip --json | jq -r '.status'
+```
+
+In the retrieved flow's `routeWork` action, "Agentforce Service Agent" is saved like this:
+
+| Parameter | Value |
+| --- | --- |
+| `routingType` | `Copilot` |
+| `copilotId` | setupReference `TypebackDemoVoice`, type `BotDefinition` |
+| `botId` | empty |
+| `serviceChannelDevName` | `sfdc_phone` |
+
+## Phase 5: Make a live test call
+
+**5.1 [AI] Start the link watcher** in its own terminal, just before the call:
+
+```sh
+scripts/link.sh 300     # waits up to 5 minutes for the agent to make a link on a live call
+```
+
+It watches for a call in progress. As soon as the agent makes a link on it, the script prints the link, its expiry time and, if `qrencode` is installed, a QR code. This stands in for the text message.
+
+**5.2 [HUMAN] Make the call.** Turn Wi-Fi off and use speakerphone, so you can type while you talk. Then call the number from your mobile. The first ring can take a while: that's carrier time before the call reaches Salesforce, which accepted mine 4 to 5 seconds after it arrived.
+
+| You | The agent |
+| --- | --- |
+| "Can you email me my booking confirmation?" | "I just texted a link to your phone ending in …. Open it, type your email, and say done when you've sent it." |
+| *(scan the QR code or open the printed link on your phone, type a test email, tap Continue, then Send)* | *(silent)* |
+| "Done." | "Got it, thanks. I have an email starting with …, at … dot com. Is that right?" |
+| "Yes." | Thanks you and asks if there's anything else |
+| "That's all, thanks." | Wraps up. Hang up when it has |
+
+Note the time you called, so you can match the call to its record.
+
+**5.3 [AI] Check the call:**
+
+```sh
+scripts/report.sh 3
+```
+
+It lists the newest requests and calls, with phone numbers cut to their last four digits. It never reads the typed value. For the timings, run these, replacing `<VoiceCall Id>` with the Id from the first query:
+
+```sh
+sf data query -o typeback -q "SELECT Id, CreatedDate, CallAcceptDateTime, CallEndDateTime, CallDurationInSeconds, CallDisposition, VendorType FROM VoiceCall ORDER BY CreatedDate DESC LIMIT 1"
+sf data query -o typeback -q "SELECT Status, ServiceChannel.DeveloperName, CreatedDate, AcceptDateTime FROM AgentWork WHERE WorkItemId = '<VoiceCall Id>'"
+sf data query -o typeback -q "SELECT Name, Status__c, CreatedDate, Submitted_At__c, Retrieved_At__c FROM Typeback_Request__c WHERE Voice_Call_Id__c = '<VoiceCall Id>'"
+```
+
+**The call passed when all of these hold:**
+
+- The call completed with no hang-up and no transfer.
+- `VendorType` is `VirtualVoiceAgent` and the AgentWork is on `sfdc_phone`.
+- The call's `FromPhoneNumber` ends in your mobile's last four digits.
+- There's one request row with that `Voice_Call_Id__c`, its status is Submitted, and `Retrieved_At__c` is set.
+- The agent never said the full email.
+
+Here are my timings from the second live call, counted from the start of the call record:
+
+| Event | Time |
+| --- | --- |
+| Agent accepts the call | 5 s |
+| Link made (after the greeting and the ask) | 21 s |
+| Form sent (link to the phone by hand, then typing) | 59 s |
+| Agent picks up the hint | 62 s, 3 s after the form was sent |
+| Call ends | 84 s |
+
+## Phase 6: Clean up
+
+- **[AI] Before any commit,** put the agent user placeholder back: `node scripts/setup-agent-user.js --username __AGENT_USER_PLACEHOLDER__`
+- **[HUMAN] The Twilio remote site setting:** `scripts/setup.sh core` deploys all of `force-app`, which includes a remote site setting named `Typeback_Egress_Check` (it allows callouts to `api.twilio.com`). If you don't plan to add a Twilio sender, delete it in **Setup → Remote Site Settings → Typeback_Egress_Check → Del**. Don't use `sf project delete source` for this, because it deletes your local copy too.
+- **[HUMAN] To stop calls reaching the agent:** deactivate the voice channel, or the Typeback Voice Routing flow. I found no way to release the number in Setup: the Phone Numbers tab only offers **Refresh Status**.
+- **[AI] To turn the agent off** (after the person says so): `sf agent deactivate -o typeback -n TypebackDemoVoice`
+- **[HUMAN] The agent user:** deactivate it in **Setup → Users** if you're done with it.
+
+Trial orgs expire. Nothing here depends on the org's history, so in a new org you can start again from Phase 0.
+
+## What about texting the link by SMS?
+
+Right now, the `Log` sender saves each link on its request row (`Test_Link__c`) instead of texting it, and `scripts/link.sh` prints it for you. I looked at two ways to send real texts. Neither is built yet.
+
+- **Native SMS on the same number.** SMS is a separate messaging channel in Agentforce Contact Center (see "Create an SMS Channel in Agentforce Contact Center" in Salesforce Help). For a US 10-digit long code, you first register a 10DLC brand and campaign in **Setup → Messaging → Regulatory Compliance**. That's where I stopped: Register Brand said "You need an active brand license to register a brand." If your org has the license, the sending side would be the **Send Conversation Messages** action.
+- **Twilio.** I confirmed the org can reach Twilio's API, but didn't build a sender. Keep in mind that a Twilio trial only texts verified numbers and adds a prefix to every message, toll-free numbers need verification before they can text US numbers, and US 10-digit numbers need A2P 10DLC registration.
+
+To add a sender yourself:
+
+1. Implement `TypebackSms.Sender` and return it from `TypebackSms.sender(name)`.
+1. Let `scripts/configure.sh` accept its name.
+1. Keep the callout before any DML, and put credentials in a named credential, never in code or settings.
+
+## Troubleshooting: every problem I hit and the fix
+
+"In the repo" means the fix is already in the scripts or code, so you'll only hit it if you change them.
+
+### Salesforce CLI and project
+
+| What happened | Why | Fix |
+| --- | --- | --- |
+| `AuthTimeoutError` on `sf org login web` | The CLI only waits a few minutes for you to click Allow | Approve straight away, in a browser window already logged in to the org |
+| Every retrieve failed with `UNSUPPORTED_API_VERSION: Unknown version:68.0` | `sourceApiVersion` was newer than the org | Set it to the org's API version (Phase 0.4). In the repo: 67.0 |
+| `Entity of type 'Flow' named 'VoiceRouting' cannot be found` | Built-in routing flows are listed but can't be retrieved, and neither can the managed voice routing templates | Build the routing flow in Flow Builder (Phase 4.2) |
+| A script log grew to 36 KB for one retrieve | Without a terminal, `sf project retrieve start` prints every frame of its progress display | Pass `--json`. In the repo |
+| `The output directory must be inside the current project` | Retrieves only write inside the SFDX project | Retrieve into `org-reference/`, which is gitignored |
+| `CannotFindBundle: Cannot find an authoring bundle in …/force-app` | `sf agent publish authoring-bundle` only looks in the default package directory, and has no flag to point elsewhere | Make `force-app-agent` the default package directory. The Apex deploy names `-d force-app` explicitly. In the repo |
+
+### The guest site
+
+| What happened | Why | Fix |
+| --- | --- | --- |
+| "Your Site is being created", then nothing | LWR sites reject `AuthenticationType=UNAUTHENTICATED`, and the error only appears on the background job | Use `AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED`, which still lets guests in. In the repo |
+| The script waited 10 minutes for a site that had already failed | Site creation is asynchronous | Check `SELECT Status, Error FROM BackgroundOperation WHERE Id = '<jobId>'`. In the repo |
+| `Installing plugin community…` | The first `sf community` command installs its plugin | Nothing to do |
+| The form opened without its token | Publish returns the site's `<prefix>vforcesite` address, and its redirect drops the query string | Links use `https://<host>/typeback/?t=<token>`. In the repo |
+| Activating would email every site member | Send welcome email is on by default | Turn it off first, then activate (Phase 2.4) |
+| A form change didn't show | The site serves its last publish | Run `scripts/setup.sh site` after every form deploy |
+| The form shows "Something went wrong" right away | The guest user can't run the controller | Add `TypebackFormController` to the guest profile's Apex class access (Phase 2.7) |
+
+### Apex and tests
+
+| What happened | Why | Fix |
+| --- | --- | --- |
+| `Method does not exist or incorrect signature: void matcher(String) from the type String` | Apex names are case-insensitive, so a `TOKEN` constant and a `token` parameter clashed with no duplicate error | Give constants distinct names (`TOKEN_PATTERN`). In the repo |
+| Deploy said success, with `Running Tests - Skipped` and 0 tests | The org accepted a `RunSpecifiedTests` deploy without running the tests | Run `sf apex run test … -c` after the deploy. In the repo (`setup.sh core`) |
+| `Operation failed due to fields being inaccessible on Sobject Typeback_Settings__c` in tests | Tests updated the record that `getOrgDefaults()` returns | Update a new record holding only the `Id` and the changed field. In the repo |
+| A test comparing expiry to `Datetime.now()` failed now and then | Saved datetimes lose their milliseconds | Allow a second either side. In the repo |
+| `node --check` fails on the LWC | It can't parse decorators such as `@api` | Expected. The org compiles the component on deploy |
+
+### The Agent Script agent
+
+| What happened | Why | Fix |
+| --- | --- | --- |
+| The agent paraphrased ("Would you like to continue?") instead of saying the Apex line | The agent user didn't have `Typeback_Agent` yet, so the actions were withheld with `NO_USER_ACCESS` (visible in the preview trace) | Assign it before the first preview. In the repo (`setup.sh agent`) |
+| An invented "3 PM" check-in, then a fallback to repeating the link line | The model makes up facts, and the grounding check catches it | Put the facts in the system instructions. In the repo |
+| A retry within the turn said an old line | `tb_line` was cleared in `after_reasoning`, so a retry saw it empty | Clear it at the start of the router. In the repo |
+| The agent answered a side question again on the next turn | "Answer their question first" also covered earlier messages | "If the caller's latest message also asks something…". In the repo |
+| "Never mind, skip it" got "No problem", but the link stayed open | The model agreed without calling the tool | "You MUST call skip_email". In the repo |
+| Agent user licenses ran short across rebuilds | Each new agent user takes one | Pin `AGENT_USER` in `.env.local`. The script reuses it |
+| The preview asked for a mobile number | A preview has no call, so there's no caller ID | Expected. On a real call it uses caller ID |
+
+Here's what I confirmed works in Agent Script on Summer '26, since the docs didn't say:
+
+- `start_agent` can have an `actions:` block.
+- Inside `instructions:->`, `run @actions.X with … set …` followed by a bare `transition to` works.
+- `available when` accepts `and`, `not` and `!=`.
+- `True` and `False` literals work in bindings, and boolean Apex outputs map to booleans.
+- The `VoiceCallId: linked string` variable with `source: @VoiceCall.Id` compiles, and it's filled in on a real phone call.
+- Preview with `--use-live-actions` runs the actions as the agent user.
+
+### Phone number, routing and calls
+
+| What happened | Why | Fix |
+| --- | --- | --- |
+| The first call didn't reach the agent | New voice channels are created inactive | Open the channel's own page and click **Activate**. The list has no toggle |
+| The flow's metadata says `Copilot`, with `botId` empty | That's how "Agentforce Service Agent" is saved | Expected. `copilotId` points at the agent's BotDefinition |
+| The call took a while to connect | It's carrier time, before the call reaches Salesforce | Nothing to fix. Salesforce accepted the call 4 to 5 seconds after it arrived |
+| No transcript on the call record (`ConversationEntry` empty) | Live calls don't save one there | Not solved. Agentforce session tracing could show the agent's side, but I didn't turn it on |
+| `scripts/link.sh` fails on Linux | It uses the macOS `date -j` | Change its `date` line to GNU `date -d` |
+
+## What's not done yet
+
+- **Caller ID withheld.** If the caller hides their number (`*67` in the US), the agent should ask for a mobile number. That works in preview but I haven't tried it on a live call.
+- **Edge cases on a live call:** saying "done" too early, a side question, resends up to the cap, and a long silence while typing. The first two pass in preview and the cap passes in the Apex tests. Silence hasn't been tried.
+- **A baseline:** timing the same request with the email spelled out, to compare against Typeback.
+- **The expiry test** on the form (Phase 2.7, last row).
+- **Automatic SMS:** see [texting the link by SMS](#what-about-texting-the-link-by-sms).
+- **A transcript of the agent's side** of a live call.
+
+If you rebuild Typeback in your own org and get further than I did (especially on SMS!), I'd love to hear about it :-)
