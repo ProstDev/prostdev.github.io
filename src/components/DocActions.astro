@@ -34,13 +34,18 @@ const { markdownUrl } = Astro.props;
     class="absolute right-0 top-full z-30 mt-1 hidden w-56 overflow-hidden rounded-lg border border-default bg-surface-card py-1 shadow-lg"
     role="menu"
   >
-    <a href={markdownUrl} target="_blank" rel="noopener" role="menuitem" class="flex items-center justify-between gap-2 px-4 py-2 text-sm text-default hover:bg-[color:var(--bg-subtle)]">
-      View as Markdown <Icon name="external" class="h-4 w-4 text-muted" />
-    </a>
-    <a href="/llms.txt" target="_blank" rel="noopener" role="menuitem" class="flex items-center justify-between gap-2 px-4 py-2 text-sm text-default hover:bg-[color:var(--bg-subtle)]">
-      View llms.txt <Icon name="external" class="h-4 w-4 text-muted" />
-    </a>
+    {[
+      { path: markdownUrl, label: 'Copy Markdown link' },
+      { path: '/llms.txt', label: 'Copy llms.txt link' },
+    ].map(({ path, label }) => (
+      <button type="button" data-copy-link={path} role="menuitem" class="flex w-full items-center justify-between gap-2 px-4 py-2 text-left text-sm text-default hover:bg-[color:var(--bg-subtle)]">
+        <span data-link-label>{label}</span>
+        <span data-link-idle><Icon name="link" class="h-4 w-4 text-muted" /></span>
+        <span data-link-done class="hidden text-green-500"><Icon name="check" class="h-4 w-4" /></span>
+      </button>
+    ))}
   </div>
+  <span data-live class="sr-only" role="status" aria-live="polite"></span>
 </div>
 
 <script>
@@ -52,6 +57,7 @@ const { markdownUrl } = Astro.props;
     const idle = root.querySelector<HTMLElement>('[data-copy-idle]')!;
     const done = root.querySelector<HTMLElement>('[data-copy-done]')!;
     const label = root.querySelector<HTMLElement>('[data-copy-label]')!;
+    const live = root.querySelector<HTMLElement>('[data-live]')!;
 
     const closeMenu = () => {
       menu.classList.add('hidden');
@@ -72,6 +78,7 @@ const { markdownUrl } = Astro.props;
         idle.classList.add('hidden');
         done.classList.remove('hidden');
         label.textContent = 'Copied!';
+        live.textContent = 'Copied';
         setTimeout(() => {
           idle.classList.remove('hidden');
           done.classList.add('hidden');
@@ -81,6 +88,37 @@ const { markdownUrl } = Astro.props;
         // Fallback: open the raw markdown in a new tab.
         window.open(url, '_blank');
       }
+    });
+
+    // Menu items copy an ABSOLUTE URL (paste-ready for an agent like Claude Code),
+    // not the page content — swap the item's icon/label to "Copied!" briefly, then close.
+    root.querySelectorAll<HTMLButtonElement>('[data-copy-link]').forEach((item) => {
+      const itemLabel = item.querySelector<HTMLElement>('[data-link-label]')!;
+      const itemIdle = item.querySelector<HTMLElement>('[data-link-idle]')!;
+      const itemDone = item.querySelector<HTMLElement>('[data-link-done]')!;
+      const original = itemLabel.textContent ?? '';
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const link = new URL(item.dataset.copyLink!, window.location.origin).href;
+        try {
+          await navigator.clipboard.writeText(link);
+        } catch {
+          // Fallback: clipboard blocked — open the link so it can be copied from the address bar.
+          window.open(link, '_blank');
+          return;
+        }
+        itemIdle.classList.add('hidden');
+        itemDone.classList.remove('hidden');
+        itemLabel.textContent = 'Copied!';
+        live.textContent = 'Link copied';
+        setTimeout(() => {
+          itemIdle.classList.remove('hidden');
+          itemDone.classList.add('hidden');
+          itemLabel.textContent = original;
+          live.textContent = '';
+          closeMenu();
+        }, 1200);
+      });
     });
 
     document.addEventListener('click', (e) => {

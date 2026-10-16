@@ -23,6 +23,7 @@ export type IconName =
   | 'copy'
   | 'check'
   | 'external'
+  | 'link'
   | 'markdown'
   | 'mail'
   | 'menu'

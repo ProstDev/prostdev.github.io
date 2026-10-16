@@ -116,7 +116,7 @@ import Icon from './Icon.astro';
     body.appendChild(pre);
 
     // ── copy behavior (mirror DocActions.astro) ──
-    // Screen-reader announcement region (DocActions only swaps a visible label).
+    // Screen-reader announcement region (same pattern as DocActions).
     const live = document.createElement('span');
     live.className = 'sr-only';
     live.setAttribute('role', 'status');
