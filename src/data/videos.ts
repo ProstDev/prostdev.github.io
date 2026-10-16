@@ -68,6 +68,18 @@ export interface Video {
 
 export const PLAYLISTS: Playlist[] = [
   {
+    // Lower-priority ('more' tier): the channel's first Agentforce / Agent Script topic (Oct 2026) —
+    // broad on purpose (follow-ups not certain), so it stays off the homepage + nav until it proves itself.
+    id: 'agentforce-agent-script',
+    slug: 'agentforce-agent-script',
+    title: 'Agentforce & Agent Script',
+    years: '2026',
+    description:
+      'Hands-on Agentforce tutorials built with Agent Script — configure an agent block by block, test it in Agentforce Builder, and add features like Agentforce Voice so it can hold a spoken conversation.',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PLP26z51QLOCQ',
+    tier: 'more',
+  },
+  {
     // Lower-priority ('more' tier): the channel's first non-MuleSoft topic (Oct 2026) —
     // a test series, so it stays off the homepage + nav until it proves itself.
     id: 'online-security-tips',
@@ -100,6 +112,8 @@ export const PLAYLISTS: Playlist[] = [
       'https://www.youtube.com/playlist?list=PLb61lESgk6hh9SszYvsAnLYiV9-WCpqPP',
   },
   {
+    // Lower-priority ('more' tier): kept off the homepage, surfaced on /videos.
+    // Still renders as the secondary block on /mulesoft-ai (SECTIONS, sections.ts).
     id: 'mulesoft-ai-2025',
     slug: 'adventures-mulesoft-ai',
     title: 'Adventures in MuleSoft + AI (2025)',
@@ -108,6 +122,7 @@ export const PLAYLISTS: Playlist[] = [
       'Exploring what happens when you mix APIs, integrations, and AI tooling. Real experiments with Cursor, CurieTech AI, and MuleSoft.',
     playlistUrl:
       'https://www.youtube.com/playlist?list=PLb61lESgk6hhX9c0mNlV68IONicyEh4fo',
+    tier: 'more',
   },
   {
     // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
@@ -138,9 +153,8 @@ export const PLAYLISTS: Playlist[] = [
     tier: 'more',
   },
   {
-    // Lower-priority ('more' tier): kept off the homepage + nav, surfaced on /videos.
-    // Has a /cicd-github-actions section page (in SECTIONS, sections.ts) so its videos'
-    // breadcrumbs resolve — reachable but NOT in the nav.
+    // Primary tier (on the homepage), but NOT in the nav. Has a /cicd-github-actions
+    // section page (in SECTIONS, sections.ts) so its videos' breadcrumbs resolve.
     id: 'cicd-github-actions',
     slug: 'cicd-github-actions',
     title: 'MuleSoft CI/CD with GitHub Actions',
@@ -149,7 +163,6 @@ export const PLAYLISTS: Playlist[] = [
       'Build a complete CI/CD pipeline to deploy your MuleSoft apps with GitHub Actions — from a basic CloudHub deploy to encrypted properties, MUnit testing with coverage gates, Connected App authentication for MFA, and deploying to CloudHub 2.0.',
     playlistUrl:
       'https://www.youtube.com/playlist?list=PLb61lESgk6hgKOR7uvNsfXOZrXyFVQUHt',
-    tier: 'more',
   },
   {
     id: 'mulesoft-from-start',
@@ -1422,6 +1435,34 @@ export const VIDEOS: Video[] = [
       { label: 'IdentityTheft.gov', url: 'https://www.identitytheft.gov/' },
     ],
   },
+  {
+    youtubeId: 'Wqe2als7sPY',
+    slug: 'turn-agentforce-agent-into-voice-agent-agent-script',
+    title: 'Turn Any Agentforce Agent into a Voice Agent (Agent Script)',
+    description:
+      'Turn a text Agentforce agent built in Agent Script into a voice agent on Agentforce Voice — add the language, connection telephony, and modality voice blocks, pick a voice in Agentforce Builder, rewrite the instructions for a listener, and repair mis-transcribed tech terms (when "async" comes through as "a sink").',
+    playlists: ['agentforce-agent-script'],
+    duration: '6:00',
+    publishedAt: '2026-10-20T13:05:00Z', // 9:00am Toronto (EDT, UTC−4) + 5 min — reveals after the YouTube drop
+    links: [
+      {
+        label: 'Blog post — Agentforce Voice for Agent Script: Voice-Enabling Best Practices',
+        url: 'https://developer.salesforce.com/blogs/2026/10/agentforce-voice-for-agent-script-voice-enabling-best-practices',
+      },
+      {
+        label: 'Agent Script docs — Configure Voice Models (new syntax)',
+        url: 'https://developer.salesforce.com/docs/ai/agentforce/guide/ascript-voice.html',
+      },
+      {
+        label: 'Agent Script docs — Voice Catalog (persona IDs per model)',
+        url: 'https://developer.salesforce.com/docs/ai/agentforce/guide/ascript-voice-catalog.html',
+      },
+      {
+        label: 'GitHub repo — Agent Script recipes',
+        url: 'https://github.com/trailheadapps/agent-script-recipes',
+      },
+    ],
+  },
 ];
 
 /**
@@ -1434,6 +1475,7 @@ export const VIDEOS: Video[] = [
  * instead. When you publish a video, add its slug to the TOP of this list.
  */
 export const LATEST_SLUGS: string[] = [
+  'turn-agentforce-agent-into-voice-agent-agent-script', // Agent Script voice agent (Agentforce & Agent Script, 'more' tier — new upload, so it's in Latest)
   'check-if-your-email-was-leaked-have-i-been-pwned', // Have I Been Pwned (Online Security Tips, 'more' tier — force-added at Alex's request)
   'enable-mulesoft-vibes-in-vs-code', // MuleSoft Vibes in VS Code setup guide (standalone)
   'ai-showdown-api-led-claude-curietech-vibes', // API-led architecture (AI Showdown, Round 2)

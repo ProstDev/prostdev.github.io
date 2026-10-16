@@ -149,6 +149,16 @@ export const SECTIONS: Section[] = [
       },
     ],
   },
+  {
+    slug: 'agentforce-agent-script',
+    seoTitle: 'Agentforce & Agent Script Tutorials: Build, Test & Voice-Enable Agents',
+    blocks: [
+      {
+        playlistId: 'agentforce-agent-script',
+        hook: 'Give your Agentforce agent new skills, one block at a time.',
+      },
+    ],
+  },
 ];
 
 /** A block with its playlist + videos resolved. `videos` respects the scheduling gate. */

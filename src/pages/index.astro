@@ -80,45 +80,45 @@ const latestPosts = (await getPosts()).slice(0, 3);
   <!-- Built for humans & AI -->
   <AiFriendly />
 
-  <!-- Playlists -->
-  <section class="bg-band-wash">
-    <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <div class="mb-4 flex items-end justify-between gap-4">
-        <div>
-          <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">▶️ More playlists</h2>
-          <p class="text-muted">Jump into a featured series.</p>
-        </div>
-        <a href="/videos" class="shrink-0 text-sm font-medium text-accent hover:underline">
-          Browse all videos →
-        </a>
-      </div>
-      {playlists.map((p) => (
-        <PlaylistRow
-          playlist={p}
-          videos={videosInPlaylist(p.id)}
-          headingHref={sectionHref(p)}
-        />
-      ))}
-    </div>
-  </section>
-
   <!-- Latest from the blog -->
   {latestPosts.length > 0 && (
-    <section class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <div class="mb-6 flex items-end justify-between gap-4">
-        <div>
-          <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">✍️ Latest from the blog</h2>
-          <p class="text-muted">SEO- and AI-friendly deep dives that pair with the videos.</p>
+    <section class="bg-band-wash">
+      <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+        <div class="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">✍️ Latest from the blog</h2>
+            <p class="text-muted">SEO- and AI-friendly deep dives that pair with the videos.</p>
+          </div>
+          <a href="/blog" class="shrink-0 text-sm font-medium text-accent hover:underline">
+            Read the blog →
+          </a>
         </div>
-        <a href="/blog" class="shrink-0 text-sm font-medium text-accent hover:underline">
-          Read the blog →
-        </a>
-      </div>
-      <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-        {latestPosts.map((post) => <PostCard post={post} />)}
+        <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+          {latestPosts.map((post) => <PostCard post={post} />)}
+        </div>
       </div>
     </section>
   )}
+
+  <!-- Playlists -->
+  <section class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+    <div class="mb-4 flex items-end justify-between gap-4">
+      <div>
+        <h2 class="mb-2 flex items-center gap-2 text-2xl font-bold">▶️ More playlists</h2>
+        <p class="text-muted">Jump into a featured series.</p>
+      </div>
+      <a href="/videos" class="shrink-0 text-sm font-medium text-accent hover:underline">
+        Browse all videos →
+      </a>
+    </div>
+    {playlists.map((p) => (
+      <PlaylistRow
+        playlist={p}
+        videos={videosInPlaylist(p.id)}
+        headingHref={sectionHref(p)}
+      />
+    ))}
+  </section>
 </BaseLayout>
 
 <style>
